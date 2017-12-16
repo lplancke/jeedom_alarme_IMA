@@ -1,0 +1,31 @@
+<div style="min-width:120px; min-height:80px;" class="cmd tooltips cmd-widget cursor container-fluid" data-type="info" data-subtype="numeric" data-cmd_id="#id#" data-cmd_uid="#uid#">
+	<center>
+		<div style="font-weight: bold;font-size : 12px;#hideCmdName#">#name_display#</div>
+		<span style="font-size: 2.5em;" class="iconCmd"></span>
+		<div style="display:inline-block;">
+			<span style="font-weight: bold;" class="pull-right">#unite#</span>
+			<span style="font-size: 2em;font-weight: bold;" class="pull-right state"></span>
+		</div>
+		<div style="#displayHistory# font-size: 0.8em;" class="col-xs-12 center-block">
+			<span title="Min" class="tooltips">#minHistoryValue#</span>|<span title="Moyenne" class="tooltips" >#averageHistoryValue#</span> | <span title="Max" class="tooltips">#maxHistoryValue#</span> <i class="#tendance#"></i>
+		</div>
+	</center>
+<!-- Ne Pas Supprimer -->
+	<script class="createWidgetInfo" type="text/javascript">//<![CDATA[{"type":"0","version":"1","min":["0"],"max":["2"],"icons":["<i class=\"icon fashion-black177\"></i>"]}]]></script>
+<!-- Ne Pas Supprimer -->
+	<script>
+	var iconUpdate = function (state){
+		$('.cmd[data-cmd_uid=#uid#] .iconCmd').empty();
+		if (state >= 0 && state <= 2) {
+			$('.cmd[data-cmd_uid=#uid#] .iconCmd').append('<i class="icon fashion-black177"></i>');
+		}
+		$('.cmd[data-cmd_uid=#uid#] .state').text(state);
+	};
+	jeedom.cmd.update['#id#'] = function(_options){
+		$('.cmd[data-cmd_uid=#uid#]').attr('title','Valeur du '+_options.valueDate+', collectée le '+_options.collectDate)
+		iconUpdate(_options.display_value);
+	}
+	jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+	</script>
+</div>
+
