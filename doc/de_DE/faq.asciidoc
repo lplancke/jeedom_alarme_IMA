@@ -1,24 +1,24 @@
-.Que deviennent mes identifiants saisis ?
+.Was wird mit meinen eingegebenen IDs?
 --
-Ils sont simplement stockés sur votre Jeedom pour pouvoir récupérer le statut de l'alarme.
---
-
-.Pourquoi le statut de mon alarme met-il du temps à se mettre à jour ?
---
-Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut donc attendre jusqu'à une minute pour voir le statut changer.
+Sie werden einfach auf Ihrem Jeedom gespeichert, um den Status des Alarms wiederherstellen zu können.
 --
 
-.Le statut de l'alarme peut-il être historisé ?
+Warum braucht der tustand meines Alarms Zeit zum Aktualisieren?
 --
-Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
-
-* la valeur 0 signifie que l'alarme était éteinte,
-* la valeur 2 signifie qu'elle était allumée,
-* la valeur 1 que l'alarme couvrait une partie de votre domicile.
-
+Der Zustand des Alarms wird jede Minute von Jeedom aktualisiert. Sie müssen bis zu einer Minute warten, um den Zustandswechsel zu sehen.
 --
 
-.Comment supprimer l'historisation de l'alarme ?
+.Kann der Alarmzustand archiviert werden?
 --
-Depuis l'écran de configuration de votre alarme, cliquez sur Commandes, et décochez la case "Historiser".
+Standardmäßig wird der Zustand Ihres Alarms protokolliert. Sie können den Verlauf einsehen, indem Sie im Widget Ihres Alarms auf dem Jeedom Armaturenbrett  auf "AlarmZustand' klicken:
+
+* der Wert 0 bedeutet, dass der Alarm ausgeschaltet war,
+* der Wert 2 bedeutet, dass er an war,
+*der Wert 1, dass der Alarm einen Teil Ihrer Wohnung bedeckte
+
+--
+
+.Wie lösche ich die Protokollierung des Alarms?
+--
+Klicken Sie in Ihrem Alarm Konfigurationsbildschirm auf Befehle, und deaktivieren Sie das Kontrollkästchen "archivieren".
 --

@@ -1,57 +1,57 @@
-= Aide du plugin "Alarme IMA téléassistance"
+= Hilfe für das Plugin "IMA Alarm Fernüberwachung"
 
-== Description
-Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
+== Beschreibung
+Dieses Plugin dient zur Anzeige des Zustandes Ihrer IMA Alarm Fernüberwachung (wird insbesondere vom MACIF vermarktet).
 
 
-== Prérequis
-Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
-Ceci peut se faire gratuitement en appelant IMA téléassistance.
-Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .
+== Voraussetzung
+Sie müssen zuerst die Option "Fernsteuerung" Ihres Alarms aktivieren.
+Dies kann kostenlos bei IMA Fernüberwachung durchgeführt werden.
+Sie erhalten dann ein Login/Passwort um auf die Seite zuzugreifen : https://pilotageadistance.imateleassistance.com .
 
  
-== Création de l'alarme
-Une fois le plugin installé:
+== Alarm erstellen
+Sobald das Plugin installiert ist:
 
-- cliquez sur Plugins > Sécurité > Alarme IMA
-- puis cliquez sur l'icône "+"
-- dans la fenêtre qui s'ouvre, choisissez un nom d'équipement, par exemple: "Mon alarme".
-- vous arrivez alors à la page de configuration de votre alarme:
+- klicken Sie auf Plugins > Sicherheit > IMA Alarm
+- klicken Sie dann auf das Symbol '"+"
+- in dem sich öffnenden Fenster wählen Sie einen Gerätenamen, zum Beispiel: "Mein Alarm".
+- Sie gelangen auf die Konfigurationsseite Ihres Alarms:
 
 [.text-center]
-image::doc.png[Configuration]
+image::doc.png[Konfiguration]
 
 [NOTE]
 ===
-Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis).
-Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme. 
+Mit dem hier zu konfigurierenden Login/Passwort können Sie auf https://pilotageadistance.imateleassistance.com zugreifen (siehe Abschnitt Voraussetzungen).
+Diese IDs sind nur auf Ihrem Jeedom gespeichert und werden verwendet, um den Zustand des Alarms abzurufen. 
 ===
 
-- enfin, cliquez sur Sauvegarder.
+- klicken Sie abschließend auf Speichern.
 
 [IMPORTANT]
 ====
-Pensez à
+Denken Sie daran
 
-* choisir un objet parent,
-* cliquer sur activer,
-* cliquer sur visible.
+*  ein Elternobjekt zu wählen,
+*  auf aktivieren zu klicken,
+* auf sichtbar zu klicken.
 
-Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
+Ohne diese 3 Bedingungen sehen Sie Ihren Alarm nicht auf dem Jeedom-Armaturenbrett.
 ====
 
 
-== Voir le statut de l'alarme
-Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
+== Den Zustand des Alarms ansehen
+Klicken Sie nun auf Start > Armaturenbrett : Ein neues Widget wird angezeigt, das den aktuellen Zustand des Alarms anzeigt.
 
 [.text-center]
 image::widget.png[Widget]
 
-3 statuts sont possibles:
+3 zustände sind möglich:
 
-- ON (l'alarme est en marche), 
-- OFF (l'alarme est éteinte), 
-- PARTIAL (l'alarme est active sur une partie de votre domicile uniquement).
+- AN (der Alarm ist eingeschaltet), 
+- AUS (der Alarm ist ausgeschalten), 
+- PARTIELL (der Alarm ist nur bei einem Teil Ihres Hauses aktiv).
 
 
 == FAQ
