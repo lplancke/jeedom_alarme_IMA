@@ -1,0 +1,29 @@
+---
+langs: [fr_FR] 
+baseurl: "/"
+sass:
+  sass_dir: assets/css
+  style: compressed
+markdown: kramdown
+permalink: /404.html
+kramdown:
+  input: GFM
+  hard_wrap: false
+highlighter: rouge
+gems:
+- jekyll-paginate
+- jekyll-seo-tag
+exclude:
+- vendor
+plugins:
+- jekyll-seo-tag
+title: "Documentation du plugin Jeedom alarme IMA teleassistance"
+description: "Documentation du plugin Jeedom alarme IMA teleassistance"
+author: "Louis Plancke"
+image: https://www.jeedom.com/market/filestore/market/plugin/images/alarme_IMA_icon.png
+twitter:
+  username: 
+social:
+  name: Jeedom
+  links:
+    - https://www.linkedin.com/in/louis-plancke-7717113/
