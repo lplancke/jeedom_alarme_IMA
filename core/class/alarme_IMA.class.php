@@ -22,7 +22,10 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alarme_IMA extends eqLogic {
     /*     * *************************Attributs****************************** */
-
+	const IMA_ON=2;
+	const IMA_PARTIAL=1;
+	const IMA_OFF=0;
+	const IMA_UNKNOWN=-1;
 
     /*     * ***********************Methode static*************************** */
 	private static function getIma($url, $cookie)
@@ -55,103 +58,114 @@ class alarme_IMA extends eqLogic {
 		return array($httpcode, $result);
 		
 	}
+	
+	private function getNumericStatus()
+	{
+		$tmpFile=sys_get_temp_dir()."/alarme_IMA_session_".$this->getId();
+		log::add('alarme_IMA', 'debug', "Fichier temporaire: $tmpFile");
+		
+		if (is_file($tmpFile)) {
+			$fd=fopen($tmpFile, "r");
+			$sessionId=trim(fgets($fd, 4096));
+			$pk=trim(fgets($fd, 4096));
+			fclose($fd);
+		}
+		log::add('alarme_IMA', 'debug', "sessionId: $sessionId, pk: $pk");
+		$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
+		list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
+		
+		log::add('alarme_IMA', 'debug', "Status de retour status sur première tentative: $httpcode");
+		if ($httpcode!=200)
+		{
+			if ($httpcode>=500) return self::IMA_UNKNOWN;
+			
+			$login_ima=$this->getConfiguration('login_ima');
+			$password_ima=$this->getConfiguration('password_ima');
+			log::add('alarme_IMA', 'debug', "Login: $login_ima");
+			//log::add('alarme_IMA', 'debug', "Password: $password_ima");
+
+			$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/keychain/web-login/";
+			list($httpcode, $result)=self::postIma($url, "username=".urlencode($login_ima)."&password=".urlencode($password_ima));
+			if ($httpcode!=200)
+			{
+				log::add('alarme_IMA', 'error', "Vérifiez vos identifiants ($httpcode). Ceux-ci doivent permettre de s'authentifier sur le site https://pilotageadistance.imateleassistance.com.");
+				return self::IMA_UNKNOWN;
+			}
+
+			preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches);
+			$cookies = array();
+			foreach($matches[1] as $item) {
+				parse_str($item, $cookie);
+				$cookies = array_merge($cookies, $cookie);
+			}
+			$sessionId=$cookies["sessionid"];
+			log::add('alarme_IMA', 'debug', 'Login ok, sessionId: '.$sessionId);
+			curl_close($ch); 
+
+
+			$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/me/?_=".time()."000";
+			list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
+			if ($httpcode!=200)
+			{
+				log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape me)");
+				return self::IMA_UNKNOWN;
+			}
+
+			$resultArr=json_decode($result,true);
+			$pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["pk"];
+			if (!$pk) {
+				log::add('alarme_IMA', 'error', "Impossible de trouver la clef pk");
+				return self::IMA_UNKNOWN;
+			}
+			curl_close($ch); 
+
+			$fd=fopen($tmpFile, "w");
+			fputs($fd, $sessionId."\n");
+			fputs($fd, $pk."\n");
+			fclose($fd);
+
+			$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
+			list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
+
+			if ($httpcode!=200)
+			{
+				log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape status): $httpcode");
+				return self::IMA_UNKNOWN;
+			}
+
+		}
+		$resultArr=json_decode($result,true);
+		$newStatus=$resultArr[0]["fields"]["status"];
+		if (!$newStatus) {
+			log::add('alarme_IMA', 'error', "Impossible de trouver le status");
+			return self::IMA_UNKNOWN;
+		}
+		log::add('alarme_IMA', 'debug', "Nouveau status alarme: $newStatus");
+		
+		$convStatusToNumeric=array(
+			"on" => "2",
+			"partial" => "1",
+			"off"=> "0"
+			);
+		$numericStatus=$convStatusToNumeric[$newStatus];
+		return $numericStatus;
+	}
+	
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom    */
-      public static function cron() {
+	public static function cron() {
 		log::add('alarme_IMA', 'debug', 'Démarrage du cron minute');
 		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
 
-			$tmpFile=sys_get_temp_dir()."/alarme_IMA_session_".$alarme_IMA->getId();
-			log::add('alarme_IMA', 'debug', "Fichier temporaire: $tmpFile");
-			
-			if (is_file($tmpFile)) {
-				$fd=fopen($tmpFile, "r");
-				$sessionId=trim(fgets($fd, 4096));
-				$pk=trim(fgets($fd, 4096));
-				fclose($fd);
-			}
-			log::add('alarme_IMA', 'debug', "sessionId: $sessionId, pk: $pk");
-			$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
-			list($httpcode, $result)=alarme_IMA::getIma($url, "sessionid=".$sessionId);
-			
-			log::add('alarme_IMA', 'debug', "Status de retour status sur première tentative: $httpcode");
-			if ($httpcode!=200)
-			{
-				$login_ima=$alarme_IMA->getConfiguration('login_ima');
-				$password_ima=$alarme_IMA->getConfiguration('password_ima');
-				log::add('alarme_IMA', 'debug', "Login: $login_ima");
-				//log::add('alarme_IMA', 'debug', "Password: $password_ima");
-
-				$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/keychain/web-login/";
-				list($httpcode, $result)=alarme_IMA::postIma($url, "username=".urlencode($login_ima)."&password=".urlencode($password_ima));
-				if ($httpcode!=200)
-				{
-					log::add('alarme_IMA', 'error', "Vérifiez vos identifiants ($httpcode). Ceux-ci doivent permettre de s'authentifier sur le site https://pilotageadistance.imateleassistance.com.");
-					return;
-				}
-				preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $result, $matches);
-				$cookies = array();
-				foreach($matches[1] as $item) {
-					parse_str($item, $cookie);
-					$cookies = array_merge($cookies, $cookie);
-				}
-				$sessionId=$cookies["sessionid"];
-				log::add('alarme_IMA', 'debug', 'Login ok, sessionId: '.$sessionId);
-				curl_close($ch); 
+			log::add('alarme_IMA', 'debug', 'Ici !');
+			$numericStatus=$alarme_IMA->getNumericStatus();
 
 
-				$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/me/?_=".time()."000";
-				list($httpcode, $result)=alarme_IMA::getIma($url, "sessionid=".$sessionId);
-				if ($httpcode!=200)
-				{
-					log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape me)");
-					return;
-				}
-
-				$resultArr=json_decode($result,true);
-				$pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["pk"];
-				if (!$pk) {
-					log::add('alarme_IMA', 'error', "Impossible de trouver la clef pk");
-					return;
-				}
-				curl_close($ch); 
-
-				$fd=fopen($tmpFile, "w");
-				fputs($fd, $sessionId."\n");
-				fputs($fd, $pk."\n");
-				fclose($fd);
-
-				$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
-				list($httpcode, $result)=alarme_IMA::getIma($url, "sessionid=".$sessionId);
-
-				if ($httpcode!=200)
-				{
-					log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape status): $httpcode");
-					return;
-				}
-
-			}
-
-
-			$resultArr=json_decode($result,true);
-			$newStatus=$resultArr[0]["fields"]["status"];
-			if (!$newStatus) {
-				log::add('alarme_IMA', 'error', "Impossible de trouver le status");
-				return;				
-			}
-			log::add('alarme_IMA', 'debug', "Nouveau status alarme: $newStatus");
-			
-			$convStatusToNumeric=array(
-				"on" => "2",
-				"partial" => "1",
-				"off"=> "0"
-				);
-			$numericStatus=$convStatusToNumeric[$newStatus];
 			log::add('alarme_IMA', 'debug', "Nouveau status numerique alarme: $numericStatus");
-		//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
-		//	$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
-			$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
-			$cmd->event($numericStatus);
+			//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
+			$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
+			//	$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
+			//	$cmd->event($numericStatus);
 		}
 	}
  
@@ -219,8 +233,9 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setTemplate('mobile', 'line');
 //			$alarme_IMACmd->setUnite('L');
 			$alarme_IMACmd->setIsHistorized(1);
-			$alarme_IMACmd->setConfiguration("MaxValue", 2);
-			$alarme_IMACmd->setConfiguration("MinValue", 0);
+			$alarme_IMACmd->setDisplay('graphStep', '1');
+			$alarme_IMACmd->setConfiguration("MaxValue", self::IMA_ON);
+			$alarme_IMACmd->setConfiguration("MinValue", self::IMA_UNKNOWN);
 			$alarme_IMACmd->save();
         }
     }
@@ -274,9 +289,10 @@ class alarme_IMACmd extends cmd {
 	 public function formatValueWidget($v)
 	 {
 		$arr=array(
-					'<div style="margin:10px;background:#d9534f">OFF</div>', 
-					'<div style="margin:10px;background:#f0ad4e">PARTIAL</div>', 
-					'<div style="margin:10px;background:#5cb85c">ON</div>'
+					0=>'<div style="margin:10px;background:#d9534f">OFF</div>', 
+					1=>'<div style="margin:10px;background:#f0ad4e">PARTIAL</div>', 
+					2=>'<div style="margin:10px;background:#5cb85c">ON</div>',
+					-1=>'<div style="margin:10px;background:#333333">UNKNOWN</div>'
 				);
 		return $arr[$v];
 	 }
