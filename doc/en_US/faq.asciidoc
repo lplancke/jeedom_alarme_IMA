@@ -1,24 +1,24 @@
-.Que deviennent mes identifiants saisis ?
+.What happens to my credentials ?
 --
-Ils sont simplement stockés sur votre Jeedom pour pouvoir récupérer le statut de l'alarme.
---
-
-.Pourquoi le statut de mon alarme met-il du temps à se mettre à jour ?
---
-Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut donc attendre jusqu'à une minute pour voir le statut changer.
+They are just stored on your Jeedom in order to obtain the alarm state.
 --
 
-.Le statut de l'alarme peut-il être historisé ?
+.Why does the state of my alarm is taking time to be updated ?
 --
-Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
-
-* la valeur 0 signifie que l'alarme était éteinte,
-* la valeur 2 signifie qu'elle était allumée,
-* la valeur 1 que l'alarme couvrait une partie de votre domicile.
-
+Jeedom updates alarm state every minutes. You have to wait until one minute to see the changes.
 --
 
-.Comment supprimer l'historisation de l'alarme ?
+.Does the state of the alarm can be historized ?
 --
-Depuis l'écran de configuration de votre alarme, cliquez sur Commandes, et décochez la case "Historiser".
+This is the defaut behaviour. You can consult the history by clicking on "Alarme State" on the alarm widget in your Jeedom dashboard.
+
+* Value 0 means alarms was turned off,
+* Value 2 means alarms was turned on,
+* Value 1 means alarms was taking care of a part of your home.
+
+--
+
+.How to remove alarme history ?
+--
+From the alarm configuration screen, click on Commands, and untick the "Historize" box.
 --
