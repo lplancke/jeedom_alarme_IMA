@@ -1,0 +1,72 @@
+<h1>Aide du plugin "Alarme IMA téléassistance"</h1>
+
+<h2>Description</h2>
+
+<p>Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).</p>
+
+<h2>Prérequis</h2>
+
+<p>Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
+Ceci peut se faire gratuitement en appelant IMA téléassistance.
+Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .</p>
+
+<h2>Création de l'alarme</h2>
+
+<p>Une fois le plugin installé:</p>
+
+<ul>
+<li>cliquez sur Plugins > Sécurité > Alarme IMA</li>
+<li>puis cliquez sur l'icône "+"</li>
+<li>dans la fenêtre qui s'ouvre, choisissez un nom d'équipement, par exemple: "Mon alarme".</li>
+<li>vous arrivez alors à la page de configuration de votre alarme:</li>
+</ul>
+
+<p><img src="doc.png" alt="alt text" title="page de configuration du plugin" /></p>
+
+<p style='border:1px solid black'> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme. </p>
+
+<ul>
+<li>enfin, cliquez sur Sauvegarder.</li>
+</ul>
+
+<h2>Important</h2>
+
+<p>Pensez à
+- choisir un objet parent,
+- cliquer sur activer,
+- cliquer sur visible.
+Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.</p>
+
+<h2>Voir le statut de l'alarme</h2>
+
+<p>Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.</p>
+
+<p><img src="widget.png" alt="alt text" title="widget alarme IMA" /></p>
+
+<p>3 statuts sont possibles:
+- ON (l'alarme est en marche), 
+- OFF (l'alarme est éteinte), 
+- PARTIAL (l'alarme est active sur une partie de votre domicile uniquement).
+- UNKNOWN (une erreur technique sur le site pilotageadistance.imateleassistance.com a empêché de récupérer le status de l'alarme)</p>
+
+<h2>FAQ</h2>
+
+<h3>Que deviennent mes identifiants saisis ?</h3>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Ils sont simplement stockés sur votre Jeedom pour pouvoir récupérer le statut de l'alarme.</p>
+
+<h3>Pourquoi le statut de mon alarme met-il du temps à se mettre à jour ?</h3>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut donc attendre jusqu'à une minute pour voir le statut changer.</p>
+
+<h3>Le statut de l'alarme peut-il être historisé ?</h3>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
+  * la valeur 0 signifie que l'alarme était éteinte,
+  * la valeur 2 signifie qu'elle était allumée,
+  * la valeur 1 que l'alarme couvrait une partie de votre domicile.
+  * la valeur -1 signifie qu'il y a eu une erreur technique sur le site pilotageadistance.imateleassistance.com au moment de la récupération du statut.</p>
+
+<h3>Comment supprimer l'historisation de l'alarme ?</h3>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Depuis l'écran de configuration de votre alarme, cliquez sur Commandes, et décochez la case "Historiser".</p>
