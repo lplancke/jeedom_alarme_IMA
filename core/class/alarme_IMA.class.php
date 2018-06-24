@@ -26,6 +26,7 @@ class alarme_IMA extends eqLogic {
 	const IMA_PARTIAL=1;
 	const IMA_OFF=0;
 	const IMA_UNKNOWN=-1;
+	const IMA_IGNORED=-2;
 
     /*     * ***********************Methode static*************************** */
 	private static function getIma($url, $cookie)
@@ -77,8 +78,6 @@ class alarme_IMA extends eqLogic {
 		log::add('alarme_IMA', 'debug', "Status de retour status sur première tentative: $httpcode");
 		if ($httpcode!=200)
 		{
-			if ($httpcode>=500) return self::IMA_UNKNOWN;
-			
 			$login_ima=$this->getConfiguration('login_ima');
 			$password_ima=$this->getConfiguration('password_ima');
 			log::add('alarme_IMA', 'debug', "Login: $login_ima");
@@ -88,6 +87,7 @@ class alarme_IMA extends eqLogic {
 			list($httpcode, $result)=self::postIma($url, "username=".urlencode($login_ima)."&password=".urlencode($password_ima));
 			if ($httpcode!=200)
 			{
+				if ($httpcode==404) return self::IMA_IGNORED; // j'ai un 404 précisément toutes les 7 minutes, un bug de fonctionnement du site probablement...
 				log::add('alarme_IMA', 'error', "Vérifiez vos identifiants ($httpcode). Ceux-ci doivent permettre de s'authentifier sur le site https://pilotageadistance.imateleassistance.com.");
 				return self::IMA_UNKNOWN;
 			}
@@ -107,6 +107,7 @@ class alarme_IMA extends eqLogic {
 			list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
 			if ($httpcode!=200)
 			{
+				if ($httpcode==404) return self::IMA_IGNORED; // j'ai un 404 précisément toutes les 7 minutes, un bug de fonctionnement du site probablement...
 				log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape me)");
 				return self::IMA_UNKNOWN;
 			}
@@ -129,6 +130,7 @@ class alarme_IMA extends eqLogic {
 
 			if ($httpcode!=200)
 			{
+				if ($httpcode==404) return self::IMA_IGNORED; // j'ai un 404 précisément toutes les 7 minutes, un bug de fonctionnement du site probablement...
 				log::add('alarme_IMA', 'error', "Erreur d'appel au site pilotageadistance (étape status): $httpcode");
 				return self::IMA_UNKNOWN;
 			}
@@ -148,8 +150,10 @@ class alarme_IMA extends eqLogic {
 			"off"=> "0"
 			);
 		$numericStatus=$convStatusToNumeric[$newStatus];
+		log::add('alarme_IMA', 'debug', "Nouveau status numerique alarme: $numericStatus");
 		return $numericStatus;
 	}
+
 	
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom    */
@@ -157,15 +161,20 @@ class alarme_IMA extends eqLogic {
 		log::add('alarme_IMA', 'debug', 'Démarrage du cron minute');
 		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
 
-			log::add('alarme_IMA', 'debug', 'Ici !');
 			$numericStatus=$alarme_IMA->getNumericStatus();
 
-
 			log::add('alarme_IMA', 'debug', "Nouveau status numerique alarme: $numericStatus");
-			//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
-			$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
-			//	$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
-			//	$cmd->event($numericStatus);
+			if ($numericStatus!=self::IMA_IGNORED)
+			{
+				//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
+				$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
+				//	$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
+				//	$cmd->event($numericStatus);
+			}
+			else
+			{
+				log::add('alarme_IMA', 'debug', "Retour ignoré");
+			}
 		}
 	}
  

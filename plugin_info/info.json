@@ -2,7 +2,6 @@
 	"id" : "alarme_IMA",
 	"name" : "Alarme IMA",
 	"description" : "Gestion de l'alarme IMA téléassistance",
-	"documentation": "http://htmlpreview.github.io/?https://github.com/lplancke/jeedom_alarme_IMA/blob/master/doc/fr_FR/index.html",
 	"licence" : "AGPL",
 	"author" : "Louis Plancke",
 	"require" : "3.0",
