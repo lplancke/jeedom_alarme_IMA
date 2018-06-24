@@ -18,7 +18,7 @@ Une fois le plugin installé:
 - dans la fenêtre qui s'ouvre, choisissez un nom d'équipement, par exemple: "Mon alarme".
 - vous arrivez alors à la page de configuration de votre alarme:
 
-![alt text](doc.png "page de configuration du plugin")
+![alt text](../images/doc.png "page de configuration du plugin")
 
 <p style='border:1px solid black'> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme. </p>
 
@@ -35,7 +35,7 @@ Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 ## Voir le statut de l'alarme
 Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
 
-![alt text](widget.png "widget alarme IMA")
+![alt text](../images/widget.png "widget alarme IMA")
 
 3 statuts sont possibles:
 - ON (l'alarme est en marche), 
