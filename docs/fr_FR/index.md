@@ -1,16 +1,19 @@
 # Aide du plugin "Alarme IMA téléassistance"
 
-## Description
+Description
+===
 Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
 
 
-## Prérequis
+Prérequis
+---
 Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
 Ceci peut se faire gratuitement en appelant IMA téléassistance.
 Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .
 
  
-## Création de l'alarme
+Création de l'alarme
+---
 Une fois le plugin installé:
 
 - cliquez sur Plugins > Sécurité > Alarme IMA
