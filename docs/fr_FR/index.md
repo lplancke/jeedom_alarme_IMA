@@ -21,16 +21,16 @@ Une fois le plugin installé:
 
 ![alt text](../images/doc.png "page de configuration du plugin")
 
-<p style='border:1px solid black'> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme. </p>
+> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
 
 - enfin, cliquez sur Sauvegarder.
 
-# Important
-Pensez à
-- choisir un objet parent,
-- cliquer sur activer,
-- cliquer sur visible.
-Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
+> **Important**
+> Pensez à
+> - choisir un objet parent,
+> - cliquer sur activer,
+> - cliquer sur visible.
+> Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
 
 Voir le statut de l'alarme
