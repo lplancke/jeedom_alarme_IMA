@@ -26,6 +26,7 @@ Une fois le plugin installé:
 - enfin, cliquez sur Sauvegarder.
 
 > **Important**
+>
 > Pensez à
 > - choisir un objet parent,
 > - cliquer sur activer,
