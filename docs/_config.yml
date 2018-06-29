@@ -27,3 +27,5 @@ social:
   name: Jeedom
   links:
     - https://www.linkedin.com/in/louis-plancke-7717113/
+
+theme: jekyll-theme-cayman

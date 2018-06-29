@@ -1,16 +1,17 @@
-# Aide du plugin "Alarme IMA téléassistance"
-
-## Description
+Description
+===
 Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
 
 
-## Prérequis
+Prérequis
+---
 Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
 Ceci peut se faire gratuitement en appelant IMA téléassistance.
 Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .
 
  
-## Création de l'alarme
+Création de l'alarme
+---
 Une fois le plugin installé:
 
 - cliquez sur Plugins > Sécurité > Alarme IMA
@@ -18,24 +19,27 @@ Une fois le plugin installé:
 - dans la fenêtre qui s'ouvre, choisissez un nom d'équipement, par exemple: "Mon alarme".
 - vous arrivez alors à la page de configuration de votre alarme:
 
-![alt text](doc.png "page de configuration du plugin")
+![alt text](../images/doc.png "page de configuration du plugin")
 
-<p style='border:1px solid black'> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme. </p>
+> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
 
 - enfin, cliquez sur Sauvegarder.
 
-## Important
-Pensez à
-- choisir un objet parent,
-- cliquer sur activer,
-- cliquer sur visible.
-Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
+> **Important**
+>
+> Pensez à
+> - choisir un objet parent,
+> - cliquer sur activer,
+> - cliquer sur visible.
+>
+> Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
 
-## Voir le statut de l'alarme
+Voir le statut de l'alarme
+---
 Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
 
-![alt text](widget.png "widget alarme IMA")
+![alt text](../images/widget.png "widget alarme IMA")
 
 3 statuts sont possibles:
 - ON (l'alarme est en marche), 
@@ -44,20 +48,25 @@ Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui re
 - UNKNOWN (une erreur technique sur le site pilotageadistance.imateleassistance.com a empêché de récupérer le status de l'alarme)
 
 
-## FAQ
-### Que deviennent mes identifiants saisis ?
-&nbsp;&nbsp;&nbsp;&nbsp;Ils sont simplement stockés sur votre Jeedom pour pouvoir récupérer le statut de l'alarme.
+FAQ
+===
+Que deviennent mes identifiants saisis ?
+---
+Ils sont simplement stockés sur votre Jeedom pour pouvoir récupérer le statut de l'alarme.
 
-### Pourquoi le statut de mon alarme met-il du temps à se mettre à jour ?
-&nbsp;&nbsp;&nbsp;&nbsp;Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut donc attendre jusqu'à une minute pour voir le statut changer.
+Pourquoi le statut de mon alarme met-il du temps à se mettre à jour ?
+---
+Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut donc attendre jusqu'à une minute pour voir le statut changer.
 
-### Le statut de l'alarme peut-il être historisé ?
-&nbsp;&nbsp;&nbsp;&nbsp;Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
+Le statut de l'alarme peut-il être historisé ?
+---
+Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
   * la valeur 0 signifie que l'alarme était éteinte,
   * la valeur 2 signifie qu'elle était allumée,
   * la valeur 1 que l'alarme couvrait une partie de votre domicile.
   * la valeur -1 signifie qu'il y a eu une erreur technique sur le site pilotageadistance.imateleassistance.com au moment de la récupération du statut.
 
-### Comment supprimer l'historisation de l'alarme ?
-&nbsp;&nbsp;&nbsp;&nbsp;Depuis l'écran de configuration de votre alarme, cliquez sur Commandes, et décochez la case "Historiser".
+Comment supprimer l'historisation de l'alarme ?
+---
+Depuis l'écran de configuration de votre alarme, cliquez sur Commandes, et décochez la case "Historiser".
 
