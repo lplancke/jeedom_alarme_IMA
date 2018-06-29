@@ -31,6 +31,7 @@ Une fois le plugin installé:
 > - choisir un objet parent,
 > - cliquer sur activer,
 > - cliquer sur visible.
+>
 > Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
 
