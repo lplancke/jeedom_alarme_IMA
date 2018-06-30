@@ -1,2 +1,0 @@
-asciidoctor -a toc=left -a toc-title="Table des matières" -a icons=font index.asciidoc
-
