@@ -78,7 +78,7 @@ class alarme_IMA extends eqLogic {
 		
 		
 		log::add('alarme_IMA', 'debug', "Status de retour status sur première tentative: $httpcode");
-		if ($httpcode!=200 or $pk=="")
+		if ($httpcode!=200)
 		{
 			$login_ima=$this->getConfiguration('login_ima');
 			$password_ima=$this->getConfiguration('password_ima');
