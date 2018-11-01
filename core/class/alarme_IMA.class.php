@@ -70,13 +70,15 @@ class alarme_IMA extends eqLogic {
 			$sessionId=trim(fgets($fd, 4096));
 			$pk=trim(fgets($fd, 4096));
 			fclose($fd);
+			log::add('alarme_IMA', 'debug', "sessionId: $sessionId, pk: $pk");
+			$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
+			list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
 		}
-		log::add('alarme_IMA', 'debug', "sessionId: $sessionId, pk: $pk");
-		$url="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/$pk/status/?_=".time()."000";
-		list($httpcode, $result)=self::getIma($url, "sessionid=".$sessionId);
+		else $httpcode=0;
+		
 		
 		log::add('alarme_IMA', 'debug', "Status de retour status sur première tentative: $httpcode");
-		if ($httpcode!=200)
+		if ($httpcode!=200 or $pk=="")
 		{
 			$login_ima=$this->getConfiguration('login_ima');
 			$password_ima=$this->getConfiguration('password_ima');
@@ -113,7 +115,9 @@ class alarme_IMA extends eqLogic {
 			}
 
 			$resultArr=json_decode($result,true);
-			$pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["pk"];
+			// $pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["pk"];
+			// remplacé par la ligne ci-dessous car pour certains utilisateurs, les 2 valeurs sont différentes et c'est la deuxième qui est la bonne
+			$pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["hss_pk"];
 			if (!$pk) {
 				log::add('alarme_IMA', 'error', "Impossible de trouver la clef pk");
 				return self::IMA_UNKNOWN;
