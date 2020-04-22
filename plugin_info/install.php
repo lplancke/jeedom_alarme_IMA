@@ -19,11 +19,14 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function alarme_IMA_install() {
-    
+    config::save('autorefresh', '* * * * *', 'alarme_IMA');
 }
 
 function alarme_IMA_update() {
-    
+    $autorefresh = config::byKey('autorefresh','alarme_IMA');
+    if($autorefresh =='') {
+        config::save('autorefresh', '* * * * *', 'alarme_IMA');
+    }
 }
 
 

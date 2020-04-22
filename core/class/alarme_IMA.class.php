@@ -162,22 +162,32 @@ class alarme_IMA extends eqLogic {
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom    */
 	public static function cron() {
-		log::add('alarme_IMA', 'debug', 'Démarrage du cron minute');
-		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
+		$autorefresh = config::byKey('autorefresh', 'alarme_IMA');
+		if ($autorefresh != '') {
+			try {
+                $c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
+                if ($c->isDue()) {
+                    log::add('alarme_IMA', 'debug', 'Exécution du cron Alarme IMA');
+		            foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
 
-			$numericStatus=$alarme_IMA->getNumericStatus();
+						$numericStatus=$alarme_IMA->getNumericStatus();
 
-			log::add('alarme_IMA', 'debug', "Nouveau status numerique alarme: $numericStatus");
-			if ($numericStatus!=self::IMA_IGNORED)
-			{
-				//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
-				$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
-				//	$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
-				//	$cmd->event($numericStatus);
-			}
-			else
-			{
-				log::add('alarme_IMA', 'debug', "Retour ignoré");
+						log::add('alarme_IMA', 'debug', "Nouveau status numerique alarme: $numericStatus");
+						if ($numericStatus!=self::IMA_IGNORED)
+						{
+							//	checkAndUpdateCmd n'insère pas une donnée chaque fois dans l'historique
+							$alarme_IMA->checkAndUpdateCmd('statusAlarme', $numericStatus);
+							//	$cmd=$alarme_IMA->getCmd('info', 'statusAlarme');
+							//	$cmd->event($numericStatus);
+						}
+						else
+						{
+							log::add('alarme_IMA', 'debug', "Retour ignoré");
+						}
+					}
+				}
+			} catch (Exception $exc) {
+				log::add('alarme_IMA', 'error', __("Erreur lors de l'exécution du cron ", __FILE__) . $exc->getMessage());
 			}
 		}
 	}
