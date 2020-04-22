@@ -250,6 +250,7 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setEqLogic_id($this->id);
 			$alarme_IMACmd->setLogicalId('statusAlarme');
 			$alarme_IMACmd->setConfiguration('data', 'statusAlarme');
+			$alarme_IMACmd->setConfiguration('historizeMode', 'none');
 			$alarme_IMACmd->setType('info');
 			$alarme_IMACmd->setSubType('numeric');
 			$alarme_IMACmd->setTemplate('dashboard', 'line');

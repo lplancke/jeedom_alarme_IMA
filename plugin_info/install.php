@@ -27,6 +27,13 @@ function alarme_IMA_update() {
     if($autorefresh =='') {
         config::save('autorefresh', '* * * * *', 'alarme_IMA');
     }
+    foreach (alarme_IMA::byType('alarme_IMA') as $eqLogic) {
+        $cmd = $eqLogic->getCmd(null, 'statusAlarme');
+        if (is_object($cmd)) {
+            $cmd->setConfiguration('historizeMode', 'none');
+            $cmd->save();
+        }
+    }
 }
 
 
