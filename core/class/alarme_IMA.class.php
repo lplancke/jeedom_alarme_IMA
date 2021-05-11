@@ -46,7 +46,7 @@ class alarme_IMA extends eqLogic {
 			try {
                 $c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
                 if ($c->isDue()) {
-                  /*
+                  
                     log::add('alarme_IMA', 'debug', 'Exécution du cron Ima Protect');
                   	
 		            foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
@@ -70,7 +70,7 @@ class alarme_IMA extends eqLogic {
                         $alarme_IMA->writeSeparateLine();
                    }
                    
-*/
+
 				}
 			} catch (Exception $exc) {
 				log::add('alarme_IMA', 'error', __("Erreur lors de l'exécution du cron ", __FILE__) . $exc->getMessage());
