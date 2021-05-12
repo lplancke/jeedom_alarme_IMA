@@ -1,0 +1,736 @@
+<div class="eqLogic eqLogic-widget allowResize allowReorderCmd allowLayout #custom_layout#  #category# "
+      style="min-height: 210px;min-width:220px; position: relative; width:#width#; height:#height#;
+             background-color:#background-color#; color:#color#; border:#border#; border-radius:#border-radius#;#style#"
+      data-eqType="#eqType#" data-eqLogic_id="#id#" data-eqLogic_uid="#uid#"  data-cat_color="#catcolore#" 
+      data-version="#version#" data-translate-category="#translate_category#" data-category="#category#" data-tags="#tags#">
+    <span class="statusCmd"></span>
+    <span class="cmd refresh pull-right cursor" data-cmd_id="#refreshAlarmeStatus_id#"><i class="fas fa-sync"></i></span>
+    <center class="widget-name">
+      <span class="reportModeVisible" style="display:none">#object_name#</span>
+      <a href="#eqLink#" class="reportModeHidden" style="margin-right: 5px;">#name_display# </a>
+    </center> 
+	
+	<div class="main">
+		<div class="tab">
+          	<button class="tablinks active" onclick="openTab(event, 'alarmState')">Statut</button>
+			<button class="tablinks" onclick="openTab(event, 'events')">Evènements</button>
+			<button class="tablinks" onclick="openTab(event, 'cameras')">Caméras</button>
+			<button class="tablinks" onclick="openTab(event, 'snapshot')">Snapshot</button>
+		</div>
+	  
+		<div id="alarmState" class="tabcontent" >
+			<div class="global" >
+				<div  class="imageStatut">
+					<img  class="imgStatutAlarme" src='plugins/alarmeIMA_V2/core/template/dashboard/img/alarm-orange.png' alt=''>
+                  	<span class="cmd cmd-widget #statusAlarme_history#" data-type="info" data-cmd_id="#statusAlarme_id#">
+				</div>
+			</div>  
+		</div>
+
+		<div id="events" class="tabcontent">
+          	<span class="cmd refreshEvents pull cursor" data-cmd_id="#alarmeEvents_id#"><i class="fas fa-sync"></i></span>
+			<p id="tabAlarmEvent" class="ctabAlarmEvent"></p>
+	  </div>
+
+	  <div id="cameras" class="tabcontent">
+        <span class="cmd refreshCameras cursor" data-cmd_id="#cameraSnapshot_id#"><i class="fas fa-sync"></i></span>
+		<p id="tabCameraEvent" class="ctabCameraEvent"></p>
+	  </div>
+	  <div id="snapshot" class="tabcontent">
+		<div class="global" >
+			<p id="tabsnapshot" class="ctabsnapshot"></p>
+		</div>
+	  </div>
+	</div>
+	<div class="switch_3_ways_v2">
+		<div id="idon" class="switch2 on"></div>
+		<div id="idpartial" class="switch2 partial"></div>
+		<div id="idoff" class="switch2 off"></div>
+		<div id="selector" class="selector"></div>
+	</div>
+	<!--manageModal-->	
+    <div id="modalEvent" class="modal">
+		<div id="idModal-content" class="modal-content">
+    		<span id="closemodalEvent" class="close">&times;</span>
+          	<div class="loader"></div>
+          	
+			<img class="itemPreview" src="">
+			
+			
+			<div class="pwd">
+				<input id="tbInput" type="password" />
+				<div id="VirtualKey">
+				  <div class="line">              	
+					<button id="btn1" class="favorite styled" type="button" onclick="input(this);" style="height:60px;width:60px">1</button>
+					<button id="btn2" class="favorite styled" type="button" onclick="input(this);" style="height:60px;width:60px">2</button>
+					<button id="btn3" class="favorite styled" type="button" onclick="input(this);" style="height:60px;width:60px">3</button>
+				  </div>
+				  <div class="line">
+					  <button id="btn4" class="favorite styled" type="button" onclick="input(this);">4</button>
+					  <button id="btn5" class="favorite styled" type="button" onclick="input(this);">5</button>
+					  <button id="btn6" class="favorite styled" type="button" onclick="input(this);" >6</button>
+				  </div>
+				  <div class="line">
+					<button id="btn7" class="favorite styled" type="button" onclick="input(this);">7</button>
+					<button id="btn8" class="favorite styled" type="button" onclick="input(this);">8</button>
+					<button id="btn9" class="favorite styled" type="button" onclick="input(this);">9</button>
+				  </div>
+				  <div class="line">
+					<button id="btn0" class="favorite styled" type="button" onclick="input(this);">0</button>
+					<button id="btnDel" class="favorite styled" type="button" onclick="del('#id#');"  style="height:60px;width:124px">SUP</button>
+				  </div>
+				  <div class="line">
+					<button id="btnValidate" class="favorite styled" type="button" onclick="validate('#id#');" style="height:60px;width:188px">VALIDER</button>
+				  </div>
+				</div>	
+			</div>
+  		</div>
+	</div>
+	
+</div>  
+<script>
+  	console.log("Entree dans plugin im protect - Statut alarme : " + #statusAlarme# + " | id cmd statut alarme : " + #statusAlarme_id#);
+   	console.log("Rooms list : " + '#actionScreenshot_listValue#');
+                
+  	jeedom.cmd.update['#statusAlarme_id#'] = function(_options) {
+      	
+		$('.eqLogic[data-eqLogic_id=' +'#id#' +']' + ' .imgStatutAlarme').attr("alarmeStatus", _options.display_value);
+		
+		changeImgAlarm('#id#',_options.display_value);
+      	changeSelectAlarmMode('#id#',_options.display_value);
+      
+		var alarmColor=getAlarmColor('#id#');
+      	setColorActiveSelector('#id#',alarmColor);
+      
+		$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .global').css('background-color', alarmColor); 
+    }	
+	jeedom.cmd.update['#statusAlarme_id#']({display_value:'#statusAlarme#',valueDate:'#valueDate#'});
+  
+  function changeSelectAlarmMode(id, value) {
+    $('.eqLogic[data-eqLogic_id=' +id +']' +' .on').text('ON');
+    $('.eqLogic[data-eqLogic_id=' +id +']' +' .off').text('OFF');
+    $('.eqLogic[data-eqLogic_id=' +id +']' +' .partial').text('PARTIAL');
+    
+    
+    $('.eqLogic[data-eqLogic_id=' +id +']' +' .switch_3_ways_v2').css('height','2em');
+    $('.eqLogic[data-eqLogic_id=' +id +']' +' .switch2').css('float','left');
+    
+    if (value == 2){
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('left',"5px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').width(($('.eqLogic[data-eqLogic_id=' +id +']' +' .on').width() + 20) + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').text('ON');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('background-color','red');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('color','white');
+    }else if (value == 1){
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('left',($('.eqLogic[data-eqLogic_id=' +id +']' +' .on').width() + 40) + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').width(($('.eqLogic[data-eqLogic_id=' +id +']' +' .partial').width() +20) + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').text('PARTIAL');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('background-color','#418d92');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('color','white');
+    }else if (value == 0){
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('left',($('.eqLogic[data-eqLogic_id=' +id +']' +' .on').width() + $('.eqLogic[data-eqLogic_id=' +id +']' +' .partial').width() + 65) + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').width(($('.eqLogic[data-eqLogic_id=' +id +']' +' .off').width() + 20) + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').text('OFF');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('background-color','green');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('color','white');
+  	}else {
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .on').text('*');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .off').text('*');
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('left',$('.eqLogic[data-eqLogic_id=' +id +']' +' .on').width()+ "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').width($('.eqLogic[data-eqLogic_id=' +id +']' +' .partial').width() + "px");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').text("ERROR");
+      $('.eqLogic[data-eqLogic_id=' +id +']' +' .selector').css('background-color','orange');
+    }
+  }
+
+	 $(document).ready (function() {
+        console.log( "document loaded" );
+    	$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #alarmState').css('display','block');
+    }
+	);
+  
+    $('.eqLogic[data-eqLogic_uid=#uid#] .refresh').on('click', function () {
+      jeedom.cmd.execute({id: '#refreshAlarmeStatus_id#'});
+    });
+  
+  	$('.eqLogic[data-eqLogic_uid=#uid#] .refreshEvents').on('click', function () {
+      jeedom.cmd.execute({id: '#refreshAlarmEvents_id#'});
+    });
+  
+  	$('.eqLogic[data-eqLogic_uid=#uid#] .refreshCameras').on('click', function () {
+      jeedom.cmd.execute({id: '#refreshCameraSnapshot_id#'});
+    });
+  
+  	jeedom.cmd.update['#alarmeEvents_id#'] = function(_options) {
+      	$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .ctabAlarmEvent').html(_options.display_value);
+    };
+  
+  	jeedom.cmd.update['#cameraSnapshot_id#'] = function(_options) {
+		var selectHtml ='<div class="center"><select name="roomList" id="room#uid#" class="select">';
+		selectHtml +='#actionScreenshot_listValue#';
+		selectHtml += '</select></br><div style="text-align:center;"><input type="button" onclick="takeSnapshot()" value="Prendre instantané"></div></div>';
+     	$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .ctabsnapshot').html(selectHtml);
+		$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .ctabCameraEvent').html(_options.display_value);
+    };	
+	
+	function openTab(evt, tabName) {
+      	$.each($('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .tabcontent'), function(index, value) {
+          $(value).css('display','none');
+        });
+      
+      	$.each($('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .tablinks'), function(index, value) {
+          var className=$(value).attr('class');
+          $(value).attr('class',className.replace(" active", ""));
+          $(value).css('background-color','');
+        });
+      
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' #'+ tabName).css('display','block');
+        evt.currentTarget.className += " active";
+
+        setColorActiveSelector('#id#',getAlarmColor('#id#'));	  
+    }
+  
+    
+    $('.on').on('click', function() {
+		jeedom.cmd.execute({id: '#setModeAlarme_id#', value: {'title': 'on', 'message': ''}});
+    });
+	
+    $('.partial').on('click', function() {
+        jeedom.cmd.execute({id: '#setModeAlarme_id#', value: {'title': 'partial', 'message': ''}});
+    });
+	
+    $('.off').on('click', function() {
+		showpwd("off");
+    });
+	
+	jeedom.cmd.update['#cameraSnapshot_id#']({display_value:'#cameraSnapshot#',valueDate:'#valueDate#'});
+  	
+    jeedom.cmd.update['#alarmeEvents_id#']({display_value:'#alarmeEvents#',valueDate:'#valueDate#'});
+	
+  	
+  //mettre dans une variable
+  	let listeIdTimeOut#uid# = [];
+    
+    
+    window.onclick = function(event) {
+      if (event.target.id == 'closemodalEvent') {
+        	closeModal('#id#');
+      }
+    }
+    
+    $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .close').click(function() {
+      	closeModal('#id#');
+    });
+  
+  	function closeModal(id) {
+      	$('.eqLogic[data-eqLogic_id=' + id +']' + ' .modal').css('display','none');
+      	$('.eqLogic[data-eqLogic_id=' + id  +']' +' .itemPreview').attr('src','');
+        $('.eqLogic[data-eqLogic_id=' + id +']' +' #tbInput').val('');
+        deleteErrorSpan('#id#');
+        var i;
+        listeIdTimeOut#uid#.forEach((timeOut, i) => {
+        clearTimeout(timeOut);
+      });
+    }
+  
+	function displayPicture(id,picture) {
+      	jeedom.cmd.execute({ id: '#actionScreenshot_id#', value: {'title': 'get', 'message': picture},
+                          success:  function($Result) {
+							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('710px');
+							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('520px');
+							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
+                            $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+							
+							$('.eqLogic[data-eqLogic_id=' +id +']' +' .itemPreview').attr('src','data:image/png;base64,' + $Result);
+                          }
+                         });
+    }
+  
+  function taskArrayPictures(id,pictureUrl){
+    	var i;
+      pictureUrl.split(",").forEach((picture, i) => {
+        listeIdTimeOut#uid#.push(setTimeout(() => {
+          console.log("pic : " +  picture);
+          displayPicture(id,picture);
+        }, i * 1000));
+      });
+  }
+  
+  function getPicture(pictureUrl) {
+	console.log("get picture");
+    let i = 0;
+    if (pictureUrl.split(",").length > 1) {
+      	while (i < 10) { 
+          taskWhile(i,pictureUrl,'#id#'); 
+           i++; 
+    	} 
+    } else {
+      	displayPicture('#id#',pictureUrl);
+    }
+  }
+  
+
+    function taskWhile(i,pictureUrl,id) { 
+      listeIdTimeOut#uid#.push(setTimeout(function() { 
+          console.log(i);
+        	taskArrayPictures(id,pictureUrl);
+      }, 8000*i)); 
+    } 
+  
+   function deletePicture(pictureUrl) {
+     	console.log('click sur delete');
+    	jeedom.cmd.execute({id: '#actionScreenshot_id#', value: {'title': 'delete', 'message': pictureUrl}});
+  }
+  
+  function setColorActiveSelector(id,color) {
+    	$('.eqLogic[data-eqLogic_id=' +id +']').find('.active').css('background-color', color); 
+  }
+  
+  function getAlarmColor(id) {
+    	var color;
+		var value = $('.eqLogic[data-eqLogic_id=' +id +']' +' .imgStatutAlarme').attr('alarmeStatus');
+		
+    	if ( value ==0 ) {
+            	color ="#D5F5E3";
+        } else if (value ==1 ) {
+                color ="#FDEBD0";
+        } else if (value ==2 ) {
+                color ="#F5B7B1";
+        } else {
+          		color ="#EAEDED";
+        }
+    	return color;
+  }
+  
+  function getAlarmColorName(value) {
+    	var color;
+    	if ( value ==0 ) {
+            	color ="green";
+        } else if (value ==1 ) {
+                color ="orange";
+        } else if (value ==2 ) {
+                color ="red";
+        } else {
+          		color ="red";
+        }
+    	return color;
+  }
+  function changeImgAlarm(id, value){
+    	var pathImg="plugins/alarmeIMA_V2/core/template/dashboard/img/alarme-" + getAlarmColorName(value) + ".png";
+		$('.eqLogic[data-eqLogic_id=' +id +']' +' .imgStatutAlarme').attr("src", pathImg);;
+  }
+  
+ 
+	
+	function takeSnapshot(){
+		$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('710px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('520px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+		$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .loader').show();
+		 jeedom.cmd.execute({ id: '#actionScreenshot_id#', value: {'title': 'take', 'message': document.getElementById("room#uid#").value},
+                          success:  function($result) {
+                            $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .loader').hide();
+							displayPicture('#id#',$result);
+                          },error: function ($error) {
+								$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .loader').hide();
+								$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .modal').hide();
+                            } 
+                         });
+	}
+  
+
+	
+	function showpwd(action) {
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('250px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('380px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .itmPreview').hide();
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').show();
+      	load('#id#');
+	}
+      
+    function input(e) {
+      	var value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+      	$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val(value + e.value);
+    }
+
+    function del(id) {
+      	var value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+      	$('.eqLogic[data-eqLogic_id=' +id +']' +' #tbInput').val(value.substr(0, value.length - 1));
+    }
+      
+    function load(id) {
+        for (i = 0; i < 10; i++) {
+			$('.eqLogic[data-eqLogic_id=' +id +']' +' #btn'+i).val(i);
+        }
+    }
+      
+    function validate(id) {
+      	deleteErrorSpan(id);
+      	console.log("on execute la demande d arret de l alarme : " + '#setModeAlarme_id#');
+      	jeedom.cmd.execute({id: '#setModeAlarme_id#', 
+                            value: {'title': 'off', 'message': $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val()}, 
+                            success: function ($succes) {
+                              $('.eqLogic[data-eqLogic_id=' +id +']' +' #closemodalEvent').trigger( "click" );
+                            } ,
+                            error: function ($error) {
+                              console.log("error : " + $error.message);
+                              $('.eqLogic[data-eqLogic_id=' +id +']' +' .pwd').after($error.message);
+                              $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').css('color','red');
+                              var width=$('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width() + $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').text().length;
+                              $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width(width + 'px');
+                              $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').height('410px');
+                            } 
+                           } 
+        );
+    }
+      
+    function deleteErrorSpan(id) {
+      	var spanError = $('.eqLogic[data-eqLogic_id=' + id +']' +' #span_errorMessage').remove();
+    }
+
+</script>
+<style>
+
+  /* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  -webkit-animation: fadeEffect 1s;
+  animation: fadeEffect 1s;
+  border-radius:0.3em;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+.global{
+	height: 210px;
+  	position:relative;
+  	border:solid 2px #5B5B5B;	
+  	border-radius:0.3em;
+}
+
+.imageStatut {
+  	margin-left:auto;
+  	margin-right:auto;
+    margin-top:40px;
+  	width:100%;
+   	top: 0;
+    left: 0;
+    position:absolute;
+}
+  
+.imgStatutAlarme {
+  	height: 130px;
+  	width: 130px;
+  	display:block;
+  	margin-left:auto;
+  	margin-right:auto;
+   	z-index: 1;
+}
+  
+.global{
+  margin-top:50px;
+}
+  
+.ctabCameraEvent,.ctabAlarmEvent, .ctabsnapshot {
+  margin-top:30px;
+}
+
+
+.colonnetab {
+	float: right;
+	width: 57%;
+	height : 100%;
+	margin-left: 5px;
+	//background: burlywood;
+}
+
+
+.center {
+    /*These options are for the div to be visible in the example, the important is the first*/
+    width: 150px;
+  	margin:auto;
+}
+
+.select {
+    display: block;
+    margin: 0;
+  	text-align: center;
+}
+  
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  //margin:0;
+  margin-left:auto;
+  margin-right:auto;
+  display:none;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.blocSelect {
+	width: 210px;
+	height : 50px;
+	//background: purple;	
+	position:absolute;
+	top: 230px;
+}
+.switch_3_ways_v2{
+  margin:5px 10px 10px 10px;
+  color:#D0D0D0;
+  border:solid 1px #5B5B5B;
+  font-size:1em;
+  font-weight:bold;
+  line-height:2em;
+  border-radius:0.3em;
+  background:grey;
+  position:relative;
+  display:block;
+  box-shadow:0px 2px 2px 0px rgba(0, 0, 0, 0.75) inset,0px 2px 2px 0px rgba(255, 255, 255, 0.5);
+  width:200px;
+  margin-left:auto;
+  margin-right:auto;
+}
+  
+.switch2.on,
+.switch2.partial,
+.switch2.off{
+  cursor:pointer;
+  position:relative;
+  display:block;
+  -webkit-transition: 300ms ease-out;
+  -moz-transition: 300ms ease-out;
+  transition: 300ms ease-out;
+  padding: 0 1em;
+}
+.selector{
+  text-align:center;
+  position:absolute;
+  width:0;
+  box-sizing:border-box;
+  -webkit-transition: 300ms ease-out;
+  -moz-transition: 300ms ease-out;
+  transition: 300ms ease-out;
+  border-radius:0.3em;
+  border:solid 0.5px white;
+  color:white;
+  text-shadow: 1px 1px 3px #000;
+  box-shadow:0px 2px 2px 0px rgba(0, 0, 0, 0.75),0px 2px 13px 0px #9b9b9b,0px 2px 2px 0px rgba(255, 255, 255, 0.5) inset;
+}
+
+//manage css TAB
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  //width: 30%;
+  //height:520px;
+  width: 710px;
+  height:520px;
+}
+
+.pwd {
+  //background-color: #fefefe;
+  background-color: transparent;
+  margin: auto;
+  padding: 20px;
+  //border: 1px solid #888;
+}
+/* The Close Button */
+.close {
+  //color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+  
+.itemPreview {
+  transform-origin: top left;
+  transform: scale(2);
+}
+  
+.styled {	
+  height:60px;
+  width:60px;
+  border: 0;
+  line-height: 2.5;
+  padding: 0 20px;
+  padding-bottom:10px;
+  font-size: 1rem;
+  text-align: center;
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+  border-radius: 10px;
+  //background-color: rgba(220, 0, 0, 1);
+  background-color: rgba(107, 109, 111, 1);
+  background-image: linear-gradient(to top left,
+    rgba(0, 0, 0, .2),
+    rgba(0, 0, 0, .2) 30%,
+    rgba(0, 0, 0, 0));
+  box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+    inset -2px -2px 3px rgba(0, 0, 0, .6);
+}
+  
+.line{
+  	//padding-bottom:3px;
+  	padding-top:3px;
+}
+
+.styled:hover {
+ background-color: rgba(184, 225, 232, 1);
+}
+
+.styled:active {
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
+                inset 2px 2px 3px rgba(0, 0, 0, .6);
+}
+
+  /* Set a fixed scrollable wrapper */
+.tableWrap {
+  height: 200px;
+  border: 2px solid black;
+  overflow: auto;
+}
+/* Set header to stick to the top of the container. */
+thead tr th {
+  position: sticky;
+  top: 0;
+}
+
+/* If we use border,
+we must use table-collapse to avoid
+a slight movement of the header row */
+table {
+ border-collapse: collapse;
+}
+
+/* Because we must set sticky on th,
+ we have to apply background styles here
+ rather than on thead */
+th {
+  padding: 16px;
+  padding-left: 15px;
+  border-left: 1px dotted rgba(200, 209, 224, 0.6);
+  border-bottom: 1px solid #e8e8e8;
+  background: #ffc491;
+  text-align: left;
+  /* With border-collapse, we must use box-shadow or psuedo elements
+  for the header borders */
+  box-shadow: 0px 0px 0 2px #e8e8e8;
+}
+
+/* Basic Demo styling */
+
+table {
+  width: 100%;
+  font-family: sans-serif;
+}
+
+table td {
+  padding: 16px;
+}
+
+tbody tr {
+  border-bottom: 2px solid #e8e8e8;
+  //background:red;
+}
+
+thead {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+tbody tr:hover {
+  background: #e6f7ff;
+}
+
+table thead th, table tbody tr {
+  text-align: center;
+}
+
+table thead th {
+  text-align: center;
+  border-left: 1px solid #f2f2f2; 
+  border-right: 1px solid #d5d5d5; 
+  background: #ddd;
+  font-weight: bold;
+}
+  
+</style>

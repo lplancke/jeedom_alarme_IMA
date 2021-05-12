@@ -1,13 +1,20 @@
 Description
 ===
-Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
+Ce plugin permet  : 
+- afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
+- modifier le mode de l'alarme
+-- mode total
+-- mode partiel
+-- desactivation de l'alarme
+- visionner les prises de photos
+- supprimer les prises de photos
 
 
 Prérequis
 ---
 Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
 Ceci peut se faire gratuitement en appelant IMA téléassistance.
-Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .
+Vous obtiendrez alors un login/mot de passe d'accès au site: https://www.imaprotect.com/fr/ .
 
  
 Création de l'alarme
@@ -21,9 +28,12 @@ Une fois le plugin installé:
 
 ![alt text](../images/doc.png "page de configuration du plugin")
 
-> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
+> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://www.imaprotect.com/fr/ (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
 
-- enfin, cliquez sur Sauvegarder.
+- cliquez sur Sauvegarder.
+- choissez le contact à utiliser
+
+> le contact va permettre au plugin de faire un contrôle, lors de l'arrêt du l'alarme, entre le mot de passe XO et le mdp saisie lors de la demande d'arrêt
 
 > **Important**
 >

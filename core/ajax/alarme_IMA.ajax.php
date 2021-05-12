@@ -24,14 +24,17 @@ try {
     if (!isConnect('admin')) {
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
-    
+
     ajax::init();
-
-
-
+  
+	if (init('action') == 'getContactList') {
+		$result=alarme_IMA::getContactList(init('input'));
+		ajax::success($result);
+	}
+	
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {
-//    ajax::error(displayExeption($e), $e->getCode());
+	ajax::error(displayExeption($e), $e->getCode());
 }
 ?>
