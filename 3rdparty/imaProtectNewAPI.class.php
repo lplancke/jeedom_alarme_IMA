@@ -69,13 +69,6 @@ class imaProtectNewAPI {
 				break;
 			case "POST":
           	case "DELETE":
-            	/*
-				curl_setopt($curl, CURLOPT_POST, 				1);
-				curl_setopt($curl, CURLOPT_POSTFIELDS, 		$data);
-				curl_setopt($curl, CURLOPT_RETURNTRANSFER, 	true);
-				curl_setopt($curl, CURLOPT_HTTPHEADER, 		$headers);
-				*/
-            
             	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($curl, CURLOPT_ENCODING, "");
                 curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
@@ -121,9 +114,7 @@ class imaProtectNewAPI {
 		$int=0;
 		foreach($matches[1] as $item) {
           parse_str($item, $id);
-          log::add('imaProtect', 'debug', 'Match 1 - item : ' . $int . ' -> ' . json_encode($item)); 
 		  if ($int == 0) {
-            log::add('imaProtect', 'debug', '	 * 0 : imainternational cookie : ' . $id['imainternational']);
 			$this->imainternational=$id['imainternational'];
 		  }
 		  if ($int == 3) {
@@ -137,7 +128,6 @@ class imaProtectNewAPI {
 		
 		$int=0;
 		foreach($matches[2] as $item) {
-          log::add('imaProtect', 'debug', 'Match 2 - item : ' . $int . ' -> ' . json_encode($item)); 
 		  parse_str($item, $id);
 		  if ($int == 0) {
 			$this->expireImaCookie=$id['expires'];
