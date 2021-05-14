@@ -5,7 +5,7 @@
 	"changelog" : "",
 	"documentation": "",
 	"licence" : "AGPL",
-	"author" : "Louis Plancke / Christophe Demongeot",
+	"author" : "Christophe Demongeot",
 	"require" : "4",
 	"category" : "security",
 	"hasDependency" : false,
