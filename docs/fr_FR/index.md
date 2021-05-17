@@ -33,7 +33,7 @@ Une fois le plugin installé:
 - cliquez sur Sauvegarder.
 - choissez le contact à utiliser
 
-![alt text](../images/Alarme_IMA_Capture_contact.JPG "Choix du contact")
+![alt text](../images/Alarme_IMA_Capture_contact_V2.JPG "Choix du contact")
 
 > le contact va permettre au plugin de faire un contrôle, lors de l'arrêt de l'alarme, entre le mot de passe XO du contact et le mdp saisie lors de la demande d'arrêt
 
@@ -57,9 +57,31 @@ Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui re
 - ON (l'alarme est en marche), 
 - OFF (l'alarme est éteinte), 
 - PARTIAL (l'alarme est active sur une partie de votre domicile uniquement).
-- UNKNOWN (une erreur technique sur le site pilotageadistance.imateleassistance.com a empêché de récupérer le status de l'alarme)
 
-Voir le statut de l'alarme
+
+Activer / Desactiver l'alarme
+---
+
+Journal des évènements
+---
+Dès que IMA aura remis la fonctionnalité disponible
+
+Historique des prises de vue
+---
+Permet de :
+- consulter un prise de vue
+- supprimer une prise de vue
+
+
+Prendre un instantané
+---
+Dès que IMA aura remis la fonctionnalité disponible
+
+
+Liste des commandes d'un équipement "Alarme_IMA"
+---
+
+
 
 FAQ
 ===
