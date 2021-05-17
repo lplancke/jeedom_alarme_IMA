@@ -431,9 +431,9 @@ class alarme_IMA extends eqLogic {
     
 
         foreach($resultArr as $event) {
-          $date=$this->fmt_date($event['date']);;
-          $etat="";
-          $element=$event['type'];
+          $date=$event['date'];
+          $etat=$event['type'];
+          $element=$event['name'];
           $photos="";
           $pk=$event['pk'];
           $item=0;
