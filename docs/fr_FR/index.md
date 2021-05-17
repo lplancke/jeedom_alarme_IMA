@@ -1,13 +1,20 @@
 Description
 ===
-Ce plugin permet d'afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
+Ce plugin permet  : 
+- afficher le statut de votre alarme IMA téléassistance
+- modifier le mode de l'alarme
+-- activer le mode total
+-- activer le mode partiel
+-- desactiver de l'alarme
+- visionner les prises de photos
+- supprimer les prises de photos
 
 
 Prérequis
 ---
 Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
 Ceci peut se faire gratuitement en appelant IMA téléassistance.
-Vous obtiendrez alors un login/mot de passe d'accès au site: https://pilotageadistance.imateleassistance.com .
+Vous obtiendrez alors un login/mot de passe d'accès au site: https://www.imaprotect.com/fr/ .
 
  
 Création de l'alarme
@@ -21,9 +28,14 @@ Une fois le plugin installé:
 
 ![alt text](../images/doc.png "page de configuration du plugin")
 
-> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://pilotageadistance.imateleassistance.com (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
+> Le login / mot de passe à configurer ici est celui qui vous permet d'accéder à https://www.imaprotect.com/fr/ (voir section Prérequis). Ces identifiants sont stockés uniquement dans votre jeedom et servent à récupérer le statut de l'alarme.
 
-- enfin, cliquez sur Sauvegarder.
+- cliquez sur Sauvegarder.
+- choissez le contact à utiliser
+
+![alt text](../images/Alarme_IMA_Capture_contact_V2.JPG "Choix du contact")
+
+> le contact va permettre au plugin de faire un contrôle, lors de l'arrêt de l'alarme, entre le mot de passe XO du contact et le mdp saisie lors de la demande d'arrêt
 
 > **Important**
 >
@@ -34,18 +46,88 @@ Une fois le plugin installé:
 >
 > Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
+Widget Alarme IMA
+===
+Le widget s'articule autour de 4 onglets : 
+- statut de l'alarme 
+- journal des évènements
+- journal des prises de vue
+- prise de vues
+
+Et d'un radio bouton permettant de modifier le mode de l'alarme (total, partiel ou désactivé)
+
 
 Voir le statut de l'alarme
 ---
 Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
 
-![alt text](../images/widget.png "widget alarme IMA")
+![alt text](../images/Alarme_IMA_Widget_status.JPG "widget alarme IMA")
 
 3 statuts sont possibles:
 - ON (l'alarme est en marche), 
 - OFF (l'alarme est éteinte), 
 - PARTIAL (l'alarme est active sur une partie de votre domicile uniquement).
-- UNKNOWN (une erreur technique sur le site pilotageadistance.imateleassistance.com a empêché de récupérer le status de l'alarme)
+
+
+Activer / Desactiver l'alarme
+---
+
+![alt text](../images/Alarme_IMA_Widget_change_status.JPG "Modifier état activation de l'alarme")
+
+La désactivation de l'alarme ouvre une fenêtre pour saisir le mot de passe de validation (code XO du contact sélectionné dans la configuration de l'équipement)
+
+Journal des évènements
+---
+Dès que IMA aura remis la fonctionnalité disponible
+
+Historique des prises de vue
+---
+
+![alt text](../images/Alarme_IMA_Widget_cameras_V3.JPG "Consulter une prise de vue")
+
+Permet de :
+- consulter un prise de vue
+
+![alt text](../images/Alarme_IMA_Widget_cameras_get.JPG "Supprimer une prise de vue")
+
+- supprimer une prise de vue en cliquant sur la corbeille
+
+
+Prendre un instantané
+---
+Dès que IMA aura remis la fonctionnalité disponible
+
+
+Liste des commandes d'un équipement "Alarme_IMA"
+---
+![alt text](../images/Alarme_IMA_Liste_cmds.JPG "Liste des commandes disponibles")
+
+ * commande de type info
+	* Statut de l'alarme
+	* Images caméras : historique des prises de vue (format html)
+	* Images caméras données brutes : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
+
+ * commande de type action
+	* Rafraîchir statut caméra : permet de forcer le rafraichissement de l'état d'activatio de l'alarme
+	* Action mode alarme : commande de type message
+		* Désactiver alarme :
+			* title : off
+			* message : le mot de passe XO du contact sélectionné dans la configuration de l'équipement
+		* Mode partiel :
+			* title : partial
+			* message : vide
+		* Mode total :
+			* title : on
+			* message : vide
+
+	* Actions sur imaga caméra :
+		* Récupérer une image :
+			* title : get
+			* message : url de l'image (disponible dans le flux brute)
+		* Supprimer une image :
+			* title : delete
+			* message : primary key (pk) de la photo (disponible dans le flux brute)
+
 
 
 FAQ
@@ -64,7 +146,6 @@ Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'h
   * la valeur 0 signifie que l'alarme était éteinte,
   * la valeur 2 signifie qu'elle était allumée,
   * la valeur 1 que l'alarme couvrait une partie de votre domicile.
-  * la valeur -1 signifie qu'il y a eu une erreur technique sur le site pilotageadistance.imateleassistance.com au moment de la récupération du statut.
 
 Comment supprimer l'historisation de l'alarme ?
 ---
