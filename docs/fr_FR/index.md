@@ -146,7 +146,6 @@ Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'h
   * la valeur 0 signifie que l'alarme était éteinte,
   * la valeur 2 signifie qu'elle était allumée,
   * la valeur 1 que l'alarme couvrait une partie de votre domicile.
-  * la valeur -1 signifie qu'il y a eu une erreur technique sur le site pilotageadistance.imateleassistance.com au moment de la récupération du statut.
 
 Comment supprimer l'historisation de l'alarme ?
 ---
