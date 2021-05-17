@@ -57,7 +57,6 @@ Le widget s'articule autour de 4 onglets :
 Et d'un radio bouton permettant de modifier le mode de l'alarme (total, partiel ou désactivé)
 
 
-
 Voir le statut de l'alarme
 ---
 Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
@@ -73,8 +72,9 @@ Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui re
 Activer / Desactiver l'alarme
 ---
 
-
 ![alt text](../images/Alarme_IMA_Widget_change_status.JPG "Modifier état activation de l'alarme")
+
+La désactivation de l'alarme ouvre une fenêtre pour saisir le mot de passe de validation (code XO du contact sélectionné dans la configuration de l'équipement)
 
 Journal des évènements
 ---
