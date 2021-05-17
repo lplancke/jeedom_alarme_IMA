@@ -73,6 +73,9 @@ Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui re
 Activer / Desactiver l'alarme
 ---
 
+
+![alt text](../images/Alarme_IMA_Widget_change_status.JPG "Modifier état activation de l'alarme")
+
 Journal des évènements
 ---
 Dès que IMA aura remis la fonctionnalité disponible
@@ -108,22 +111,22 @@ Liste des commandes d'un équipement "Alarme_IMA"
 	* Rafraîchir statut caméra : permet de forcer le rafraichissement de l'état d'activatio de l'alarme
 	* Action mode alarme : commande de type message
 		* Désactiver alarme :
------ title : off
------ message : le mot de passe XO du contact sélectionné dans la configuration de l'équipement
+			* title : off
+			* message : le mot de passe XO du contact sélectionné dans la configuration de l'équipement
 		* Mode partiel :
------ title : partial
------ message : vide
+			* title : partial
+			* message : vide
 		* Mode total :
------ title : on
------ message : vide
+			* title : on
+			* message : vide
 
 	* Actions sur imaga caméra :
 		* Récupérer une image :
------ title : get
------ message : url de l'image (disponible dans le flux brute)
+			* title : get
+			* message : url de l'image (disponible dans le flux brute)
 		* Supprimer une image :
------ title : delete
-# message : primary key (pk) de la photo (disponible dans le flux brute)
+			* title : delete
+			* message : primary key (pk) de la photo (disponible dans le flux brute)
 
 
 
