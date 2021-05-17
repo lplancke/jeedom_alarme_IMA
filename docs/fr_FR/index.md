@@ -1,11 +1,11 @@
 Description
 ===
 Ce plugin permet  : 
-- afficher le statut de votre alarme IMA téléassistance (commercialisée notamment par la MACIF).
+- afficher le statut de votre alarme IMA téléassistance
 - modifier le mode de l'alarme
--- mode total
--- mode partiel
--- desactivation de l'alarme
+-- activer le mode total
+-- activer le mode partiel
+-- desactiver de l'alarme
 - visionner les prises de photos
 - supprimer les prises de photos
 
@@ -33,7 +33,9 @@ Une fois le plugin installé:
 - cliquez sur Sauvegarder.
 - choissez le contact à utiliser
 
-> le contact va permettre au plugin de faire un contrôle, lors de l'arrêt du l'alarme, entre le mot de passe XO et le mdp saisie lors de la demande d'arrêt
+![alt text](../images/Alarme_IMA_Capture_contact.jpg "Choix du contact")
+
+> le contact va permettre au plugin de faire un contrôle, lors de l'arrêt de l'alarme, entre le mot de passe XO du contact et le mdp saisie lors de la demande d'arrêt
 
 > **Important**
 >
@@ -57,6 +59,7 @@ Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui re
 - PARTIAL (l'alarme est active sur une partie de votre domicile uniquement).
 - UNKNOWN (une erreur technique sur le site pilotageadistance.imateleassistance.com a empêché de récupérer le status de l'alarme)
 
+Voir le statut de l'alarme
 
 FAQ
 ===
