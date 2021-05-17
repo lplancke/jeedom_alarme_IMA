@@ -49,10 +49,12 @@ Une fois le plugin installé:
 Widget Alarme IMA
 ===
 Le widget s'articule autour de 4 onglets : 
-- statut de l'alarme avec possibilité d'agire sur l'arlarme à l'aide d'un radio bouton
+- statut de l'alarme 
 - journal des évènements
 - journal des prises de vue
 - prise de vues
+
+Et d'un radio bouton permettant de modifier le mode de l'alarme (total, partiel ou désactivé)
 
 
 
