@@ -1,7 +1,7 @@
 <?php
 class imaProtectNewAPI {
 	
-	const BASE_URL='https://www.alarme_IMA.com/fr/';
+	const BASE_URL='https://www.imaprotect.com/fr/';
 	
 	private $id;
 	
@@ -152,7 +152,7 @@ class imaProtectNewAPI {
 	private function setHeaders()   {				
 		
 		$headers = array();
-		$headers[] = "Referer: https://www.alarme_IMA.com/fr/client/";
+		$headers[] = "Referer: https:/www.imaprotect.com/fr/client/";
 		$headers[] = "Accept: application/json, text/plain, *\/*";
 		//$headers[] = "Content-Type:application/json";
 		
@@ -311,7 +311,7 @@ class imaProtectNewAPI {
   
   	private function getHeadersLogin() {
       	$headers = array();
-		$headers[] = "Referer: https://www.alarme_IMA.com";
+		$headers[] = "Referer: https://www.imaprotect.com";
 		$headers[] = "Content-Type: application/x-www-form-urlencoded";
       	return $headers;
     }
@@ -554,8 +554,8 @@ class imaProtectNewAPI {
     }
   
   function getHeadersPost() {
-    $headers[] = "Origin: https://www.alarme_IMA.com";
-    $headers[] = "Referer: https://www.alarme_IMA.com/fr/client/management";
+    $headers[] = "Origin: https://www.imaprotect.com";
+    $headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
     $headers[] = "Accept: application/json, text/plain, */*";
     $headers[] = "Content-Type:application/json";
     $headers[]="imainternational: ".$this->imainternational;
