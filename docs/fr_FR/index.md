@@ -62,7 +62,7 @@ Voir le statut de l'alarme
 ---
 Cliquez maintenant sur Accueil > Dashboard : un nouveau widget apparaît, qui représente le statut actuel de l'alarme.
 
-![alt text](../images/widget.png "widget alarme IMA")
+![alt text](../images/Alarme_IMA_Widget_status.JPG "widget alarme IMA")
 
 3 statuts sont possibles:
 - ON (l'alarme est en marche), 
@@ -79,9 +79,15 @@ Dès que IMA aura remis la fonctionnalité disponible
 
 Historique des prises de vue
 ---
+
+![alt text](../images/Alarme_IMA_Widget_cameras_V3.JPG "Consulter une prise de vue")
+
 Permet de :
 - consulter un prise de vue
-- supprimer une prise de vue
+
+![alt text](../images/Alarme_IMA_Widget_cameras_get.JPG "Supprimer une prise de vue")
+
+- supprimer une prise de vue en cliquant sur la corbeille
 
 
 Prendre un instantané
@@ -91,6 +97,33 @@ Dès que IMA aura remis la fonctionnalité disponible
 
 Liste des commandes d'un équipement "Alarme_IMA"
 ---
+![alt text](../images/Alarme_IMA_Liste_cmds.JPG "Liste des commandes disponibles")
+
+ * commande de type info
+	* Statut de l'alarme
+	* Images caméras : historique des prises de vue (format html)
+	* Images caméras données brutes : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
+
+ * commande de type action
+	* Rafraîchir statut caméra : permet de forcer le rafraichissement de l'état d'activatio de l'alarme
+	* Action mode alarme : commande de type message
+		* Désactiver alarme :
+----- title : off
+----- message : le mot de passe XO du contact sélectionné dans la configuration de l'équipement
+		* Mode partiel :
+----- title : partial
+----- message : vide
+		* Mode total :
+----- title : on
+----- message : vide
+
+	* Actions sur imaga caméra :
+		* Récupérer une image :
+----- title : get
+----- message : url de l'image (disponible dans le flux brute)
+		* Supprimer une image :
+----- title : delete
+# message : primary key (pk) de la photo (disponible dans le flux brute)
 
 
 
