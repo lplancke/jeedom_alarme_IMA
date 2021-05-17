@@ -46,6 +46,15 @@ Une fois le plugin installé:
 >
 > Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
+Widget Alarme IMA
+===
+Le widget s'articule autour de 4 onglets : 
+- statut de l'alarme avec possibilité d'agire sur l'arlarme à l'aide d'un radio bouton
+- journal des évènements
+- journal des prises de vue
+- prise de vues
+
+
 
 Voir le statut de l'alarme
 ---
