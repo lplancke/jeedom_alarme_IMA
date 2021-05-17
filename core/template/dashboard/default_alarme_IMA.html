@@ -21,7 +21,7 @@
 		<div id="alarmState" class="tabcontent" >
 			<div class="global" >
 				<div  class="imageStatut">
-					<img  class="imgStatutAlarme" src='plugins/alarmeIMA_V2/core/template/dashboard/img/alarm-orange.png' alt=''>
+					<img  class="imgStatutAlarme" src='plugins/alarme_IMA/core/template/dashboard/img/alarm-orange.png' alt=''>
                   	<span class="cmd cmd-widget #statusAlarme_history#" data-type="info" data-cmd_id="#statusAlarme_id#">
 				</div>
 			</div>  
@@ -316,7 +316,7 @@
     	return color;
   }
   function changeImgAlarm(id, value){
-    	var pathImg="plugins/alarmeIMA_V2/core/template/dashboard/img/alarme-" + getAlarmColorName(value) + ".png";
+    	var pathImg="plugins/alarme_IMA/core/template/dashboard/img/alarme-" + getAlarmColorName(value) + ".png";
 		$('.eqLogic[data-eqLogic_id=' +id +']' +' .imgStatutAlarme').attr("src", pathImg);;
   }
   
