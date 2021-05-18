@@ -16,7 +16,13 @@ Vous devez tout d'abord activer l'option "Pilotage à distance" de votre alarme.
 Ceci peut se faire gratuitement en appelant IMA téléassistance.
 Vous obtiendrez alors un login/mot de passe d'accès au site: https://www.imaprotect.com/fr/ .
 
- 
+Cron
+---
+Le plugin vous offre la possibilité de choisir le cron de MAJ du statut de l'alarme au travers de la page d'activation du plugin.
+
+Un cron toutes les heures est executé automatiquement pour récupérer l'historique des prises de vue
+
+
 Création de l'alarme
 ---
 Une fois le plugin installé:
@@ -143,9 +149,9 @@ Le statut de l'alarme est mis à jour toutes les minutes par jeedom. Il faut don
 Le statut de l'alarme peut-il être historisé ?
 ---
 Par défaut, le statut de votre alarme est historisé. Vous pouvez consulter l'historique en cliquant sur "Statut alarme" sur le widget de votre alarme sur le dashboard jeedom:
-  * la valeur 0 signifie que l'alarme était éteinte,
-  * la valeur 2 signifie qu'elle était allumée,
-  * la valeur 1 que l'alarme couvrait une partie de votre domicile.
+  * la valeur 0 signifie que l'alarme est désactivée,
+  * la valeur 2 signifie que l'alarme est activée en mode total,
+  * la valeur 1 que l'alarme est activée en mode partiel.
 
 Comment supprimer l'historisation de l'alarme ?
 ---
