@@ -79,14 +79,14 @@ class alarme_IMA extends eqLogic {
 
      /* Fonction exécutée automatiquement toutes les heures par Jeedom */
     public static function cronHourly() {
-      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA V2 - Start');
+      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - Start');
       foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
         $alarme_IMA->writeSeparateLine();
         //$alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
         $alarme_IMA->getCmd(null, 'refreshCameraSnapshot')->execCmd();
         $alarme_IMA->writeSeparateLine();
       }
-      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA V2 - End');
+      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - End');
     }
 
     /*
