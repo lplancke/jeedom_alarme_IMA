@@ -362,14 +362,25 @@ class imaProtectNewAPI {
 
   //Get alarm status
 	public function getAlarmStatus() {
-      	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus ");
-		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',"", "GET",  $this->setHeaders());
-      
-      	if (isset($httpcode) and $httpcode >= 400 ) {
-          	throw new Exception($this->manageErrorMessage($httpcode,$result));
-        } else {
-      		return json_decode($result,true);
-        }
+		$response='';
+		for ($i = 1; $i <= 3; $i++) {
+          	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus - attemp : " . $i);
+			list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',"", "GET",  $this->setHeaders());
+			
+          	if (isset($httpcode) and $httpcode >= 400 ) {
+				throw new Exception($this->manageErrorMessage($httpcode,$result));
+			} else {			
+				if ($httpcode >= 300) {
+					//regeneration of cookies and token for the next time
+					$this->Login();
+					$this->getTokens();					
+				} else {
+ 	              $response = $result;
+                  break;
+                }
+			}
+		}
+		return json_decode($response,true);
 	}
 	
 	public function getContactList(){   
