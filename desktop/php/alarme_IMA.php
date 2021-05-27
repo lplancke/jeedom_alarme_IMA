@@ -2,9 +2,12 @@
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
-$plugin = plugin::byId('alarme_IMA');
+$plugId = 'alarme_IMA';
+$plugin = plugin::byId($plugId);
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
+$plugName=$plugin->getName();
+
 ?>
 
 <div class="row row-overflow">
@@ -22,7 +25,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
     <span>{{Configuration}}</span>
   </div>
   </div>
-  <legend><i class="fas fa-table"></i> {{Mes alarmes IMA}}</legend>
+  <legend><i class="fas fa-table"></i> {{Mes alarmes IMA Protect}}</legend>
    <input class="form-control" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
 <div class="eqLogicThumbnailContainer">
     <?php
@@ -51,6 +54,8 @@ foreach ($eqLogics as $eqLogic) {
   <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
     <div role="tabpanel" class="tab-pane active" id="eqlogictab">
       <br/>
+	<div class="row">
+	<div class="col-sm-7">
     <form class="form-horizontal">
         <fieldset>
             <div class="form-group">
@@ -98,15 +103,88 @@ foreach (jeeObject::all() as $object) {
             <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="login_ima" placeholder="votre login ima téléassistance"/>
         </div>
     </div>
-       <div class="form-group">
+	<div class="form-group">
         <label class="col-sm-3 control-label">{{Password IMA téléassistance}}</label>
         <div class="col-sm-3">
             <input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password_ima" placeholder="votre password ima téléassistance"/>
         </div>
     </div>
+    </br>
+	<div class="form-group">
+		<label class="col-sm-3 control-label">{{Contact}}
+			<sup>
+				<i class="fa fa-question-circle tooltips" title="{{Contact utilisé pour le code de validation XO}}"></i>
+			</sup>
+		</label>
+		<div class="col-sm-3">
+			<div class="input-group">
+				<select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="cfgContactList">
+				</select>
+			</div>
+		</div>
+        <a class="btn btn-danger btn-sm cmdAction" id="bt_SynchronizeContact"><i class="fas fa-sync"></i> {{Synchroniser les contacts}}</a>
+	</div>
 </fieldset>
+	
 </form>
 </div>
+						<div id="info" class="col-sm-4">
+							<fieldset>
+								<legend>{{Informations}}</legend>
+								<div class="form-group">									
+									<div id="div_instruction"></div>
+								</div>
+							</fieldset>					
+						</div> 
+					</div>
+
+				</div
+</div>
+<!--Modif ChD-->
+<div role="tabpanel" class="tab-pane" id="commandtab">
+<legend>
+<center class="title_cmdtable">{{Tableau de commandes <?php echo ' - '.$plugName.': ';?>}}
+	<span class="eqName"></span>
+</center>
+</legend>
+
+<legend><i class="fas fa-info-circle"></i>  {{Infos}}</legend>
+	
+	<table id="table_cmdi" class="table table-bordered table-condensed ">
+		<!--<table class="table  tablesorter tablesorter-bootstrap tablesorter hasResizable table-striped hasFilters" id="table_update" style="margin-top: 5px;" role="grid"><colgroup class="tablesorter-colgroup"></colgroup>
+		</table>-->
+		<thead>
+			<tr>
+				<th style="width: 40px;">Id</th>
+				<th style="width: 280px;">{{Nom}}</th>
+				<th style="width: 100px;">{{Type}}</th>
+				<th style="width: 220px;">{{Options}}</th>
+				<th style="width: 80px;">{{Action}}</th>
+				 
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+
+	<legend><i class="fas fa-list-alt"></i>  {{Actions}}</legend>
+	<table id="table_cmda" class="table table-bordered table-condensed">
+		
+		<thead>
+			<tr>
+				<th style="width: 40px;">Id</th>
+				<th style="width: 280px;">{{Nom}}</th>
+				<th style="width: 100px;">{{Type}}</th>
+				<th style="width: 220px;">{{Options}}</th>
+				<th style="width: 80px;">{{Action}}</th>
+				 
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+
+
+</div>
+<!--
       <div role="tabpanel" class="tab-pane" id="commandtab">
 <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
 <table id="table_cmd" class="table table-bordered table-condensed">
@@ -126,6 +204,7 @@ foreach (jeeObject::all() as $object) {
 
 </div>
 </div>
+-->
 
 <?php include_file('desktop', 'alarme_IMA', 'js', 'alarme_IMA');?>
 <?php include_file('core', 'plugin.template', 'js');?>
