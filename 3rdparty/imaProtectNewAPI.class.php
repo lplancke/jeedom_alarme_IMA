@@ -32,7 +32,7 @@ class imaProtectNewAPI {
 	
 		
 	public function __construct($username,$password,$pkContact,$id) {
-        log::add('imaProtect', 'debug', "			==> constructor of class imaProtectAPi - Start");
+        log::add('alarme_IMA', 'debug', "			==> constructor of class imaProtectNewAPI - Start");
 		$this->id=$id;
 		$this->username = $username;
 		$this->password = $password;
@@ -52,9 +52,9 @@ class imaProtectNewAPI {
    
 	//Execute all https request to Ima protect API
 	private function doRequest($url, $data, $method, $headers) {		
-      	log::add('imaProtect', 'debug', "			==> doRequest");
-      	log::add('imaProtect', 'debug', "				==> Params : $url | $data | $method | ".json_encode($headers));
-      	log::add('imaProtect', 'debug', "				==> Params json input : " . json_encode($data));
+      	log::add('alarme_IMA', 'debug', "			==> doRequest");
+      	log::add('alarme_IMA', 'debug', "				==> Params : $url | $data | $method | ".json_encode($headers));
+      	log::add('alarme_IMA', 'debug', "				==> Params json input : " . json_encode($data));
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL,				$url);
       	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
@@ -106,11 +106,11 @@ class imaProtectNewAPI {
 			$this->getCookiesFromPostRequest($header);
         }
 		
-      	log::add('imaProtect', 'debug', "				==> Response");
-      	log::add('imaProtect', 'debug', "					# Code Http : $httpRespCode");
-      	log::add('imaProtect', 'debug', "					# Response  : ".$resultCurl);
-      	log::add('imaProtect', 'debug', "					# Body  : ".$body);
-      	log::add('imaProtect', 'debug', "					# Header  : ".$header);
+      	log::add('alarme_IMA', 'debug', "				==> Response");
+      	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
+      	log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
+      	log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
+      	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 				
 		return array($httpRespCode, $body);
 	}
@@ -121,9 +121,9 @@ class imaProtectNewAPI {
 		$int=0;
 		foreach($matches[1] as $item) {
           parse_str($item, $id);
-          log::add('imaProtect', 'debug', 'Match 1 - item : ' . $int . ' -> ' . json_encode($item)); 
+          //log::add('alarme_IMA', 'debug', 'Match 1 - item : ' . $int . ' -> ' . json_encode($item)); 
 		  if ($int == 0) {
-            log::add('imaProtect', 'debug', '	 * 0 : imainternational cookie : ' . $id['imainternational']);
+            //log::add('alarme_IMA', 'debug', '	 * 0 : imainternational cookie : ' . $id['imainternational']);
 			$this->imainternational=$id['imainternational'];
 		  }
 		  if ($int == 3) {
@@ -137,7 +137,7 @@ class imaProtectNewAPI {
 		
 		$int=0;
 		foreach($matches[2] as $item) {
-          log::add('imaProtect', 'debug', 'Match 2 - item : ' . $int . ' -> ' . json_encode($item)); 
+          //log::add('alarme_IMA', 'debug', 'Match 2 - item : ' . $int . ' -> ' . json_encode($item)); 
 		  parse_str($item, $id);
 		  if ($int == 0) {
 			$this->expireImaCookie=$id['expires'];
@@ -145,14 +145,14 @@ class imaProtectNewAPI {
 		  ++$int;
 		}
       	
-      	log::add('imaProtect', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
+      	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
 
 	}
 
 	private function setHeaders()   {				
 		
 		$headers = array();
-		$headers[] = "Referer: https://www.imaprotect.com/fr/client/";
+		$headers[] = "Referer: https:/www.imaprotect.com/fr/client/";
 		$headers[] = "Accept: application/json, text/plain, *\/*";
 		//$headers[] = "Content-Type:application/json";
 		
@@ -189,53 +189,53 @@ class imaProtectNewAPI {
 		if (isset($cookieExpiredDate)) {
 			$diff=round(strtotime($cookieExpiredDate)-time(),1);
 			if ($diff > 10) {
-				log::add('imaProtect', 'debug', "				* sessionID is valid");
+				log::add('alarme_IMA', 'debug', "				* sessionID is valid");
 				return true;
 			} else {
-				log::add('imaProtect', 'debug', "				* sessionID is expired");
+				log::add('alarme_IMA', 'debug', "				* sessionID is expired");
 				return false;
 			}
 		} else {
-			log::add('imaProtect', 'debug', "			==> Expiration of sessionID is missing");
+			log::add('alarme_IMA', 'debug', "			==> Expiration of sessionID is missing");
 			return false;
 		}
 	}
 
 	private function storeContextToTmpFile($contextArray){
-		log::add('imaProtect', 'debug', "			==> storeContextToTmpFile : " . json_encode($contextArray));
+		log::add('alarme_IMA', 'debug', "			==> storeContextToTmpFile : " . json_encode($contextArray));
 		if(isset($contextArray)){
 			if (isset($this->id)) {
-				$tmpFile=sys_get_temp_dir()."/imaProtect_session_".$this->id;
+				$tmpFile=sys_get_temp_dir()."/alarme_IMA_session_".$this->id;
 				$fd=fopen($tmpFile, "w");
 				fputs($fd,json_encode($contextArray));
 				fclose($fd);
 			} else {
 				//ToDo Log error
-				log::add('imaProtect', 'debug', "			==> Equipment ID null ... impossible to follow !!!");
+				log::add('alarme_IMA', 'debug', "			==> Equipment ID null ... impossible to follow !!!");
 				return false;
 			}
 		} else {
-			log::add('imaProtect', 'debug', "			==> No datas send to store in temporary file !!!");
+			log::add('alarme_IMA', 'debug', "			==> No datas send to store in temporary file !!!");
 			return false;
 		}
 	}
 
 	//Recover datas from config file
 	public function getContextFromTmpFile(){
-      	log::add('imaProtect', 'debug', "			==> getContextFromTmpFile");
+      	log::add('alarme_IMA', 'debug', "			==> getContextFromTmpFile");
 		if (isset($this->id)) {
-          	$tmpFile=sys_get_temp_dir()."/imaProtect_session_".$this->id;
+          	$tmpFile=sys_get_temp_dir()."/alarme_IMA_session_".$this->id;
 			if (is_file($tmpFile)) {
 				$fd=fopen($tmpFile, "r");
               	$readLine=fgets($fd);
 
 				if (isset($readLine)) {
-                  	log::add('imaProtect', 'debug', "			==> Read config file .. datas $readLine");
+                  	log::add('alarme_IMA', 'debug', "			==> Read config file .. datas $readLine");
 					$arrayDecode=json_decode($readLine,true);
                   
                   	//check if temp fil is OK
                   	if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"])) {
-                      log::add('imaProtect', 'debug', "			==> No all datas read in temporary file !!!");
+                      log::add('alarme_IMA', 'debug', "			==> No all datas read in temporary file !!!");
                       return false;
                     }
 					
@@ -265,23 +265,23 @@ class imaProtectNewAPI {
 	
                   	return $this->cookieIsValid($this->expireImaCookie);
 				} else {
-					log::add('imaProtect', 'debug', "			==> No datas read in temporary file !!!");
+					log::add('alarme_IMA', 'debug', "			==> No datas read in temporary file !!!");
 					return false;
 				}
               	fclose($fd);
 				return true;
 			} else {
-				log::add('imaProtect', 'debug', "			==> No config file ... init to call");
+				log::add('alarme_IMA', 'debug', "			==> No config file ... init to call");
 				return false;
 			}
 		} else {
-			log::add('imaProtect', 'debug', "			==> Equipment ID null ... impossible to follow !!!");
+			log::add('alarme_IMA', 'debug', "			==> Equipment ID null ... impossible to follow !!!");
 			return false;
 		}
 	}
   
   	private function manageErrorMessage($httpCode,$error) {
-      	log::add('imaProtect', 'debug', "			Function manageErrorMessage : " . $error . "|" .$httpCode);
+      	log::add('alarme_IMA', 'debug', "			Function manageErrorMessage : " . $error . "|" .$httpCode);
       	$errorMessage="Unknown error";
 		if (!$this->IsNullOrEmpty($error)) {
 			$errorMessage=$error;
@@ -301,7 +301,7 @@ class imaProtectNewAPI {
 			$errorMessage .= "(". $httpCode . ")";
 		}
 		
-      	log::add('imaProtect', 'debug', "			==> errorMessage : " . $errorMessage);
+      	log::add('alarme_IMA', 'debug', "			==> errorMessage : " . $errorMessage);
       	return $errorMessage;
     }
   
@@ -318,7 +318,7 @@ class imaProtectNewAPI {
 
   //Log to IMA Account
 	public function Login()  {		
-		log::add('imaProtect', 'debug', "			==> Login ");
+		log::add('alarme_IMA', 'debug', "			==> Login ");
 		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeadersLogin());
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -362,18 +362,29 @@ class imaProtectNewAPI {
 
   //Get alarm status
 	public function getAlarmStatus() {
-      	log::add('imaProtect', 'debug', "			==> getAlarmStatus ");
-		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',"", "GET",  $this->setHeaders());
-      
-      	if (isset($httpcode) and $httpcode >= 400 ) {
-          	throw new Exception($this->manageErrorMessage($httpcode,$result));
-        } else {
-      		return json_decode($result,true);
-        }
+		$response='';
+		for ($i = 1; $i <= 3; $i++) {
+          	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus - attemp : " . $i);
+			list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',"", "GET",  $this->setHeaders());
+			
+          	if (isset($httpcode) and $httpcode >= 400 ) {
+				throw new Exception($this->manageErrorMessage($httpcode,$result));
+			} else {			
+				if ($httpcode >= 300) {
+					//regeneration of cookies and token for the next time
+					$this->Login();
+					$this->getTokens();					
+				} else {
+ 	              $response = $result;
+                  break;
+                }
+			}
+		}
+		return json_decode($response,true);
 	}
 	
 	public function getContactList(){   
-		log::add('imaProtect', 'debug', "			==> getContactList ");
+		log::add('alarme_IMA', 'debug', "			==> getContactList ");
 		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/contact/list',"", "GET",  $this->setHeaders());
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
@@ -383,69 +394,54 @@ class imaProtectNewAPI {
         }
 	}
   
-  /*
+
   //Get IMA other info like room id
 	public function getOtherInfo() {
-		log::add('imaProtect', 'debug', "			==> getOtherInfo ");
-		$urlOtherInfo="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/?_=".time()."000";
-		$method = "GET";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlOtherInfo,"", $method, $headers);
+		log::add('alarme_IMA', 'debug', "			==> getOtherInfo ");
+		
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/cameras',"", "GET",  $this->setHeaders());
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
-			throw new Exception($result);
+          	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
 			$roomsInfo=$this->readResponseForGetOtherInfo($result);
 			if(isset($roomsInfo)) {
 				$this->rooms=$roomsInfo;
-			     $contextArray =	array(
-                    "sessionID" => $this->sessionID,
-                    "sessionIDExpires" => $this->sessionIDExpires,
-                    "xcsrfToken" =>  $this->xcsrfToken,
-                    "xcsrfTokenExpires" => $this->xcsrfTokenExpires,
-                    "pk" => $this->pk,
+				$contextArray =	array(
+					"expireImaCookie" => $this->expireImaCookie,
+					"imainternational" => $this->imainternational,
+					"TS013a2ec2" =>  $this->TS013a2ec2,
+					"TS0192ac0d" => $this->TS0192ac0d,
+					"statusToken" => $this->statusToken,
+					"captureToken"=> $this->captureToken,
 					"rooms"=> $this->rooms
-                );
-                $this->storeContextToTmpFile($contextArray);
-				
+				);
                 return true;
             } else {
 				throw new Exception("Error extracting rooms informations");
 			}
         }
 	}
-    */
-	/*
+
 	//Recover pk of rooms
 	private function readResponseForGetOtherInfo($result) {
-		log::add('imaProtect', 'debug', "				==> readResponseForGetOtherInfo - Start");
+		log::add('alarme_IMA', 'debug', "				==> readResponseForGetOtherInfo - Start");
 		$response= array();
 		$resultArr=json_decode($result,true);
 		
-		foreach($resultArr as $event) {
-          foreach($event as $key=>$value){
-            if ($key == "fields") {
-				foreach($value as $detailEventkey=>$detailEventValue) {
-					if ($detailEventkey == "device_set") {
-						foreach($detailEventValue as $equipmentKey=>$equipmentValue) {
-							log::add('imaProtect', 'debug', "					==> name : " .$equipmentValue["fields"]["name"] . "| pk : " .$equipmentValue["pk"]);
-							array_push($response,array("room"=>$equipmentValue["fields"]["name"],"pk"=>$equipmentValue["pk"]));
-						}
-						
-					}
-				  }     
-            }
-          }	
-        }
-		log::add('imaProtect', 'debug', "				==> readResponseForGetOtherInfo - End -> response :  ".json_encode($response));
+		foreach($resultArr as $room) {
+		  array_push($response,array("room"=>$room["name"],"pk"=>$room["pk"]));
+		}
+		
+		log::add('alarme_IMA', 'debug', "				==> readResponseForGetOtherInfo - End -> response :  ".json_encode($response));
 		return $response;
 	}
-	*/
+
 	
 	/*
 	//Get IMA info in order to retrieve id psk of installation and other informations	
 	public function getIMAAccountInfo(){
-      	log::add('imaProtect', 'debug', "			==> getIMAAccountInfo ");
+      	log::add('alarme_IMA', 'debug', "			==> getIMAAccountInfo ");
 		$urlImaAccount="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/me/?_=".time()."000";
 		$method = "GET";
 		$headers = $this->setHeaders();
@@ -456,7 +452,7 @@ class imaProtectNewAPI {
         } else {
 			$this->pk=($this->getPK($result));
 			if (!isset($this->pk)) {
-              	log::add('imaProtect', 'debug', "				# key pk empty");
+              	log::add('alarme_IMA', 'debug', "				# key pk empty");
 				throw new Exception("key pk empty");
             }
           	
@@ -466,7 +462,7 @@ class imaProtectNewAPI {
   
   /*
   	private function getPK($input) {
-      log::add('imaProtect', 'debug', "			==> getPK - input : $input");
+      log::add('alarme_IMA', 'debug', "			==> getPK - input : $input");
       $resultArr=json_decode($input,true);
       
       //ToDo ==> code à améliorer
@@ -474,10 +470,10 @@ class imaProtectNewAPI {
       $brandLogo=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["branding_logo_url"];
       $brandName=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["partner_name"];
       //$userAdr=[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["address_1"] . " " . [0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["city_name"] . " " . [0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["address_1"] . " ( " . [0]		["fields"]["contract_set"][0]["fields"]["site"]["fields"]["postal_code"];
-      log::add('imaProtect', 'debug', "			    ## pk : $pk");
-      log::add('imaProtect', 'debug', "			    ## Brand logo : $brandLogo");
-      log::add('imaProtect', 'debug', "			    ## Brand name : $brandName");
-      //log::add('imaProtect', 'debug', "			    ## User adresse : $userAdr");
+      log::add('alarme_IMA', 'debug', "			    ## pk : $pk");
+      log::add('alarme_IMA', 'debug', "			    ## Brand logo : $brandLogo");
+      log::add('alarme_IMA', 'debug', "			    ## Brand name : $brandName");
+      //log::add('alarme_IMA', 'debug', "			    ## User adresse : $userAdr");
       return $pk;
     }
 	*/
@@ -485,7 +481,7 @@ class imaProtectNewAPI {
   
 	//Set alarm to off
 	public function setAlarmToOff($pwd) {
-      	log::add('imaProtect', 'debug', "			==> setAlarmToOff");
+      	log::add('alarme_IMA', 'debug', "			==> setAlarmToOff");
       
       	//Check XO code and pwd in input
       	$this->checkAlarmPwd($pwd);
@@ -512,7 +508,7 @@ class imaProtectNewAPI {
 	
 	//set alarm to on
 	public function setAlarmToOn() {
-      	log::add('imaProtect', 'debug', "			==> setAlarmToOn");
+      	log::add('alarme_IMA', 'debug', "			==> setAlarmToOn");
 		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',array('status' => 'on','token' => $this->statusToken), "POST", $this->setHeaders());	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -521,7 +517,7 @@ class imaProtectNewAPI {
   
 	//Set alarm to partial
 	public function setAlarmToPartial() {
-      	log::add('imaProtect', 'debug', "			==> setAlarmToPartial");
+      	log::add('alarme_IMA', 'debug', "			==> setAlarmToPartial");
 		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',array('status' => 'partial','token' => $this->statusToken), "POST", $this->setHeaders());
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -542,7 +538,7 @@ class imaProtectNewAPI {
   
   	//Get selected picture
   	public function getPictures($pictureUrl) {
-      	log::add('imaProtect', 'debug', "			==> getPictures : $pictureUrl");
+      	log::add('alarme_IMA', 'debug', "			==> getPictures : $pictureUrl");
 		$headers = $this->setHeaders();
       	list($httpcode, $result) = $this->doRequest($pictureUrl,"", "GET", $this->setHeaders());
       	
@@ -553,22 +549,22 @@ class imaProtectNewAPI {
 		}
     }
   
-  function getHeadersPost() {
-    $headers[] = "Origin: https://www.imaprotect.com";
-    $headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
-    $headers[] = "Accept: application/json, text/plain, */*";
-    $headers[] = "Content-Type:application/json";
-    $headers[]="imainternational: ".$this->imainternational;
-    $headers[]="TS013a2ec2: ".$this->TS013a2ec2;
-    $headers[]="TS0192ac0d: ".$this->TS0192ac0d;
-    $headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
-    return $headers;
-  }
+	private function getHeadersPost() {
+		$headers[] = "Origin: https://www.imaprotect.com";
+		$headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
+		$headers[] = "Accept: application/json, text/plain, */*";
+		$headers[] = "Content-Type:application/json";
+		$headers[]="imainternational: ".$this->imainternational;
+		$headers[]="TS013a2ec2: ".$this->TS013a2ec2;
+		$headers[]="TS0192ac0d: ".$this->TS0192ac0d;
+		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
+		return $headers;
+	}
   
   	//Delete selected picture
   	public function deletePictures($picture) {
-      	log::add('imaProtect', 'debug', "			==> deletePictures : $pictureUrl");
-		$urlDeletePictures="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/captures/$picture";
+      	log::add('alarme_IMA', 'debug', "			==> deletePictures : $pictureUrl");
+		//$urlDeletePictures="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/captures/$picture";
       	list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/capture/delete/'.$picture,json_encode(array('token' => $this->captureToken)), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
@@ -581,7 +577,7 @@ class imaProtectNewAPI {
 	/*
 	//Get alarm events
 	public function getAlarmEvent(){
-      	log::add('imaProtect', 'debug', "			==> getAlarmEvent ");
+      	log::add('alarme_IMA', 'debug', "			==> getAlarmEvent ");
 		$urlEvents="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/events/?_=".time()."000";
 		$method = "GET";
 		$headers = $this->setHeaders();
@@ -594,26 +590,35 @@ class imaProtectNewAPI {
 		}
 
 	}
-  
+  	*/
 	
   
   	
 
 	//Get camera snapshot of alarm
 	public function takeSnapshot($roomID) {
-      	log::add('imaProtect', 'debug', "			==> takeSnapshot : $roomID");
-		$urlTakeSnapshot="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/devices/$roomID/captures/";
-		$method = "POST";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlTakeSnapshot,"", $method, $headers);
+      	log::add('alarme_IMA', 'debug', "			==> takeSnapshot : $roomID");
+
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
 			return $result;
-		}
+		}      	
     }
-	*/
+	
+	private function guidv4() {
+		// Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+		$data = random_bytes(16);
+
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+		
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+	}
+
+
 }
 
 ?>

@@ -20,9 +20,9 @@
 //require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
   require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-if (!class_exists('alarme_IMANewAPI')) {
+if (!class_exists('imaProtectNewAPI')) {
 	//require_once dirname(__FILE__) . '/../../3rdparty/alarme_IMAAPI.class.php';
-  	require_once __DIR__  . '/../../3rdparty/alarme_IMANewAPI.class.php';
+  	require_once __DIR__  . '/../../3rdparty/imaProtectNewAPI.class.php';
 }
 
 class alarme_IMA extends eqLogic {
@@ -46,7 +46,6 @@ class alarme_IMA extends eqLogic {
 			try {
                 $c = new Cron\CronExpression(checkAndFixCron($autorefresh), new Cron\FieldFactory);
                 if ($c->isDue()) {
-                  
                     log::add('alarme_IMA', 'debug', 'Exécution du cron Ima Protect');
                   	
 		            foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
@@ -59,7 +58,7 @@ class alarme_IMA extends eqLogic {
                           	if (isset($oldValue) && is_numeric($oldValue)) {
                               if (strcmp($oldValue,$newValue) > 0 OR  strcmp($oldValue,$newValue) < 0) {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $newValue");
-                                $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
+                                //$alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
                               } else {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l'alarme n'a pas changé (old|new): $oldValue | $newValue");
                               }
@@ -70,7 +69,6 @@ class alarme_IMA extends eqLogic {
                         $alarme_IMA->writeSeparateLine();
                    }
                    
-
 				}
 			} catch (Exception $exc) {
 				log::add('alarme_IMA', 'error', __("Erreur lors de l'exécution du cron ", __FILE__) . $exc->getMessage());
@@ -81,16 +79,14 @@ class alarme_IMA extends eqLogic {
 
      /* Fonction exécutée automatiquement toutes les heures par Jeedom */
     public static function cronHourly() {
-      /*
-      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA V2 - Start');
+      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - Start');
       foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
         $alarme_IMA->writeSeparateLine();
-        $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
+        //$alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
         $alarme_IMA->getCmd(null, 'refreshCameraSnapshot')->execCmd();
         $alarme_IMA->writeSeparateLine();
       }
-      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA V2 - End');
-      */
+      log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - End');
     }
 
     /*
@@ -360,9 +356,9 @@ class alarme_IMA extends eqLogic {
   	log::add('alarme_IMA', 'debug',  "  GetAlarmState Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
     try {
-      	$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+      	$myImaProtectAlarm = $this->getInstanceIMAApi();
 		log::add('alarme_IMA', 'debug',  "	* Recuperation statut de l'alarme");
-		$alarmeStatus = $myalarme_IMAAlarm->getAlarmStatus();
+		$alarmeStatus = $myImaProtectAlarm->getAlarmStatus();
       
       	if (!isset($alarmeStatus)) {
             log::add('alarme_IMA', 'error', "	    - Impossible de trouver le status");
@@ -388,9 +384,9 @@ class alarme_IMA extends eqLogic {
   	log::add('alarme_IMA', 'debug',  "  GetAlarmEvents Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try{
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
 		log::add('alarme_IMA', 'debug',  "	* Recover alarm events");
-		$alarmEvent = $myalarme_IMAAlarm->getAlarmEvent();
+		$alarmEvent = $myImaProtectAlarm->getAlarmEvent();
         log::add('alarme_IMA', 'debug',  "  GetAlarmEvents End");
 		return $alarmEvent;
 	} catch (Exception $e) {
@@ -402,9 +398,9 @@ class alarme_IMA extends eqLogic {
   	log::add('alarme_IMA', 'debug',  "  GetCamerasSnapshot Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
 		log::add('alarme_IMA', 'debug',  "	* Recover alarm events");
-		$cameraEvents = $myalarme_IMAAlarm->getCamerasSnapshot();
+		$cameraEvents = $myImaProtectAlarm->getCamerasSnapshot();
 		log::add('alarme_IMA', 'debug',  "  GetCamerasSnapshot End");
       	return $cameraEvents;
        
@@ -413,6 +409,26 @@ class alarme_IMA extends eqLogic {
 	}
   }
 
+	private function getLastPictureTaken($cameraEvents) {
+		log::add('alarme_IMA', 'debug',  "		* getLastPictureTaken - Start : ".$cameraEvents);
+		$response='';
+    	$resultArr=json_decode($cameraEvents,true);
+        foreach($resultArr as $event) {        
+          foreach($event['images'] as $img) {
+            	if (!$this->IsNullOrEmpty($img)) {
+					$response=$img;
+					break;
+                }
+          }
+		  
+			if (!$this->IsNullOrEmpty($response)) {
+				break;
+			}
+        }
+		
+		return $response;
+	}
+	
   public function buildTabCamerasEvents($cameraEvents){
     	log::add('alarme_IMA', 'debug',  "		* buildTabCamerasEvents - Start : ".$cameraEvents);
     	$resultArr=json_decode($cameraEvents,true);
@@ -433,9 +449,9 @@ class alarme_IMA extends eqLogic {
     
 
         foreach($resultArr as $event) {
-          $date=$this->fmt_date($event['date']);;
-          $etat="";
-          $element=$event['type'];
+          $date=$event['date'];
+          $etat=$event['type'];
+          $element=$event['name'];
           $photos="";
           $pk=$event['pk'];
           $item=0;
@@ -450,39 +466,7 @@ class alarme_IMA extends eqLogic {
                   $item++;
                 }
           }
-          /*
-          foreach($event as $key=>$value){
-            if ($key == "fields") {
-              foreach($value as $detailEventkey=>$detailEventValue) {
-                switch ($detailEventkey) {
-                  case "date":
-                    $date=$this->fmt_date($detailEventValue);
-                    break;
-                  case "name":
-                    $element=$detailEventValue;
-                    break;
-                  case "images":
-					log::add('alarme_IMA', 'debug',  "		* on ajoute la photo " . json_encode($detailEventValue));
-					$item = 0;
-					foreach ($detailEventValue as $value) {
-						if (!$this->IsNullOrEmpty($value)) {
-							if ($item > 0) {
-								$photos.=',' . $value;
-							} else {	
-								$photos=$value;
-							}
-							$item++;
-						}
-					}
-                    //$photos=$detailEventValue;
-                    break;
-                }
-              }             
-            } else if($key == "pk") {              
-              $pk=$value;
-            }
-          }
-          */
+
 		  
           $cameraEventTab .=  "<tr>";
 		  $cameraEventTab .= "<td><i class=\"fa fa-trash\" aria-hidden=\"true\" onclick=deletePicture(\"";
@@ -585,17 +569,17 @@ class alarme_IMA extends eqLogic {
     $response='';
 	try {
       	$eqlogic = eqLogic::byId($input);
-      	$alarme_IMAAPI = new alarme_IMANewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input);
+      	$imaProtectAPI = new imaProtectNewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input);
       	
-      	if (!($alarme_IMAAPI->getContextFromTmpFile())) {
+      	if (!($imaProtectAPI->getContextFromTmpFile())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
-			$alarme_IMAAPI->Login();
+			$imaProtectAPI->Login();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation information compte IMA Protect");
-			$alarme_IMAAPI->getTokens();
+			$imaProtectAPI->getTokens();
 		}
       	
       	log::add('alarme_IMA', 'debug',  "	* Call backend getContactList()");
-      	$response =  $alarme_IMAAPI->getContactList();
+      	$response =  $imaProtectAPI->getContactList();
 	} catch (Exception $e) {
 	  $this->manageErrorAPI("getContactList",$e->getMessage());
 	}
@@ -608,9 +592,9 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  SetAlarmToOff Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
 	    log::add('alarme_IMA', 'debug',  "	* Extinction alarme");
-		$myalarme_IMAAlarm->setAlarmToOff($pwd);
+		$myImaProtectAlarm->setAlarmToOff($pwd);
 	} catch (Exception $e) {
 	  $this->manageErrorAPI("setAlarmToOff",$e->getMessage());
 	}
@@ -621,9 +605,9 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  setAlarmToOn Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try{
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
 	    log::add('alarme_IMA', 'debug',  "	* Mise en route alarme");
-		$myalarme_IMAAlarm->setAlarmToOn();
+		$myImaProtectAlarm->setAlarmToOn();
 	} catch (Exception $e) {
 	  $this->manageErrorAPI("setAlarmToOff",$e->getMessage());
 	}
@@ -634,9 +618,9 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  setAlarmToPartial Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try{
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
 	    log::add('alarme_IMA', 'debug',  "	* Mise en route alarme");
-		$myalarme_IMAAlarm->setAlarmToPartial();
+		$myImaProtectAlarm->setAlarmToPartial();
 	} catch (Exception $e) {
 	  $this->manageErrorAPI("setAlarmToOff",$e->getMessage());
 	}
@@ -648,8 +632,8 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  getPictures Start => $pictureUrl");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
-		$byteArray=$myalarme_IMAAlarm->getPictures($pictureUrl);
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
+		$byteArray=$myImaProtectAlarm->getPictures($pictureUrl);
 	    if (isset($byteArray)) {
 			$str=base64_encode($byteArray);
 			return base64_encode($byteArray);
@@ -665,8 +649,8 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  deletePictures Start => $picture");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
-		$result=$myalarme_IMAAlarm->deletePictures($picture);
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
+		$result=$myImaProtectAlarm->deletePictures($picture);
 		$cameraSnapshot=$this->GetCamerasSnapshot();
 		$this->checkAndUpdateCmd('cameraSnapshot', $this->buildTabCamerasEvents($cameraSnapshot));
 	} catch (Exception $e) {
@@ -675,46 +659,57 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  deletePictures End");
   }
   
-  /*
+
   public function takeSnapshot($roomId) {
-	log::add('alarme_IMA', 'debug',  "  takeSnapshot Start => $picture");
+	log::add('alarme_IMA', 'debug',  "  takeSnapshot Start => $roomId");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
-		$myalarme_IMAAlarm = $this->getInstanceIMAApi();
-		$result=$myalarme_IMAAlarm->takeSnapshot($roomId);
+		$myImaProtectAlarm = $this->getInstanceIMAApi();
+		$result=$myImaProtectAlarm->takeSnapshot($roomId);
+		log::add('alarme_IMA', 'debug',  "	* pause of 20s in order to be able to retrieve new snapshot");
+		sleep(20);
 		$cameraSnapshot=$this->GetCamerasSnapshot();
-		$this->checkAndUpdateCmd('cameraSnapshot', $this->buildTabCamerasEvents($cameraSnapshot));
-      	return $result;
+		if (isset($cameraSnapshot)) {
+			log::add('alarme_IMA', 'debug', " * MAJ cameraSnapshotBrute");
+			$this->checkAndUpdateCmd('cameraSnapshotBrute', $cameraSnapshot);
+			log::add('alarme_IMA', 'debug', " * MAJ cameraSnapshot");
+			$this->checkAndUpdateCmd('cameraSnapshot', $this->buildTabCamerasEvents($cameraSnapshot));
+			return $this->getLastPictureTaken($cameraSnapshot);
+		}
+      	return '';
 	} catch (Exception $e) {
       	$this->manageErrorAPI("takeSnapshot",$e->getMessage());
     } 
     log::add('alarme_IMA', 'debug',  "  takeSnapshot End");
   }
-  */
+
   
   private function getInstanceIMAApi(){
     try {
-      	$alarme_IMAAPI = new alarme_IMANewAPI($this->getConfiguration('login_ima'),$this->getConfiguration('password_ima'),$this->getConfiguration('cfgContactList'),$this->getId());
+      	$imaProtectAPI = new imaProtectNewAPI($this->getConfiguration('login_ima'),$this->getConfiguration('password_ima'),$this->getConfiguration('cfgContactList'),$this->getId());
       	
-      	if (!($alarme_IMAAPI->getContextFromTmpFile())) {
+      	if (!($imaProtectAPI->getContextFromTmpFile())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
-			$alarme_IMAAPI->Login();
-			log::add('alarme_IMA', 'debug',  "	* Recuperation information compte IMA Protect");
-			$alarme_IMAAPI->getTokens();
+			$imaProtectAPI->Login();
+			log::add('alarme_IMA', 'debug',  "	* Recuperation token IMA Protect");
+			$imaProtectAPI->getTokens();
+			log::add('alarme_IMA', 'debug',  "	* Recuperation informations sur les caméras IMA Protect");
+			$imaProtectAPI->getOtherInfo();
+			$this->setRoomsList($imaProtectAPI);
 		}
-      	return $alarme_IMAAPI;
+      	return $imaProtectAPI;
     } catch (Exception $e) {
       	$this->manageErrorAPI("getInstanceIMAApi",$e->getMessage());
     }
   }
   
-  /*
-  private function setRoomsList($alarme_IMAAPI){
-		log::add('alarme_IMA', 'debug',  "	* setRoomsList Start : ". json_encode($alarme_IMAAPI->rooms));
+
+  private function setRoomsList($imaProtectAPI){
+		log::add('alarme_IMA', 'debug',  "	* setRoomsList Start : ". json_encode($imaProtectAPI->rooms));
 		$cmdActionScreenshot = $this->getCmd(null, 'actionScreenshot');
 		if (is_object($cmdActionScreenshot)) {
           	$listValue='';
-			$roomsList=$alarme_IMAAPI->rooms;
+			$roomsList=$imaProtectAPI->rooms;
 			for ($i = 0; $i < count($roomsList); $i++) {
               	if (!empty($roomsList[$i]["room"])){
                   if (!$this->IsNullOrEmpty($listValue)) {
@@ -731,7 +726,7 @@ class alarme_IMA extends eqLogic {
 		}
 	  log::add('alarme_IMA', 'debug',  "	* setRoomsList End");
   }
-  */
+
 
   
   private function IsNullOrEmpty($input){
