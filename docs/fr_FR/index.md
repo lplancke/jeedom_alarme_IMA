@@ -8,6 +8,7 @@ Ce plugin permet  :
 -- desactiver de l'alarme
 - visionner les prises de photos
 - supprimer les prises de photos
+- prendre des snapshots via les cameras IMA
 
 
 Prérequis
@@ -133,6 +134,9 @@ Liste des commandes d'un équipement "Alarme_IMA"
 		* Supprimer une image :
 			* title : delete
 			* message : primary key (pk) de la photo (disponible dans le flux brute)
+		* prendre une snapshot d'une caméra :
+			* title : take
+			* message : primary key (pk) de la pièce (disponible dans la configuration de la commande action sur les images)
 
 
 
