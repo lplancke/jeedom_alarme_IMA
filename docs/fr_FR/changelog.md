@@ -2,10 +2,10 @@
 
 >**IMPORTANT**
 >
->Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+>Pour rappel s'il n'y a pas d'information sur la mise Ã  jour, c'est que celle-ci concerne uniquement de la mise Ã  jour de documentation, de traduction ou de texte.
 
 # 08/06/2021
-- Prise en charge de la fonction de prise d'instantanée par les caméras IMA
+- Prise en charge de la fonction de prise d'instantanÃ©e par les camÃ©ras IMA
 
 # 29/05/2021
 - Mise en place lien vers la documentation du plugin
