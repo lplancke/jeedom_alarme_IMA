@@ -153,7 +153,7 @@ Liste des commandes d'un équipement "Alarme_IMA"
 					* la pk pour la pièce garage est 1870
 					* la pk pour la pièce séjour est 1871
 
-
+![alt text](../images/Alarme_IMA_List_Rooms.JPG "Liste des caméras disponibles")
 
 FAQ
 ===
