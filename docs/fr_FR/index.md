@@ -103,13 +103,17 @@ Permet de :
 Prendre un instantané
 ---
 - il suffit d'aller dans l'onglet Snapshot ... de sélectionner la caméra et de cliquer sur "Prendre instantané"
+
 ![alt text](../images/Alarme_IMA_Widget_Snapshot.JPG "Prise instantanée")
 
 - le résultat s'affiche entre 20 et 30s après (le temps que l'image soit disponible)
+
 ![alt text](../images/Alarme_IMA_Widget_Snapshot_result.JPG "Affichage dans le widget")
 
-La liste des caméras est MAJ à chaque renouvellement de session IMA ... max toutes les 7 minutes
-La liste des caméras est ajouter à la configuration de la commande "Actions sur une image caméra" 
+La liste des caméras est MAJ à chaque renouvellement de session IMA ... max toutes les 7 minutes.
+
+La liste des caméras est ajouter à la configuration de la commande "Actions sur une image caméra".
+
 ![alt text](../images/Alarme_IMA_List_Rooms.JPG "Liste des caméras disponibles")
 
 
