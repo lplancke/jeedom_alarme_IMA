@@ -409,6 +409,26 @@ class alarme_IMA extends eqLogic {
 	}
   }
 
+	private function getLastPictureTaken($cameraEvents) {
+		log::add('alarme_IMA', 'debug',  "		* getLastPictureTaken - Start : ".$cameraEvents);
+		$response='';
+    	$resultArr=json_decode($cameraEvents,true);
+        foreach($resultArr as $event) {        
+          foreach($event['images'] as $img) {
+            	if (!$this->IsNullOrEmpty($img)) {
+					$response=$img;
+					break;
+                }
+          }
+		  
+			if (!$this->IsNullOrEmpty($response)) {
+				break;
+			}
+        }
+		
+		return $response;
+	}
+	
   public function buildTabCamerasEvents($cameraEvents){
     	log::add('alarme_IMA', 'debug',  "		* buildTabCamerasEvents - Start : ".$cameraEvents);
     	$resultArr=json_decode($cameraEvents,true);
@@ -446,39 +466,7 @@ class alarme_IMA extends eqLogic {
                   $item++;
                 }
           }
-          /*
-          foreach($event as $key=>$value){
-            if ($key == "fields") {
-              foreach($value as $detailEventkey=>$detailEventValue) {
-                switch ($detailEventkey) {
-                  case "date":
-                    $date=$this->fmt_date($detailEventValue);
-                    break;
-                  case "name":
-                    $element=$detailEventValue;
-                    break;
-                  case "images":
-					log::add('alarme_IMA', 'debug',  "		* on ajoute la photo " . json_encode($detailEventValue));
-					$item = 0;
-					foreach ($detailEventValue as $value) {
-						if (!$this->IsNullOrEmpty($value)) {
-							if ($item > 0) {
-								$photos.=',' . $value;
-							} else {	
-								$photos=$value;
-							}
-							$item++;
-						}
-					}
-                    //$photos=$detailEventValue;
-                    break;
-                }
-              }             
-            } else if($key == "pk") {              
-              $pk=$value;
-            }
-          }
-          */
+
 		  
           $cameraEventTab .=  "<tr>";
 		  $cameraEventTab .= "<td><i class=\"fa fa-trash\" aria-hidden=\"true\" onclick=deletePicture(\"";
@@ -671,22 +659,30 @@ class alarme_IMA extends eqLogic {
     log::add('alarme_IMA', 'debug',  "  deletePictures End");
   }
   
-  /*
+
   public function takeSnapshot($roomId) {
-	log::add('alarme_IMA', 'debug',  "  takeSnapshot Start => $picture");
+	log::add('alarme_IMA', 'debug',  "  takeSnapshot Start => $roomId");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
 	try {
 		$myImaProtectAlarm = $this->getInstanceIMAApi();
 		$result=$myImaProtectAlarm->takeSnapshot($roomId);
+		log::add('alarme_IMA', 'debug',  "	* pause of 20s in order to be able to retrieve new snapshot");
+		sleep(20);
 		$cameraSnapshot=$this->GetCamerasSnapshot();
-		$this->checkAndUpdateCmd('cameraSnapshot', $this->buildTabCamerasEvents($cameraSnapshot));
-      	return $result;
+		if (isset($cameraSnapshot)) {
+			log::add('alarme_IMA', 'debug', " * MAJ cameraSnapshotBrute");
+			$this->checkAndUpdateCmd('cameraSnapshotBrute', $cameraSnapshot);
+			log::add('alarme_IMA', 'debug', " * MAJ cameraSnapshot");
+			$this->checkAndUpdateCmd('cameraSnapshot', $this->buildTabCamerasEvents($cameraSnapshot));
+			return $this->getLastPictureTaken($cameraSnapshot);
+		}
+      	return '';
 	} catch (Exception $e) {
       	$this->manageErrorAPI("takeSnapshot",$e->getMessage());
     } 
     log::add('alarme_IMA', 'debug',  "  takeSnapshot End");
   }
-  */
+
   
   private function getInstanceIMAApi(){
     try {
@@ -695,8 +691,11 @@ class alarme_IMA extends eqLogic {
       	if (!($imaProtectAPI->getContextFromTmpFile())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
 			$imaProtectAPI->Login();
-			log::add('alarme_IMA', 'debug',  "	* Recuperation information compte IMA Protect");
+			log::add('alarme_IMA', 'debug',  "	* Recuperation token IMA Protect");
 			$imaProtectAPI->getTokens();
+			log::add('alarme_IMA', 'debug',  "	* Recuperation informations sur les caméras IMA Protect");
+			$imaProtectAPI->getOtherInfo();
+			$this->setRoomsList($imaProtectAPI);
 		}
       	return $imaProtectAPI;
     } catch (Exception $e) {
@@ -704,7 +703,7 @@ class alarme_IMA extends eqLogic {
     }
   }
   
-  /*
+
   private function setRoomsList($imaProtectAPI){
 		log::add('alarme_IMA', 'debug',  "	* setRoomsList Start : ". json_encode($imaProtectAPI->rooms));
 		$cmdActionScreenshot = $this->getCmd(null, 'actionScreenshot');
@@ -727,7 +726,7 @@ class alarme_IMA extends eqLogic {
 		}
 	  log::add('alarme_IMA', 'debug',  "	* setRoomsList End");
   }
-  */
+
 
   
   private function IsNullOrEmpty($input){

@@ -8,6 +8,7 @@ Ce plugin permet  :
 -- desactiver de l'alarme
 - visionner les prises de photos
 - supprimer les prises de photos
+- prendre des snapshots via les cameras IMA
 
 
 Prérequis
@@ -38,6 +39,7 @@ Une fois le plugin installé:
 
 - cliquez sur Sauvegarder.
 - choissez le contact à utiliser
+
 
 ![alt text](../images/Alarme_IMA_Capture_contact_V2.JPG "Choix du contact")
 
@@ -101,7 +103,19 @@ Permet de :
 
 Prendre un instantané
 ---
-Dès que IMA aura remis la fonctionnalité disponible
+- il suffit d'aller dans l'onglet Snapshot ... de sélectionner la caméra et de cliquer sur "Prendre instantané"
+
+![alt text](../images/Alarme_IMA_Widget_Snapshot.JPG "Prise instantanée")
+
+- le résultat s'affiche entre 20 et 30s après (le temps que l'image soit disponible)
+
+![alt text](../images/Alarme_IMA_Widget_Snapshot_result.JPG "Affichage dans le widget")
+
+La liste des caméras est MAJ à chaque renouvellement de session IMA ... max toutes les 7 minutes.
+
+La liste des caméras est ajouter à la configuration de la commande "Actions sur une image caméra".
+
+![alt text](../images/Alarme_IMA_List_Rooms.JPG "Liste des caméras disponibles")
 
 
 Liste des commandes d'un équipement "Alarme_IMA"
@@ -133,8 +147,14 @@ Liste des commandes d'un équipement "Alarme_IMA"
 		* Supprimer une image :
 			* title : delete
 			* message : primary key (pk) de la photo (disponible dans le flux brute)
+		* prendre une snapshot d'une caméra :
+			* title : take
+			* message : primary key (pk) de la pièce (disponible dans la configuration de la commande action sur les images)
+				* exemple de valeur de configuration : {"listValue":"1870|garage;1871|s\u00e9jour"}
+					* la pk pour la pièce garage est 1870
+					* la pk pour la pièce séjour est 1871
 
-
+![alt text](../images/Alarme_IMA_List_Rooms.JPG "Liste des caméras disponibles")
 
 FAQ
 ===
