@@ -149,6 +149,9 @@ Liste des commandes d'un équipement "Alarme_IMA"
 		* prendre une snapshot d'une caméra :
 			* title : take
 			* message : primary key (pk) de la pièce (disponible dans la configuration de la commande action sur les images)
+				* exemple de valeur de configuration : {"listValue":"1870|garage;1871|s\u00e9jour"}
+					* la pk pour la pièce garage est 1870
+					* la pk pour la pièce séjour est 1871
 
 
 
