@@ -394,64 +394,49 @@ class imaProtectNewAPI {
         }
 	}
   
-  /*
+
   //Get IMA other info like room id
 	public function getOtherInfo() {
 		log::add('alarme_IMA', 'debug', "			==> getOtherInfo ");
-		$urlOtherInfo="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/?_=".time()."000";
-		$method = "GET";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlOtherInfo,"", $method, $headers);
+		
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/cameras',"", "GET",  $this->setHeaders());
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
-			throw new Exception($result);
+          	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
 			$roomsInfo=$this->readResponseForGetOtherInfo($result);
 			if(isset($roomsInfo)) {
 				$this->rooms=$roomsInfo;
-			     $contextArray =	array(
-                    "sessionID" => $this->sessionID,
-                    "sessionIDExpires" => $this->sessionIDExpires,
-                    "xcsrfToken" =>  $this->xcsrfToken,
-                    "xcsrfTokenExpires" => $this->xcsrfTokenExpires,
-                    "pk" => $this->pk,
+				$contextArray =	array(
+					"expireImaCookie" => $this->expireImaCookie,
+					"imainternational" => $this->imainternational,
+					"TS013a2ec2" =>  $this->TS013a2ec2,
+					"TS0192ac0d" => $this->TS0192ac0d,
+					"statusToken" => $this->statusToken,
+					"captureToken"=> $this->captureToken,
 					"rooms"=> $this->rooms
-                );
-                $this->storeContextToTmpFile($contextArray);
-				
+				);
                 return true;
             } else {
 				throw new Exception("Error extracting rooms informations");
 			}
         }
 	}
-    */
-	/*
+
 	//Recover pk of rooms
 	private function readResponseForGetOtherInfo($result) {
 		log::add('alarme_IMA', 'debug', "				==> readResponseForGetOtherInfo - Start");
 		$response= array();
 		$resultArr=json_decode($result,true);
 		
-		foreach($resultArr as $event) {
-          foreach($event as $key=>$value){
-            if ($key == "fields") {
-				foreach($value as $detailEventkey=>$detailEventValue) {
-					if ($detailEventkey == "device_set") {
-						foreach($detailEventValue as $equipmentKey=>$equipmentValue) {
-							log::add('alarme_IMA', 'debug', "					==> name : " .$equipmentValue["fields"]["name"] . "| pk : " .$equipmentValue["pk"]);
-							array_push($response,array("room"=>$equipmentValue["fields"]["name"],"pk"=>$equipmentValue["pk"]));
-						}
-						
-					}
-				  }     
-            }
-          }	
-        }
+		foreach($resultArr as $room) {
+		  array_push($response,array("room"=>$room["name"],"pk"=>$room["pk"]));
+		}
+		
 		log::add('alarme_IMA', 'debug', "				==> readResponseForGetOtherInfo - End -> response :  ".json_encode($response));
 		return $response;
 	}
-	*/
+
 	
 	/*
 	//Get IMA info in order to retrieve id psk of installation and other informations	
@@ -564,22 +549,22 @@ class imaProtectNewAPI {
 		}
     }
   
-  function getHeadersPost() {
-    $headers[] = "Origin: https://www.imaprotect.com";
-    $headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
-    $headers[] = "Accept: application/json, text/plain, */*";
-    $headers[] = "Content-Type:application/json";
-    $headers[]="imainternational: ".$this->imainternational;
-    $headers[]="TS013a2ec2: ".$this->TS013a2ec2;
-    $headers[]="TS0192ac0d: ".$this->TS0192ac0d;
-    $headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
-    return $headers;
-  }
+	private function getHeadersPost() {
+		$headers[] = "Origin: https://www.imaprotect.com";
+		$headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
+		$headers[] = "Accept: application/json, text/plain, */*";
+		$headers[] = "Content-Type:application/json";
+		$headers[]="imainternational: ".$this->imainternational;
+		$headers[]="TS013a2ec2: ".$this->TS013a2ec2;
+		$headers[]="TS0192ac0d: ".$this->TS0192ac0d;
+		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
+		return $headers;
+	}
   
   	//Delete selected picture
   	public function deletePictures($picture) {
       	log::add('alarme_IMA', 'debug', "			==> deletePictures : $pictureUrl");
-		$urlDeletePictures="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/captures/$picture";
+		//$urlDeletePictures="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/captures/$picture";
       	list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/capture/delete/'.$picture,json_encode(array('token' => $this->captureToken)), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
@@ -605,7 +590,7 @@ class imaProtectNewAPI {
 		}
 
 	}
-  
+  	*/
 	
   
   	
@@ -613,18 +598,27 @@ class imaProtectNewAPI {
 	//Get camera snapshot of alarm
 	public function takeSnapshot($roomID) {
       	log::add('alarme_IMA', 'debug', "			==> takeSnapshot : $roomID");
-		$urlTakeSnapshot="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/devices/$roomID/captures/";
-		$method = "POST";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlTakeSnapshot,"", $method, $headers);
+
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
 			return $result;
-		}
+		}      	
     }
-	*/
+	
+	private function guidv4() {
+		// Generate 16 bytes (128 bits) of random data or use the data passed into the function.
+		$data = random_bytes(16);
+
+		$data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+		$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+		
+		return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+	}
+
+
 }
 
 ?>
