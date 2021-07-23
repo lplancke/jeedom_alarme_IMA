@@ -58,7 +58,7 @@ class alarme_IMA extends eqLogic {
                           	if (isset($oldValue) && is_numeric($oldValue)) {
                               if (strcmp($oldValue,$newValue) > 0 OR  strcmp($oldValue,$newValue) < 0) {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $newValue");
-                                //$alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
+                                $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
                               } else {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l'alarme n'a pas changé (old|new): $oldValue | $newValue");
                               }
@@ -82,7 +82,7 @@ class alarme_IMA extends eqLogic {
       log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - Start');
       foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
         $alarme_IMA->writeSeparateLine();
-        //$alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
+        $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
         $alarme_IMA->getCmd(null, 'refreshCameraSnapshot')->execCmd();
         $alarme_IMA->writeSeparateLine();
       }
@@ -140,7 +140,6 @@ class alarme_IMA extends eqLogic {
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
       
-      /*
       	$cmd = $this->getCmd(null, 'alarmeEvents');
 		if (! is_object($cmd))
 		{
@@ -160,8 +159,7 @@ class alarme_IMA extends eqLogic {
           	$cmd->save();
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmd->getName().' (LogicalId : '.$cmd->getLogicalId().')');
         }
-      */
-	  /*
+
       	$cmd = $this->getCmd(null, 'alarmeEventsBrute');
 		if (! is_object($cmd))
 		{
@@ -181,7 +179,6 @@ class alarme_IMA extends eqLogic {
           	$cmd->save();
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmd->getName().' (LogicalId : '.$cmd->getLogicalId().')');
         }
-		*/
 		
       	$cmdCameraSnapshot = $this->getCmd(null, 'cameraSnapshot');
 		if (! is_object($cmdCameraSnapshot))
@@ -252,7 +249,7 @@ class alarme_IMA extends eqLogic {
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdRefreshCameraSnapshot->getName().' (LogicalId : '.$cmdRefreshCameraSnapshot->getLogicalId().')');
 		}
       
-		/*
+
       	$cmdRefreshEventsAlarm = $this->getCmd(null, 'refreshAlarmEvents');
 		if (!is_object($cmdRefreshEventsAlarm)) {
 			$cmdRefreshEventsAlarm = new alarme_IMACmd();
@@ -267,9 +264,6 @@ class alarme_IMA extends eqLogic {
 			$cmdRefreshEventsAlarm->save();
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdRefreshEventsAlarm->getName().' (LogicalId : '.$cmdRefreshEventsAlarm->getLogicalId().')');
 		}
-		
-      	
-      */
 	  
       	$cmdActionModeAlarme = $this->getCmd(null, 'setModeAlarme');
         if ( ! is_object($cmdActionModeAlarme)) {
@@ -379,7 +373,7 @@ class alarme_IMA extends eqLogic {
       	$this->manageErrorAPI("GetAlarmState",$e->getMessage());
     }
   }
-  /*
+ 
   public function GetAlarmEvents()	{
   	log::add('alarme_IMA', 'debug',  "  GetAlarmEvents Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
@@ -393,7 +387,7 @@ class alarme_IMA extends eqLogic {
 		$this->manageErrorAPI("GetAlarmEvents",$e->getMessage());
 	}
   }
-  */
+  
   public function GetCamerasSnapshot()	{
   	log::add('alarme_IMA', 'debug',  "  GetCamerasSnapshot Start");
   	log::add('alarme_IMA', 'debug',  "	* instanciation api ima protect");
@@ -499,7 +493,7 @@ class alarme_IMA extends eqLogic {
           return $cameraEventTab;
   }
 
-  /*
+
   public function buildTabAlarmEvents($alarmEvents){
     	log::add('alarme_IMA', 'debug',  "		* build alarm events V2tab - Start");
     	$resultArr=json_decode($alarmEvents,true);
@@ -508,17 +502,31 @@ class alarme_IMA extends eqLogic {
 		$alarmeEventTab .= "<table>";
 		$alarmeEventTab .= "<thead>";
 		$alarmeEventTab .= "<tr>";
+		$alarmeEventTab .= "<th></th>";
 		$alarmeEventTab .= "<th>Date</th>";
-		$alarmeEventTab .= "<th>Etat</th>";
-		$alarmeEventTab .= "<th>Utilisateur</th>";
-		$alarmeEventTab .= "<th>Elément</th>";
-    	$alarmeEventTab .= "<th>Lieu</th>";
+		$alarmeEventTab .= "<th>Evènement</th>";
+		$alarmeEventTab .= "<th>Détail</th>";
 		$alarmeEventTab .= "</tr>";
 		$alarmeEventTab .= "</thead>";
 		$alarmeEventTab .= "<tbody>";
 
-        foreach($resultArr as $event) {
-          foreach($event as $key=>$value){
+        foreach($resultArr as $journalK=>$journalV) {
+          foreach($journalV as $eventDateK=>$eventDateV){
+			  
+			  foreach($eventDateV as $eventDetailK=>$eventDetailV){
+					$event=str_replace("'"," ",$eventDetailV['fields']['title']);
+					$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
+					$icon=$eventDetailV['fields']['icon'];
+					$date=str_replace(['T','+02:00'],' ',$eventDetailV['fields']['creationDatetime']);
+					
+					$alarmeEventTab .=  "<tr>";
+					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
+					$alarmeEventTab .=  "<td>$date</td>";
+					$alarmeEventTab .=  "<td>$event</td>";
+					$alarmeEventTab .=  "<td>$detail</td>";
+					$alarmeEventTab .=  "</tr>"; 
+			  }
+			  /*
             if ($key == "fields") {
 				$date="";
 				$etat="";
@@ -553,6 +561,7 @@ class alarme_IMA extends eqLogic {
 				$alarmeEventTab .=  "<td>$lieu</td>";
 				$alarmeEventTab .=  "</tr>";            
             }
+			*/
           }	
         }
         $alarmeEventTab .=  "</tbody>";
@@ -561,7 +570,7 @@ class alarme_IMA extends eqLogic {
     	log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End => $alarmeEventTab");
     	return $alarmeEventTab;
   }
-  */
+
   
   public function getContactList($input){   
     log::add('alarme_IMA', 'debug',  "  getContactList Start : " . $input);
