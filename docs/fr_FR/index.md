@@ -9,6 +9,7 @@ Ce plugin permet  :
 - visionner les prises de photos
 - supprimer les prises de photos
 - prendre des snapshots via les cameras IMA
+- consulter la liste des évènements de l'alarme
 
 
 Prérequis
@@ -86,7 +87,7 @@ La désactivation de l'alarme ouvre une fenêtre pour saisir le mot de passe de 
 
 Journal des évènements
 ---
-Dès que IMA aura remis la fonctionnalité disponible
+![alt text](../images/Alarme_IMA_Widget_EventsList.JPG "Liste évènement de l'alarme")
 
 Historique des prises de vue
 ---
@@ -126,9 +127,13 @@ Liste des commandes d'un équipement "Alarme_IMA"
 	* Statut de l'alarme
 	* Images caméras : historique des prises de vue (format html)
 	* Images caméras données brutes : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
+	* Evenements : historique des évènements de l'alarme (format html)
+	* Evenements données brutes  : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
 
  * commande de type action
 	* Rafraîchir statut caméra : permet de forcer le rafraichissement de l'état d'activatio de l'alarme
+	* Rafraichir capture caméras : permet de forcer le rafraichissement des captures de caméras
+	* Rafraichir évènements alarme : permet de forcer le rafraichissement de la liste des évènements de l'alarme
 	* Action mode alarme : commande de type message
 		* Désactiver alarme :
 			* title : off

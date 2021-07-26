@@ -437,48 +437,7 @@ class imaProtectNewAPI {
 		return $response;
 	}
 
-	
-	/*
-	//Get IMA info in order to retrieve id psk of installation and other informations	
-	public function getIMAAccountInfo(){
-      	log::add('alarme_IMA', 'debug', "			==> getIMAAccountInfo ");
-		$urlImaAccount="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/me/?_=".time()."000";
-		$method = "GET";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlImaAccount,"", $method, $headers);
-      
-      	if (isset($httpcode) and $httpcode >= 400 ) {
-			throw new Exception($this->manageErrorMessage($httpcode,$result));
-        } else {
-			$this->pk=($this->getPK($result));
-			if (!isset($this->pk)) {
-              	log::add('alarme_IMA', 'debug', "				# key pk empty");
-				throw new Exception("key pk empty");
-            }
-          	
-        }	
-	}
-	*/
-  
-  /*
-  	private function getPK($input) {
-      log::add('alarme_IMA', 'debug', "			==> getPK - input : $input");
-      $resultArr=json_decode($input,true);
-      
-      //ToDo ==> code à améliorer
-      $pk=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["hss_pk"];
-      $brandLogo=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["branding_logo_url"];
-      $brandName=$resultArr[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["partner_name"];
-      //$userAdr=[0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["address_1"] . " " . [0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["city_name"] . " " . [0]["fields"]["contract_set"][0]["fields"]["site"]["fields"]["address_1"] . " ( " . [0]		["fields"]["contract_set"][0]["fields"]["site"]["fields"]["postal_code"];
-      log::add('alarme_IMA', 'debug', "			    ## pk : $pk");
-      log::add('alarme_IMA', 'debug', "			    ## Brand logo : $brandLogo");
-      log::add('alarme_IMA', 'debug', "			    ## Brand name : $brandName");
-      //log::add('alarme_IMA', 'debug', "			    ## User adresse : $userAdr");
-      return $pk;
-    }
-	*/
-	
-  
+	  
 	//Set alarm to off
 	public function setAlarmToOff($pwd) {
       	log::add('alarme_IMA', 'debug', "			==> setAlarmToOff");
@@ -564,7 +523,6 @@ class imaProtectNewAPI {
   	//Delete selected picture
   	public function deletePictures($picture) {
       	log::add('alarme_IMA', 'debug', "			==> deletePictures : $pictureUrl");
-		//$urlDeletePictures="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/captures/$picture";
       	list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/capture/delete/'.$picture,json_encode(array('token' => $this->captureToken)), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
@@ -574,26 +532,19 @@ class imaProtectNewAPI {
 		}
     }
 	
-	/*
 	//Get alarm events
 	public function getAlarmEvent(){
       	log::add('alarme_IMA', 'debug', "			==> getAlarmEvent ");
-		$urlEvents="https://pilotageadistance.imateleassistance.com/proxy/api/1.0/hss/". $this->pk . "/events/?_=".time()."000";
-		$method = "GET";
-		$headers = $this->setHeaders();
-      	list($httpcode, $result) = $this->doRequest($urlEvents,"", $method, $headers);
+      	list($httpcode, $result) = $this->doRequest("https://www.imaprotect.com/fr/client/management/journal","", "GET", $this->setHeaders());
       	
-		if (isset($httpcode) and $httpcode >= 400 ) {
+      	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
 			return $result;
 		}
 
 	}
-  	*/
 	
-  
-  	
 
 	//Get camera snapshot of alarm
 	public function takeSnapshot($roomID) {
