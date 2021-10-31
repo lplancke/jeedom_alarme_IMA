@@ -32,6 +32,11 @@ try {
 		ajax::success($result);
 	}
 	
+	if (init('action') == 'removeDatasSession') {
+		$result=alarme_IMA::removeDatasSession(init('input'));
+		ajax::success($result);
+	}
+	
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
 } catch (Exception $e) {

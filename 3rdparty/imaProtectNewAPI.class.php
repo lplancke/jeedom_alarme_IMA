@@ -220,9 +220,62 @@ class imaProtectNewAPI {
 		}
 	}
 
+	public function getDatasSession(){
+      	log::add('alarme_IMA', 'debug', "			==> " . __FUNCTION__);
+		if (config::byKey('imaToken_session_'.$this->id, 'alarme_IMA') == '') {
+            log::add('alarme_IMA', 'debug', "			==> No plugin config ... init to call");
+			return false;
+        } else {
+			log::add('alarme_IMA', 'debug', '			==> plugin config : '.json_encode(config::byKey('imaToken_session_'.$this->id, 'alarme_IMA')));
+			return self::checkDatasSession(json_encode(config::byKey('imaToken_session_'.$this->id, 'alarme_IMA')));
+		}
+	}
+	
+	private function checkDatasSession($datasSession) {
+		if (isset($datasSession)) {
+			log::add('alarme_IMA', 'debug', "			==> Read datas session ... datas $datasSession");
+			$arrayDecode=json_decode($datasSession,true);
+		  
+			//check if temp fil is OK
+			if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"])) {
+			  log::add('alarme_IMA', 'debug', "			==> No all datas read in temporary file !!!");
+			  return false;
+			}
+			
+			if (isset($arrayDecode["expireImaCookie"])) {
+				$this->expireImaCookie=$arrayDecode["expireImaCookie"];
+			}
+			
+			if (isset($arrayDecode["imainternational"])) {
+					$this->imainternational=$arrayDecode["imainternational"];
+			}
+			
+			if (isset($arrayDecode["TS013a2ec2"])) {
+					$this->TS013a2ec2=$arrayDecode["TS013a2ec2"];
+			}
+			
+			if (isset($arrayDecode["TS0192ac0d"])) {
+					$this->TS0192ac0d=$arrayDecode["TS0192ac0d"];
+			}
+			
+			if (isset($arrayDecode["statusToken"])) {
+					$this->statusToken=$arrayDecode["statusToken"];
+			}
+			
+			if (isset($arrayDecode["captureToken"])) {
+				$this->captureToken=$arrayDecode["captureToken"];
+			}
+
+			return $this->cookieIsValid($this->expireImaCookie);
+		} else {
+			log::add('alarme_IMA', 'debug', "			==> No datas read in temporary file !!!");
+			return false;
+		}
+	}
+	
 	//Recover datas from config file
 	public function getContextFromTmpFile(){
-      	log::add('alarme_IMA', 'debug', "			==> getContextFromTmpFile");
+		log::add('alarme_IMA', 'debug', "			==> getContextFromTmpFile");
 		if (isset($this->id)) {
           	$tmpFile=sys_get_temp_dir()."/alarme_IMA_session_".$this->id;
 			if (is_file($tmpFile)) {
@@ -341,7 +394,10 @@ class imaProtectNewAPI {
 				"statusToken" => $this->statusToken,
 				"captureToken"=> $this->captureToken
 			);
+			
 			$this->storeContextToTmpFile($contextArray);
+			
+			config::save('imaToken_session_'.$this->id,json_encode($contextArray),'alarme_IMA');
 						
 			return true;
         }		

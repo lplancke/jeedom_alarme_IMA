@@ -352,11 +352,14 @@ class alarme_IMA extends eqLogic {
     try {
       	$myImaProtectAlarm = $this->getInstanceIMAApi();
 		log::add('alarme_IMA', 'debug',  "	* Recuperation statut de l'alarme");
+		
 		$alarmeStatus = $myImaProtectAlarm->getAlarmStatus();
       
       	if (!isset($alarmeStatus)) {
             log::add('alarme_IMA', 'error', "	    - Impossible de trouver le status");
-            return self::IMA_UNKNOWN;
+			$oldValue=$alarme_IMA->getCmd(null, 'statusAlarme')->execCmd();
+            $oldValue;
+			//return self::IMA_UNKNOWN;
         }
 
         $convStatusToNumeric=array(
@@ -571,6 +574,10 @@ class alarme_IMA extends eqLogic {
     	return $alarmeEventTab;
   }
 
+	public function removeDatasSession($input) {
+		log::add('alarme_IMA', 'debug',  __FUNCTION__ .' - id : ' . $input );
+		config::remove('imaToken_session_'.$input,'alarme_IMA');
+	}
   
   public function getContactList($input){   
     log::add('alarme_IMA', 'debug',  "  getContactList Start : " . $input);
@@ -579,8 +586,9 @@ class alarme_IMA extends eqLogic {
 	try {
       	$eqlogic = eqLogic::byId($input);
       	$imaProtectAPI = new imaProtectNewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input);
-      	
-      	if (!($imaProtectAPI->getContextFromTmpFile())) {
+		
+      	//if (!($imaProtectAPI->getContextFromTmpFile())) {
+		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
 			$imaProtectAPI->Login();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation information compte IMA Protect");
@@ -696,8 +704,9 @@ class alarme_IMA extends eqLogic {
   private function getInstanceIMAApi(){
     try {
       	$imaProtectAPI = new imaProtectNewAPI($this->getConfiguration('login_ima'),$this->getConfiguration('password_ima'),$this->getConfiguration('cfgContactList'),$this->getId());
-      	
-      	if (!($imaProtectAPI->getContextFromTmpFile())) {
+				
+      	//if (!($imaProtectAPI->getContextFromTmpFile())) {
+		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
 			$imaProtectAPI->Login();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation token IMA Protect");
