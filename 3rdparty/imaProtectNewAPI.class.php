@@ -334,24 +334,30 @@ class imaProtectNewAPI {
 	}
   
   	private function manageErrorMessage($httpCode,$error) {
-      	log::add('alarme_IMA', 'debug', "			Function manageErrorMessage : " . $error . "|" .$httpCode);
+      	log::add('alarme_IMA', 'debug', "			" . __FUNCTION__ . " : " . $error . "|" .$httpCode);
       	$errorMessage="Unknown error";
 		if (!$this->IsNullOrEmpty($error)) {
-			$errorMessage=$error;
+			$errorMessage=str_replace("\"","",$error);
+			/*
 			$errorArray=json_decode($error,true);
-			if (!$this->IsNullOrEmpty($errorArray["localizable_title"])) {
-				$errorMessage=$errorArray["localizable_title"];
-				if (!$this->IsNullOrEmpty($errorArray["localizable_description"])) {
-					$errorMessage.=  " ==> " . $errorArray["localizable_description"];
-				}
-				if (!$this->IsNullOrEmpty($errorArray["error_code"])) {
-					$errorMessage.= "(return code : " .$errorArray["error_code"] . ")";
-				}
+			if (json_last_error() === JSON_ERROR_NONE) {
+				log::add('alarme_IMA', 'debug', "				Error is a JSON");
+				if (!$this->IsNullOrEmpty($errorArray["localizable_title"])) {
+					$errorMessage=$errorArray["localizable_title"];
+					if (!$this->IsNullOrEmpty($errorArray["localizable_description"])) {
+						$errorMessage.=  " ==> " . $errorArray["localizable_description"];
+					}
+					if (!$this->IsNullOrEmpty($errorArray["error_code"])) {
+						$errorMessage.= "(return code : " .$errorArray["error_code"] . ")";
+					}
+				}	
 			}
+			*/
+			
 		}
 		
 		if (!$this->IsNullOrEmpty($httpCode)) {
-			$errorMessage .= "(". $httpCode . ")";
+			$errorMessage .= " (". $httpCode . ")";
 		}
 		
       	log::add('alarme_IMA', 'debug', "			==> errorMessage : " . $errorMessage);
@@ -422,7 +428,7 @@ class imaProtectNewAPI {
 		for ($i = 1; $i <= 3; $i++) {
           	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus - attemp : " . $i);
 			list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/management/status',"", "GET",  $this->setHeaders());
-			
+
           	if (isset($httpcode) and $httpcode >= 400 ) {
 				throw new Exception($this->manageErrorMessage($httpcode,$result));
 			} else {			

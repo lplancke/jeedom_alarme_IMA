@@ -40,9 +40,10 @@ Une fois le plugin installé:
 
 - cliquez sur Sauvegarder.
 - choissez le contact à utiliser
+- supprimer les données de sessions (jetons, etc ...)
 
 
-![alt text](../images/Alarme_IMA_Capture_contact_V2.JPG "Choix du contact")
+![alt text](../images/Alarme_IMA_Capture_contact_V3.JPG "Choix du contact")
 
 > le contact va permettre au plugin de faire un contrôle, lors de l'arrêt de l'alarme, entre le mot de passe XO du contact et le mdp saisie lors de la demande d'arrêt
 
