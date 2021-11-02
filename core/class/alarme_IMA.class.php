@@ -356,10 +356,9 @@ class alarme_IMA extends eqLogic {
 		$alarmeStatus = $myImaProtectAlarm->getAlarmStatus();
       
       	if (!isset($alarmeStatus)) {
-            log::add('alarme_IMA', 'error', "	    - Impossible de trouver le status");
-			$oldValue=$alarme_IMA->getCmd(null, 'statusAlarme')->execCmd();
-            $oldValue;
-			//return self::IMA_UNKNOWN;
+			$oldValue=$this->getCmd(null, 'statusAlarme')->execCmd();
+            log::add('alarme_IMA', 'error', "	    - Impossible de trouver le status, on conserve la valeur précédente : " . $oldValue);
+            return $oldValue;
         }
 
         $convStatusToNumeric=array(
