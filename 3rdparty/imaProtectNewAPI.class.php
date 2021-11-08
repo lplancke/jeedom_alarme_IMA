@@ -30,6 +30,9 @@ class imaProtectNewAPI {
 	//Token for get, post and delete pictures
 	private $captureToken;
 	
+	//csrf
+	private $csrfToken;
+	
 		
 	public function __construct($username,$password,$pkContact,$id) {
         log::add('alarme_IMA', 'debug', "			==> constructor of class imaProtectNewAPI - Start");
@@ -43,6 +46,7 @@ class imaProtectNewAPI {
 		$this->TS0192ac0d=null;
 		$this->statusToken=null;
 		$this->captureToken=null;
+		$this->csrfToken=null;
 	}
 
 
@@ -101,75 +105,144 @@ class imaProtectNewAPI {
 		
 		//close curl
       	curl_close($curl);
-      
-      	if ($method == "POST") {
-			$this->getCookiesFromPostRequest($header);
-        }
-		
+
       	log::add('alarme_IMA', 'debug', "				==> Response");
       	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
       	log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
       	log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
+		
+		if ($method == "POST" and $url == self::BASE_URL.'client/login_check') {
+			$this->getCookiesFromPostRequest($header);
+        }
+		
+		if ($method == 'GET' and $url == self::BASE_URL.'client/login') {
+			$this->getCookiesFromGetRequest($header,$body);
+		}
 				
 		return array($httpRespCode, $body);
 	}
+	
+	private function getCookiesFromGetRequest($header,$body) {
+		$regExpCsrf='/<input type="hidden" name="_csrf_token"(.*?)value=(.*?)>/ims';
+		$regExpIma='/Set-Cookie: imainternational=(.*?);/ims';
+		$regExeTS='/Set-Cookie: TS013a2ec2=(.*?);/ims';
+	  
+		preg_match_all($regExpCsrf, $body, $matchCsrf);
+		preg_match_all($regExpIma, $header, $matchIma);
+		preg_match_all($regExeTS, $header, $matchTS);
+		
+		$csrf=str_replace(array('\\"','[',']','"',' ',"\n"),'',json_encode($matchCsrf[2]));  
+		$ima=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchIma[1]));
+		$TS013a2ec2=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchTS[1]));
+	  
+		$regExexpires='/Set-Cookie: imainternational='.$ima.'; expires=(.*?);/ims';
+		preg_match_all($regExexpires, $header, $matchExpires);
+		$expire=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchExpires[1]));
 
+		if (!$this->IsNullOrEmpty($TS013a2ec2)) {
+			$this->TS013a2ec2=$TS013a2ec2;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie TS013a2ec2 absent !!!'));
+		}
+
+		if(!$this->IsNullOrEmpty($ima)) {
+			$this->imainternational=$ima;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie imainternational absent !!!'));
+		}
+		
+		if(!$this->IsNullOrEmpty($expire)) {
+			$this->expireImaCookie=$expire;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie expires imainternational absent !!!'));
+		}
+		
+		if(!$this->IsNullOrEmpty($csrf)) {
+			$this->csrfToken=substr($csrf,0,43);
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! token csrf absent !!!'));
+		}	
+		
+		log::add('alarme_IMA', 'debug', '				==> Recover cookies get : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->expireImaCookie.'|'.$this->csrfToken);
+	}
+	
 	private function getCookiesFromPostRequest($header) {
-		preg_match_all('/^Set-Cookie:\s*(.*?);(.*?);/mi', $header, $matches);
-		
-		$int=0;
-		foreach($matches[1] as $item) {
-          parse_str($item, $id);
-          //log::add('alarme_IMA', 'debug', 'Match 1 - item : ' . $int . ' -> ' . json_encode($item)); 
-		  if ($int == 0) {
-            //log::add('alarme_IMA', 'debug', '	 * 0 : imainternational cookie : ' . $id['imainternational']);
-			$this->imainternational=$id['imainternational'];
-		  }
-		  if ($int == 3) {
-		   $this->TS013a2ec2=$id['TS013a2ec2'];
-		  }
-		  if ($int == 4) {
-		   $this->TS0192ac0d=$id['TS0192ac0d'];
-		  }
-		  ++$int;
-		}
-		
-		$int=0;
-		foreach($matches[2] as $item) {
-          //log::add('alarme_IMA', 'debug', 'Match 2 - item : ' . $int . ' -> ' . json_encode($item)); 
-		  parse_str($item, $id);
-		  if ($int == 0) {
-			$this->expireImaCookie=$id['expires'];
-		  }
-		  ++$int;
-		}
-      	
-      	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
+		$regExpIma='/Set-Cookie: imainternational=(.*?);/ims';
+		$regExeTS013='/Set-Cookie: TS013a2ec2=(.*?);/ims';
+		$regExeTS019='/Set-Cookie: TS0192ac0d=(.*?);/ims';
 
+		preg_match_all($regExpIma, $header, $matchIma);
+		preg_match_all($regExeTS013, $header, $matchTS013);
+		preg_match_all($regExeTS019, $header, $matchTS019);
+
+		$ima=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchIma[1][0]));
+		$TS013a2ec2=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchTS013[1][0]));
+		$TS0192ac0d=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchTS019[1]));
+
+		$regExexpires='/Set-Cookie: imainternational='.$ima.'; expires=(.*?);/ims';
+		preg_match_all($regExexpires, $header, $matchExpires);
+		$expire=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchExpires[1]));
+		
+		if(!$this->IsNullOrEmpty($TS0192ac0d)) {
+			$this->TS0192ac0d=$TS0192ac0d;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie TS0192ac0d absent !!!'));
+		}
+		
+		if(!$this->IsNullOrEmpty($TS013a2ec2)) {
+			$this->TS013a2ec2=$TS013a2ec2;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie TS013a2ec2 absent !!!'));
+		}
+		
+		if(!$this->IsNullOrEmpty($ima)) {
+			$this->imainternational=$ima;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie imainternational absent !!!'));
+		}
+		
+		if(!$this->IsNullOrEmpty($expire)) {
+			$this->expireImaCookie=$expire;
+		} else {
+			throw new Exception($this->manageErrorMessage('500','!!! cookie expires imainternational absent !!!'));
+		}
+		     	
+      	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
 	}
 
-	private function setHeaders()   {				
-		
+	private function setHeaders()   {		
+
 		$headers = array();
-		$headers[] = "Referer: https:/www.imaprotect.com/fr/client/";
-		$headers[] = "Accept: application/json, text/plain, *\/*";
-		//$headers[] = "Content-Type:application/json";
+
+		$headers[] ='Host: www.imaprotect.com';
+		$headers[] ='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
+		$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
+		$headers[] ='Accept-Encoding: gzip, deflate, br';
+		$cookie=sprintf('Cookie:tr=%s; imainternational=%s; TS013a2ec2=%s', 'REFERER%3Awww.imaprotect.com', $this->imainternational, $this->TS013a2ec2);
+		$headers[]=$cookie;
 		
-		if (isset($this->imainternational) && !empty($this->imainternational) && isset($this->TS013a2ec2) && !empty($this->TS013a2ec2) && isset($this->TS0192ac0d) && !empty($this->TS0192ac0d)) {
-			$headers[] = "imainternational: ".$this->imainternational;
-			$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;		
-			$headers[] = "TS0192ac0d: ".$this->TS0192ac0d;
-			$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
-		}
 		return $headers;
+	}	
+	
+	private function gunzip($zipped) {
+		$offset = 0;
+		if (substr($zipped,0,2) == "\x1f\x8b") {
+			$offset = 2;
+		}
+		
+		if (substr($zipped,$offset,1) == "\x08")  {
+		 return gzinflate(substr($zipped, $offset + 8));
+		}
+		
+		return "Unknown Format";
 	}	
 
 	private function setParams($request,$pwd) {			//Set params for https request to Verisure Cloud
 		
 		switch($request)  {
 			case "LOGIN":
-				$params = array( '_username' => $this->username, '_password' => $this->password );
+				$params = array( '_username' => $this->username, '_password' => $this->password, '_csrf_token' => $this->csrfToken );
 				break;
           	case "ALARM_OFF":
             	$params = array('status' => 'off','token' => $this->$statusToken);
@@ -201,6 +274,7 @@ class imaProtectNewAPI {
 		}
 	}
 
+	/*
 	private function storeContextToTmpFile($contextArray){
 		log::add('alarme_IMA', 'debug', "			==> storeContextToTmpFile : " . json_encode($contextArray));
 		if(isset($contextArray)){
@@ -219,6 +293,7 @@ class imaProtectNewAPI {
 			return false;
 		}
 	}
+	*/
 
 	public function getDatasSession(){
       	log::add('alarme_IMA', 'debug', "			==> " . __FUNCTION__);
@@ -237,7 +312,7 @@ class imaProtectNewAPI {
 			$arrayDecode=json_decode($datasSession,true);
 		  
 			//check if temp fil is OK
-			if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"])) {
+			if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"]) || $this->IsNullOrEmpty($arrayDecode["csrfToken"])) {
 			  log::add('alarme_IMA', 'debug', "			==> No all datas read in temporary file !!!");
 			  return false;
 			}
@@ -265,6 +340,10 @@ class imaProtectNewAPI {
 			if (isset($arrayDecode["captureToken"])) {
 				$this->captureToken=$arrayDecode["captureToken"];
 			}
+			
+			if (isset($arrayDecode["csrfToken"])) {
+				$this->csrfToken=$arrayDecode["csrfToken"];
+			}
 
 			return $this->cookieIsValid($this->expireImaCookie);
 		} else {
@@ -273,6 +352,7 @@ class imaProtectNewAPI {
 		}
 	}
 	
+	/*
 	//Recover datas from config file
 	public function getContextFromTmpFile(){
 		log::add('alarme_IMA', 'debug', "			==> getContextFromTmpFile");
@@ -287,7 +367,7 @@ class imaProtectNewAPI {
 					$arrayDecode=json_decode($readLine,true);
                   
                   	//check if temp fil is OK
-                  	if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"])) {
+                  	if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"]) || $this->IsNullOrEmpty($arrayDecode["csrfToken"])) {
                       log::add('alarme_IMA', 'debug', "			==> No all datas read in temporary file !!!");
                       return false;
                     }
@@ -315,6 +395,10 @@ class imaProtectNewAPI {
 					if (isset($arrayDecode["captureToken"])) {
 						$this->captureToken=$arrayDecode["captureToken"];
 					}
+					
+					if (isset($arrayDecode["csrfToken"])) {
+						$this->csrfToken=$arrayDecode["csrfToken"];
+					}
 	
                   	return $this->cookieIsValid($this->expireImaCookie);
 				} else {
@@ -332,6 +416,7 @@ class imaProtectNewAPI {
 			return false;
 		}
 	}
+	*/
   
   	private function manageErrorMessage($httpCode,$error) {
       	log::add('alarme_IMA', 'debug', "			" . __FUNCTION__ . " : " . $error . "|" .$httpCode);
@@ -368,20 +453,38 @@ class imaProtectNewAPI {
     	return (!isset($input) || trim($input)==='');
 	}
   
-  	private function getHeadersLogin() {
-      	$headers = array();
-		$headers[] = "Referer: https://www.imaprotect.com";
+  	private function getHeadersLoginCheck	() {
+		
+		$headers = array();
+		$headers[] = "Host: www.imaprotect.com";
+		$headers[] = "Origin: https://www.imaprotect.com";
+		$headers[] = "Referer: https://www.imaprotect.com/fr/client/login";
 		$headers[] = "Content-Type: application/x-www-form-urlencoded";
+		$cookie=sprintf('Cookie: imainternational=%s; tr=%s;TS013a2ec2=%s', $this->imainternational,'REFERER%3Awww.imaprotect.com',$this->TS013a2ec2);
+		$headers[]=$cookie;
+
       	return $headers;
     }
 
   //Log to IMA Account
-	public function Login()  {		
-		log::add('alarme_IMA', 'debug', "			==> Login ");
-		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeadersLogin());
+	public function login()  {		
+		log::add('alarme_IMA', 'debug','		* ' .  __FUNCTION__);
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/login',null, "GET", null);
+      	if (isset($httpcode) and $httpcode >= 400 ) {
+          	throw new Exception($this->manageErrorMessage($httpcode,$result));
+        } else {
+			//get cookie for accessing to ima api
+			$this->loginCheck();
+		}
+	}
+	
+	private function loginCheck() {
+		log::add('alarme_IMA', 'debug','		* ' .  __FUNCTION__);
+		list($httpcode, $result) = $this->doRequest(self::BASE_URL.'client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeadersLoginCheck());
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         }
+
 	}
 	
 	//Get IMA Tokens for futur actions
@@ -391,18 +494,17 @@ class imaProtectNewAPI {
       	if (isset($httpcode) and $httpcode >= 400 ) {
 			throw new Exception($result);
         } else {
-			$this->retrieveIMATokens($result);			
+			$this->retrieveIMATokens($this->gunzip($result));			
 			$contextArray =	array(
 				"expireImaCookie" => $this->expireImaCookie,
 				"imainternational" => $this->imainternational,
 				"TS013a2ec2" =>  $this->TS013a2ec2,
 				"TS0192ac0d" => $this->TS0192ac0d,
 				"statusToken" => $this->statusToken,
-				"captureToken"=> $this->captureToken
+				"captureToken"=> $this->captureToken,
+				"csrfToken"=> $this->csrfToken
 			);
-			
-			$this->storeContextToTmpFile($contextArray);
-			
+				
 			config::save('imaToken_session_'.$this->id,json_encode($contextArray),'alarme_IMA');
 						
 			return true;
@@ -476,6 +578,7 @@ class imaProtectNewAPI {
 					"TS0192ac0d" => $this->TS0192ac0d,
 					"statusToken" => $this->statusToken,
 					"captureToken"=> $this->captureToken,
+					"csrfToken"=> $this->csrfToken,
 					"rooms"=> $this->rooms
 				);
                 return true;

@@ -589,7 +589,7 @@ class alarme_IMA extends eqLogic {
       	//if (!($imaProtectAPI->getContextFromTmpFile())) {
 		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
-			$imaProtectAPI->Login();
+			$imaProtectAPI->login();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation information compte IMA Protect");
 			$imaProtectAPI->getTokens();
 		}
@@ -707,7 +707,7 @@ class alarme_IMA extends eqLogic {
       	//if (!($imaProtectAPI->getContextFromTmpFile())) {
 		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
-			$imaProtectAPI->Login();
+			$imaProtectAPI->login();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation token IMA Protect");
 			$imaProtectAPI->getTokens();
 			log::add('alarme_IMA', 'debug',  "	* Recuperation informations sur les caméras IMA Protect");
