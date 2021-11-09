@@ -108,7 +108,7 @@ class imaProtectNewAPI {
 
       	log::add('alarme_IMA', 'debug', "				==> Response");
       	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
-      	log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
+      	//log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
       	log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 		
@@ -124,7 +124,7 @@ class imaProtectNewAPI {
 	}
 	
 	private function getCookiesFromGetRequest($header,$body) {
-		$regExpCsrf='/<input type="hidden" name="_csrf_token"(.*?)value=(.*?)>/ims';
+		$regExpCsrf='/<input type="hidden" name="_csrf_token"(.*?)value="(.*?)"/ims';
 		$regExpIma='/Set-Cookie: imainternational=(.*?);/ims';
 		$regExeTS='/Set-Cookie: TS013a2ec2=(.*?);/ims';
 	  
@@ -159,7 +159,7 @@ class imaProtectNewAPI {
 		}
 		
 		if(!$this->IsNullOrEmpty($csrf)) {
-			$this->csrfToken=substr($csrf,0,43);
+			$this->csrfToken=$csrf;
 		} else {
 			throw new Exception($this->manageErrorMessage('500','!!! token csrf absent !!!'));
 		}	
