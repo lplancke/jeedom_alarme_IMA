@@ -96,6 +96,14 @@ $('#bt_SynchronizeContact').on('click',function() {
   	buildContactList(eqid,'');
 });
 
+$('#bt_RemoveDatasSession').on('click',function() {
+  	var eqid= $('.eqLogicAttr[data-l1key=id]').value();
+	$('#div_alert').showAlert({message: '{{Suppression données de session en cours}}', level: 'warning'});
+  	removeDatasSession(eqid);
+});
+
+
+
 function setInstructions() {
   	$('#div_instruction').empty();
 	$('#div_instruction').html('<div class="alert alert-info">'+getInstruction()+'</div>');
@@ -113,11 +121,17 @@ function getInstruction() {
   	instruction += "</br>";
   	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Synchronisez les contacts</span>";
 	instruction += "</br>";
-  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Choisissez le ontact</span>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Choisissez le contact</span>";
   	instruction += "</br>";
   	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Le choix du contact permet au plugin de contrôler lors de l'arrêt de l'alarme que le code de desactivation passé par l'utilisateur correspond bien à celui du contact (code XO)</span>";
   	instruction += "</br>";
   	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Sauvegardez l'équipement ... le plugin doit être opérationnel</span>";
+	instruction += "</br>";
+	instruction += "</br>";
+	instruction += "</br>";
+	instruction +="<span><u>Supprimer les données de session : </u></span>";
+	instruction += "</br>";
+	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- permet de remettre à 0 les appels vers l'api IMA Protect (jeton, durée expiration, etc ...) à n'utiliser qu'en cas de dysfonctionnement du plugin</span>";
   	return instruction;
 }
 
@@ -159,4 +173,26 @@ function buildContactList(id,pkContact) {
           }
         }
 });
+}
+
+function removeDatasSession(id) {
+    $.ajax({// fonction permettant de faire de l'ajax
+        type: "POST", // méthode de transmission des données au fichier php
+        url: "plugins/alarme_IMA/core/ajax/alarme_IMA.ajax.php", // url du fichier php
+        data: {
+            action: "removeDatasSession",
+          	input:id
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+          	$('#div_alert').showAlert({message: '{{Erreur lors de la suppression des données de sessions}}', level: 'danger'});
+        },
+        success: function (data) { // si l'appel a bien fonctionné
+            if (data.state == 'ok') {
+				$('#div_alert').showAlert({message: '{{Données de session correctement supprimées}}', level: 'success'});
+        }
+		
+	}
+	});
 }

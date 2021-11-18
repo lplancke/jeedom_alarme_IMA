@@ -123,6 +123,7 @@ foreach (jeeObject::all() as $object) {
 			</div>
 		</div>
         <a class="btn btn-danger btn-sm cmdAction" id="bt_SynchronizeContact"><i class="fas fa-sync"></i> {{Synchroniser les contacts}}</a>
+		
 	</div>
 </fieldset>
 	
@@ -133,9 +134,11 @@ foreach (jeeObject::all() as $object) {
 								<legend>{{Informations}}</legend>
 								<div class="form-group">									
 									<div id="div_instruction"></div>
+									<a class="btn btn-danger btn-sm cmdAction" id="bt_RemoveDatasSession"><i class="fas fa-sync tooltips"  title="{{Contact utilisé pour le code de validation XO}}"></i> {{Supprimer les données de session}}</a>
 								</div>
+								
 							</fieldset>					
-						</div> 
+						</div>
 					</div>
 
 				</div
