@@ -7,9 +7,9 @@
 # 21/11/2021
 - gestion envoi de notification en fonction du journal d'évènement
 
--- activation / désactivation
--- intrusion
--- porte ouverte et alarme activée
+* activation / désactivation
+* intrusion
+* porte ouverte et alarme activée
 
 # 08/11/2021
 - Modification gestion des jetons de session (stockage en BDD)
