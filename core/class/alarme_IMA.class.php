@@ -148,11 +148,18 @@ class alarme_IMA extends eqLogic {
           log::add('alarme_IMA', 'debug', '					-> send notif for ' . $activity);
           cache::set('alarme_IMA::'.$cacheName.'::'.$this->getId(),$response["timestamp"], 0);
           
-          if ($response["detailEvent"] != '') {
-          	$options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"] .' par ' . $response["detailEvent"]);
-          } else {
-          	$options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"]);
+           switch ($cacheName) {
+              case 'alarmStatus':
+                  $options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"] .' par ' . $response["detailEvent"]);
+                  break;
+              case 'alarmOpenedDoor':
+                  $options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"] .' -> ' . $response["detailEvent"]);
+                  break;
+              case 'alarmIntrusion':
+                  $options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"]);
+                  break;
           }
+		  
           $notifCmd->execCmd($options, $cache=0);
         }
     }
