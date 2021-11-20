@@ -68,8 +68,8 @@ Gestion des notifications en fonction des évènements de l'alarme
 -- Activation / désactivation
 -- intrusion
 -- ouvrant ouvert et alarme activée
-- choisissez le titre de la notification
 - sélectionnez la commande notification utilisée par le plugin pour envoyer la notification
+- choisissez le titre de la notification
 
 
  
