@@ -47,9 +47,27 @@ foreach ($eqLogics as $eqLogic) {
 			</span>
 		</div>
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
-    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
-    <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
+    <li role="presentation">
+		<a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay">
+			<i class="fa fa-arrow-circle-left"></i>
+		</a>
+	</li>
+    <li role="presentation" class="active">
+		<a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab">
+			<i class="fas fa-tachometer-alt"></i> {{Equipement}}
+		</a>
+	</li>
+	<li role="presentation">
+		<a href="#tabNotifications" aria-controls="home" role="tab" data-toggle="tab">
+			<i class="fas fa-bell"></i> 
+			{{Notiifcations}}
+		</a>
+	</li>
+    <li role="presentation">
+		<a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab">
+			<i class="fa fa-list-alt"></i> {{Commandes}}
+		</a>
+	</li>
   </ul>
   <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
     <div role="tabpanel" class="tab-pane active" id="eqlogictab">
@@ -187,6 +205,111 @@ foreach (jeeObject::all() as $object) {
 
 
 </div>
+
+<div role="tabpanel" class="tab-pane" id="tabNotifications">
+	<br/>
+	<div class="row">
+		<div class="col-sm-7">
+			<form class="form-horizontal">
+				<fieldset>
+					
+					<div class="form-group">
+						<label class="col-sm-3 control-label" >
+							{{Activer les notifications}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Voulez-vous recevoir des notifications sur certains évènements ?}}"></i>
+							</sup>
+						</label>
+						<div class="col-sm-5">
+							<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgSendMsg"/>
+						</div>
+					</div>
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormChangeStatus">
+						<label class="col-md-6 control-label">{{Statut de l'alarme}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Notification lors d'un changement de statut de l'alarme}}"></i>
+							</sup>
+						</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgAlertChangeStatus"/>
+							</div>
+						</div>
+					</div>
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormAlertIntrusion">
+						<label class="col-md-6 control-label">{{Intrusion}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Notification lors d'une  alerte d'intrusion}}"></i>
+							</sup>
+						</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgAlertIntrusion"/>
+							</div>
+						</div>
+					</div>
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormAlertOpenedDoor">
+						<label class="col-md-6 control-label">{{Ouvrant}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Notification lors d'une alerte porte ouverte}}"></i>
+							</sup>
+						</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgAlertOpenedDoor"/>
+							</div>
+						</div>
+					</div>
+						</br>
+						</br>
+
+					<!--</div>		-->
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormCmdSendMsg">
+						<label class="col-sm-3 control-label">{{Commande de notification}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Sélectionner la commande permettant d'envoyer la notification}}"></i>
+							</sup>
+						</label>
+						<div class="col-sm-5">
+							<div class="input-group">
+								<input type="text" class="eqLogicAttr form-control CmdAction" data-l1key="configuration" data-l2key="cfgCmdSendMsg" placeholder="{{Séléctionner une commande}}"/>
+								<span class="input-group-btn">
+									<a class="btn btn-success btn-sm listCmdActionMessage" data-type="action">
+										<i class="fa fa-list-alt"></i>
+									</a>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormMsgTitle">
+						<label class="col-sm-3 control-label" >
+							{{Titre de la notification}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Saisissez le titre de la notification }}"></i>
+							</sup>
+						</label>
+						<div class="col-sm-5">
+							<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="cfgMsgTitle" placeholder="{{Titre de la notification}}"/>
+						</div>
+					</div>
+				</fieldset>
+			</form>
+			
+
+		</div>
+		<div id="infoNodeDesign" class="col-sm-4">
+			<fieldset>
+				<legend>{{Informations}}</legend>
+				<div class="form-group">
+					<div id="div_instruction_notification"></div>
+				</div>							
+			</fieldset>					
+		</div> 
+		
+	</div>
+
+</div>
+
 <!--
       <div role="tabpanel" class="tab-pane" id="commandtab">
 <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>

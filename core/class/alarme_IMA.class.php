@@ -49,6 +49,8 @@ class alarme_IMA extends eqLogic {
                     log::add('alarme_IMA', 'debug', 'Exécution du cron Ima Protect');
                   	
 		            foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
+                      	
+                      	$bEventsRefreshed=(bool)FALSE;
 					
                       	$oldValue=$alarme_IMA->getCmd(null, 'statusAlarme')->execCmd();
 						$newValue=$alarme_IMA->GetAlarmState();
@@ -59,6 +61,7 @@ class alarme_IMA extends eqLogic {
                               if (strcmp($oldValue,$newValue) > 0 OR  strcmp($oldValue,$newValue) < 0) {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $newValue");
                                 $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
+                                $bEventsRefreshed=(bool)TRUE;
                               } else {
                                 log::add('alarme_IMA', 'debug',  " Le statut de l'alarme n'a pas changé (old|new): $oldValue | $newValue");
                               }
@@ -66,6 +69,16 @@ class alarme_IMA extends eqLogic {
                         } else {
                             log::add('alarme_IMA', 'debug', "Retour ignoré");
                         }
+                      
+                      	
+                      	if ($alarme_IMA->getConfiguration('cfgSendMsg') === '1' and $alarme_IMA->getConfiguration('cfgCmdSendMsg') != '' ) {
+                          	$notifCmd=cmd::byId(str_replace('#','',$alarme_IMA->getConfiguration('cfgCmdSendMsg')));
+                          	if (is_object($notifCmd)) {
+                          		$alarme_IMA->manageNotifications($bEventsRefreshed,$notifCmd);
+                            } else {
+                            }
+                        }
+                      	
                         $alarme_IMA->writeSeparateLine();
                    }
                    
@@ -75,6 +88,105 @@ class alarme_IMA extends eqLogic {
 			}
 		}
 	}
+  
+  	private function initCache() {
+      	//cache::set('alarme_IMA::alarmStatus::'.$this->getId(),1637308809, 0);
+      	if ((cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(microtime(true)) === '') {
+          	cache::set('alarme_IMA::alarmStatus::'.$this->getId(),time(), 0);
+        }
+      
+      	if ((cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(microtime(true)) === '') {
+          	cache::set('alarme_IMA::alarmIntrusion::'.$this->getId(),time(), 0);
+        }
+      
+      	if ((cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(microtime(true)) === '') {
+          	cache::set('alarme_IMA::alarmOpenedDoor::'.$this->getId(),time(), 0);
+        }
+    }
+  
+  	public function manageNotifications($bEventsRefreshed,$notifCmd) {
+            
+      try {
+        $this->initCache();
+        
+        if ($bEventsRefreshed == FALSE) {
+          	$this->getCmd(null, 'refreshAlarmEvents')->execCmd();
+        } else {
+			log::add('alarme_IMA', 'debug',  "  ". __FUNCTION__ ." Start");
+			log::add('alarme_IMA', 'debug', '	- cache alarmStatus : ' . (cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(false));
+			log::add('alarme_IMA', 'debug',  '	- cache alarmIntrusion : ' . (cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(false));
+			log::add('alarme_IMA', 'debug',  '	- cache alarmOpenedDoor : ' . (cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(false));
+			
+			$eventResponse=$this->getCmd(null, 'alarmeEventsBrute')->execCmd();
+			if ($this->getConfiguration('cfgAlertChangeStatus') === '1') {
+              		$this->checkActivity('activ','alarmStatus',$eventResponse,$notifCmd);
+			}
+
+			if ($this->getConfiguration('cfgAlertIntrusion') === '1') {
+              	  $this->checkActivity('intrusion','alarmIntrusion',$eventResponse,$notifCmd);
+			}
+
+			if ($this->getConfiguration('cfgAlertOpenedDoor') === '1') {
+              		$this->checkActivity('porte','alarmOpenedDoor',$eventResponse,$notifCmd);
+			}
+			log::add('alarme_IMA', 'debug',  "  ". __FUNCTION__ ." End");
+		}
+
+      } catch (Exception $e) {
+          $this->manageErrorAPI("GetAlarmState",$e->getMessage());
+      }
+    }
+  
+  	private function checkActivity($activity,$cacheName,$eventResponse,$notifCmd) {
+		$response = $this->getLastEvent($eventResponse,$activity);
+        log::add('alarme_IMA', 'debug', "				-> response event " . $activity  ." ". json_encode($response));
+        $cache=(cache::byKey('alarme_IMA::'. $cacheName .'::'.$this->getId()))->getValue(false);
+      	log::add('alarme_IMA', 'debug', "				-> cache value for " . $cacheName  ." ". $cache);
+      	log::add('alarme_IMA', 'debug', "				-> timestamp response  " . $response["timestamp"]);
+
+        if ($response["timestamp"] != '' and ($response["timestamp"] > $cache)) {
+          log::add('alarme_IMA', 'debug', '					-> send notif for ' . $activity);
+          cache::set('alarme_IMA::'.$cacheName.'::'.$this->getId(),$response["timestamp"], 0);
+          
+          if ($response["detailEvent"] != '') {
+          	$options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"] .' par ' . $response["detailEvent"]);
+          } else {
+          	$options = array('title' => $this->getConfiguration('cfgMsgTitle'), 'message'=>$response["event"]);
+          }
+          $notifCmd->execCmd($options, $cache=0);
+        }
+    }
+  
+  	private static function getLastEvent($eventResponse,$eventType) {
+      
+        $resultArr=json_decode($eventResponse,true);
+
+        foreach($resultArr as $journalK=>$journalV) {
+          foreach($journalV as $eventDateK=>$eventDateV){
+            foreach($eventDateV as $eventDetailK=>$eventDetailV){
+              $event=str_replace("'"," ",$eventDetailV['fields']['title']);
+              
+
+              if (self::stringContains($eventType,$event)) {
+                $date=new DateTime($eventDetailV['fields']['creationDatetime']);
+          		$mefDate=$date->format('Y-m-d H:i:s');
+                return array("date" => $mefDate, "timestamp"=> strtotime($mefDate),"event" => $event, "detailEvent" => str_replace("'"," ",$eventDetailV['fields']['subtitle']));
+              }
+            }
+          }	
+        }	
+    }
+  
+  	private static function stringContains($string_1, $string_2) {
+      	if ((strtolower($string_1) == strtolower($string_2)) or 
+              (strpos(strtolower($string_1),strtolower($string_2)) !== false ) or 
+              (strpos(strtolower($string_2),strtolower($string_1)) !== false )) {
+          	return true;
+        } else {
+          	return false;
+        }
+      
+    }
 
 
      /* Fonction exécutée automatiquement toutes les heures par Jeedom */
@@ -100,19 +212,15 @@ class alarme_IMA extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {        
-		log::add('alarme_IMA', 'debug',  "A");
     }
 
     public function postInsert() {        
-		log::add('alarme_IMA', 'debug',  "B");
     }
 
     public function preSave() {        
-		log::add('alarme_IMA', 'debug',  "C");
     }
 
     public function postSave() {
-		log::add('alarme_IMA', 'debug',  "D");
     }
   
   	private function createCmd(){
@@ -429,7 +537,6 @@ class alarme_IMA extends eqLogic {
     	log::add('alarme_IMA', 'debug',  "		* buildTabCamerasEvents - Start : ".$cameraEvents);
     	$resultArr=json_decode($cameraEvents,true);
     
-    	//$cameraEventTab = "<link rel=\"stylesheet\" href=\"plugins/alarme_IMA/core/template/dashboard/alarme_IMA.css\">";
     	$cameraEventTab  = "<div class=\"tableWrap\">";
 		$cameraEventTab .= "<table>";
 		$cameraEventTab .= "<thead>";
@@ -475,7 +582,6 @@ class alarme_IMA extends eqLogic {
 		  $cameraEventTab .=  "<a class=\"zoom\" href=\"#\" onclick=getPicture(\"";
 		  $cameraEventTab .= $photos;
 		  $cameraEventTab .=  "\") data-eqLogic_id=\"#id#\">";
-		  //$cameraEventTab .=  "<a class=\"zoom\" href=\"#\" onclick=getPicture(". $photos .") data-eqLogic_id=\"#id#\">";
           
           if ($item > 1) {
             $cameraEventTab .=  " photos</a>";
@@ -499,7 +605,7 @@ class alarme_IMA extends eqLogic {
   public function buildTabAlarmEvents($alarmEvents){
     	log::add('alarme_IMA', 'debug',  "		* build alarm events V2tab - Start");
     	$resultArr=json_decode($alarmEvents,true);
-        //$alarmeEventTab = "<link rel=\"stylesheet\" href=\"plugins/alarme_IMA/core/template/dashboard/alarme_IMA.css\">";
+
     	$alarmeEventTab ="<div class=\"tableWrap\">";
 		$alarmeEventTab .= "<table>";
 		$alarmeEventTab .= "<thead>";
@@ -519,51 +625,17 @@ class alarme_IMA extends eqLogic {
 					$event=str_replace("'"," ",$eventDetailV['fields']['title']);
 					$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
 					$icon=$eventDetailV['fields']['icon'];
-					$date=str_replace(['T','+02:00'],' ',$eventDetailV['fields']['creationDatetime']);
+					//$date=str_replace(['T','+01:00'],' ',$eventDetailV['fields']['creationDatetime']);
+                	$date=new DateTime($eventDetailV['fields']['creationDatetime']);
+          			$mefDate=$date->format('Y-m-d H:i:s');
 					
 					$alarmeEventTab .=  "<tr>";
 					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
-					$alarmeEventTab .=  "<td>$date</td>";
+					$alarmeEventTab .=  "<td>$mefDate</td>";
 					$alarmeEventTab .=  "<td>$event</td>";
 					$alarmeEventTab .=  "<td>$detail</td>";
 					$alarmeEventTab .=  "</tr>"; 
 			  }
-			  /*
-            if ($key == "fields") {
-				$date="";
-				$etat="";
-				$lieu="";
-				$element="";
-				$utilisateur="";
-				foreach($value as $detailEventkey=>$detailEventValue) {
-                  	$detailEventValue = str_replace(array('\'', '"'), ' ', $detailEventValue);
-					switch ($detailEventkey) {
-						case "creation_datetime":
-							$date=$this->fmt_date($detailEventValue);
-							break;
-						case "title":
-							$etat=$detailEventValue;
-							break;
-						case "device_name":
-							$lieu=$detailEventValue;
-							break;
-						case "device_type":
-							$element=$detailEventValue;
-							break;
-						case "user_name":
-							$utilisateur=$detailEventValue;
-						break;
-					}
-				  }
-				$alarmeEventTab .=  "<tr>";
-				$alarmeEventTab .=  "<td>$date</td>";
-				$alarmeEventTab .=  "<td>$etat</td>";
-				$alarmeEventTab .=  "<td>$utilisateur</td>";
-				$alarmeEventTab .=  "<td>$element</td>";
-				$alarmeEventTab .=  "<td>$lieu</td>";
-				$alarmeEventTab .=  "</tr>";            
-            }
-			*/
           }	
         }
         $alarmeEventTab .=  "</tbody>";
@@ -586,7 +658,6 @@ class alarme_IMA extends eqLogic {
       	$eqlogic = eqLogic::byId($input);
       	$imaProtectAPI = new imaProtectNewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input);
 		
-      	//if (!($imaProtectAPI->getContextFromTmpFile())) {
 		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
 			$imaProtectAPI->login();
@@ -897,6 +968,14 @@ class alarme_IMACmd extends cmd {
 						log::add('alarme_IMA', 'debug', " * MAJ alarmeEvents");
 						$eqlogic->checkAndUpdateCmd('alarmeEvents', $eqlogic->buildTabAlarmEvents($alarmEvent));
                     }
+					//manage notification on events
+					if ($eqlogic->getConfiguration('cfgSendMsg') === '1' and $eqlogic->getConfiguration('cfgCmdSendMsg') != '' ) {
+						$notifCmd=cmd::byId(str_replace('#','',$eqlogic->getConfiguration('cfgCmdSendMsg')));
+						if (is_object($notifCmd)) {
+							$eqlogic->manageNotifications(TRUE,$notifCmd);
+						} else {
+						}
+					}
             		$eqlogic->writeSeparateLine();
             		break;            
          	 	case 'refreshCameraSnapshot':

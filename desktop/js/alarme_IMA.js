@@ -17,6 +17,48 @@
 
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+
+$("body").on('click', ".listCmdActionMessage", function() {
+	var el = $(this).closest('.input-group').find('.CmdAction');
+	var type=$(this).attr('data-type');
+	jeedom.cmd.getSelectModal({cmd: {type: type, subType :"message"}}, function (result) {
+		el.value(result.human);
+	});
+});
+
+
+
+
+initialize();
+
+function initialize() {
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').hide();	
+}
+
+	
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgSendMsg]').on('change', function () {
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgSendMsg]').prop("checked")) {
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').show();
+	} else {
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').hide();
+	}
+	
+});
+
+
+
 /*
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template
  */
@@ -107,6 +149,9 @@ $('#bt_RemoveDatasSession').on('click',function() {
 function setInstructions() {
   	$('#div_instruction').empty();
 	$('#div_instruction').html('<div class="alert alert-info">'+getInstruction()+'</div>');
+    $('#div_instruction_notification').empty();
+  	$('#div_instruction_notification').html('<div class="alert alert-info">'+getInstructionNotifications()+'</div>');
+
 
 }
 
@@ -132,6 +177,17 @@ function getInstruction() {
 	instruction +="<span><u>Supprimer les données de session : </u></span>";
 	instruction += "</br>";
 	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- permet de remettre à 0 les appels vers l'api IMA Protect (jeton, durée expiration, etc ...) à n'utiliser qu'en cas de dysfonctionnement du plugin</span>";
+  	return instruction;
+}
+
+function getInstructionNotifications() {
+  	var instruction ="<span><u>Gestion des notifications : </u></span>";
+  	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- permet d'activer l'envoi de notification en fonction d'évènements</span>";
+  	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- l'envoi de notification est lié au cron choisi ... il peut donc y avoir un décalage entre l'évènement et l'envoi de la notification</span>";
+
+
   	return instruction;
 }
 
