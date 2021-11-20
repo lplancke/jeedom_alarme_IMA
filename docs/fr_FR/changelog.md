@@ -6,6 +6,7 @@
 
 # 21/11/2021
 - gestion envoi de notification en fonction du journal d'évènement
+
 -- activation / désactivation
 -- intrusion
 -- porte ouverte et alarme activée
