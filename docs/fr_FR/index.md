@@ -10,6 +10,8 @@ Ce plugin permet  :
 - supprimer les prises de photos
 - prendre des snapshots via les cameras IMA
 - consulter la liste des évènements de l'alarme
+- envoyer des notifications en fonction des évènements de l'alarme (envoi lié à la fréquence du cron)
+
 
 
 Prérequis
@@ -56,6 +58,21 @@ Une fois le plugin installé:
 >
 > Sans ces 3 conditions, vous ne verrez pas votre alarme sur le dashboard jeedom.
 
+Gestion des notifications en fonction des évènements de l'alarme
+---
+
+![alt text](../images/Alarme_IMA_Capture_GestionNotifications.JPG "page de configuration des notifications")
+
+- activer les notifications
+- chosissez sur quels évènements vous souhaitez être notifié 
+-- Activation / désactivation
+-- intrusion
+-- ouvrant ouvert et alarme activée
+- choisissez le titre de la notification
+- sélectionnez la commande notification utilisée par le plugin pour envoyer la notification
+
+
+ 
 Widget Alarme IMA
 ===
 Le widget s'articule autour de 4 onglets : 
