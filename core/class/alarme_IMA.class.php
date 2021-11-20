@@ -127,7 +127,7 @@ class alarme_IMA extends eqLogic {
 			}
 
 			if ($this->getConfiguration('cfgAlertOpenedDoor') === '1') {
-              		$this->checkActivity('porte','alarmOpenedDoor',$eventResponse,$notifCmd);
+              		$this->checkActivity('ouverture','alarmOpenedDoor',$eventResponse,$notifCmd);
 			}
 			log::add('alarme_IMA', 'debug',  "  ". __FUNCTION__ ." End");
 		}
