@@ -202,10 +202,10 @@ class imaProtectNewAPI {
 		$headers = array();
 
 		$headers[] ='Host: www.imaprotect.com';
-		$headers[] ='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
+		$headers[] ='Connection: keep-alive';
+		$headers[] ='Accept: application/json, text/plain, */*';
 		$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
 		$headers[] ='Accept-Encoding: gzip, deflate, br';
-		//$cookie=sprintf('Cookie:tr=%s; imainternational=%s; TS013a2ec2=%s', 'REFERER%3Awww.imaprotect.com', $this->imainternational, $this->TS013a2ec2);
 		$cookie=sprintf('Cookie: imainternational=%s; TS013a2ec2=%s', $this->imainternational, $this->TS013a2ec2);
 		$headers[]=$cookie;
 		
