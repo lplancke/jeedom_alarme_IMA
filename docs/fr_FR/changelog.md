@@ -4,6 +4,9 @@
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+# 20/10/2022
+Correction bug récupération des tokens IMA
+
 # 21/11/2021
 Gestion envoi de notification en fonction du journal d'évènement
 
