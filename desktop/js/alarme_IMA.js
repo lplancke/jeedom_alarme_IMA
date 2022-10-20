@@ -219,9 +219,13 @@ function buildContactList(id,pkContact) {
                   	selectOption +='<option value=\"0\">{{}}</option>';
                 }
                 if (pkContact != '' && myObj.contactList[i].pk == pkContact) {
-                  	selectOption +='<option selected value=\"'+myObj.contactList[i].pk +'\">{{' + myObj.contactList[i].fullName +' }}</option>';
+                  	selectOption +='<option selected value=\"'+myObj.contactList[i].pk +'\">{{' ;
+                  	selectOption += myObj.contactList[i].fullName;
+                  	selectOption += ' }}</option>';
                 } else {
-                  	selectOption +='<option value=\"'+myObj.contactList[i].pk +'\">{{' + myObj.contactList[i].fullName +' }}</option>';
+                  	selectOption +='<option value=\"'+myObj.contactList[i].pk +'\">{{';
+                  	selectOption += myObj.contactList[i].fullName;
+                  	selectOption += ' }}</option>';
                 }
               }
               $('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgContactList]').find('option').remove().end().append(selectOption);
