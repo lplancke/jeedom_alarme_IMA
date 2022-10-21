@@ -3,6 +3,10 @@
 >**IMPORTANT**
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+
+# 21/10/2022
+Ne plus afficher dans la log le corps du retour de l'api IMA si celui-ci n'est pas de type JSON
+
 # 20/10/2022
 Correction bug récupération des tokens IMA
 
