@@ -103,10 +103,17 @@ class imaProtectNewAPI {
       	log::add('alarme_IMA', 'debug', "				==> Response");
       	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
       	//log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
-      	log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
+      	if ($this->isJson($body)) {
+		log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
+	}  
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 		
 		return array($httpRespCode, $body, $header);
+	}
+	
+	private function isJson($inputJson) {
+	   json_decode($inputJson);
+	   return json_last_error() === JSON_ERROR_NONE;
 	}
 	
 	private function getCookiesFromGetRequest($header,$body) {
