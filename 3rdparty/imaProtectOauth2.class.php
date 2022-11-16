@@ -1,54 +1,41 @@
 <?php
-class imaProtectNewAPI {
+if (!class_exists('DTOContext')) {
+	//require_once dirname(__FILE__) . '/../../3rdparty/alarme_IMAAPI.class.php';
+  	require_once __DIR__  . '/DTOContext.class.php';
+}
+
+class imaProtectOauth2 {
 	
-	const BASE_URL='https://www.imaprotect.com/fr/';
+	const ENV='https://api.preprod.ima.eu';
+	const CALLBACK_URL='urn:ietf:wg:oauth:2.0:oob';
+	const AUTH_URL=$ENV.'/imaprotect/oauth2/auth';
+	const ACCESS_TOKEN_URL=$ENV.'/imaprotect/oauth2/token';
+	const RESSOURCE_URL=$ENV.'/remote-control/v2';
+	const HOMES_URL=$ENV.RESSOURCE_URL.'/homes';
+	const DEVICES_URl=$ENV.RESSOURCE_URL.'/homes/%s/devices';
+	const CAPABILITIES=$ENV.RESSOURCE_URL.'/devices/%s/capabilities/%s';
 	
-	private $id;
+	const scope='';
 	
-	//username of ima protect account
-	private $username;
+	/*
+	$cookie=sprintf('Cookie:tr=%s; imainternational=%s; TS013a2ec2=%s', 'REFERER%3Awww.imaprotect.com', $this->imainternational, $this->TS013a2ec2);
+	*/
 	
-	//password of ima protect account
-	private $password;
-  
-  	//private key of contact
-  	private $pkContact;
-	
-	//Expiration date for sessionID
-  	private $expireImaCookie;
-  
-  
-	private $imainternational;
-	
-	//Cookies
-	private $TS013a2ec2;
-	private $TS0192ac0d;
-	
-	//Token for updating status
-	private $statusToken;
-	
-	//Token for get, post and delete pictures
-	private $captureToken;
-	
-	//csrf
-	private $csrfToken;
+
+	private $_dtoContext;
 	
 		
-	public function __construct($username,$password,$pkContact,$id) {
-        log::add('alarme_IMA', 'debug', "			==> constructor of class imaProtectNewAPI - Start");
-		$this->id=$id;
-		$this->username = $username;
-		$this->password = $password;
-      	$this->pkContact= $pkContact;
-		$this->expireImaCookie=null;
-		$this->imainternational=null;
-		$this->TS013a2ec2=null;
-		$this->TS0192ac0d=null;
-		$this->statusToken=null;
-		$this->captureToken=null;
-		$this->csrfToken=null;
+	public function __construct($username,$password,$clientId,$clientSecret) {
+        log::add('alarme_IMA_OAuth2', 'debug', "			==> constructor of class imaProtectOauth2 - Start");
+		
+		$this->_dtoContext= new DTOContext();
+		$_dtoContex->setClientId($clientId);	
+		$_dtoContex->setClientSecret($clientSecret);
+		$_dtoContex->setUsername($username);
+		$_dtoContex->setPassword($password);
+		
+		//serialize($dto)
 	}
-
 
 	public function __destruct()  {
 	
@@ -56,9 +43,9 @@ class imaProtectNewAPI {
    
 	//Execute all https request to Ima protect API
 	private function doRequest($url, $data, $method, $headers) {		
-      	log::add('alarme_IMA', 'debug', "			==> doRequest");
-      	log::add('alarme_IMA', 'debug', "				==> Params : $url | $data | $method | ".json_encode($headers));
-      	log::add('alarme_IMA', 'debug', "				==> Params json input : " . json_encode($data));
+      	log::add('alarme_IMA_OAuth2', 'debug', "			==> doRequest");
+      	log::add('alarme_IMA_OAuth2', 'debug', "				==> Params : $url | $data | $method | ".json_encode($headers));
+      	log::add('alarme_IMA_OAuth2', 'debug', "				==> Params json input : " . json_encode($data));
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL,				$url);
       	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
@@ -100,38 +87,15 @@ class imaProtectNewAPI {
 		//close curl
       	curl_close($curl);
 
-      	log::add('alarme_IMA', 'debug', "				==> Response");
-      	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
-     
-      	if (strpos($body, 'rejected')) {
-          	/*
-          	log::add('alarme_IMA', 'debug', "					# url : $url | $method");
-          	log::add('alarme_IMA', 'debug', "					# headers : ".json_encode($headers));
-          	log::add('alarme_IMA', 'debug', "					# body : $data");
-            */
-          	throw new Exception($this->manageErrorMessage('500','Request was rejected by server -> '.$url));
-        } else {
-			if ($this->isJson($body)) {
-				log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
-			}      	
-
-
-        }
-      	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
+      	log::add('alarme_IMA_OAuth2', 'debug', "				==> Response");
+      	log::add('alarme_IMA_OAuth2', 'debug', "					# Code Http : $httpRespCode");
+      	log::add('alarme_IMA_OAuth2', 'debug', "					# Body  : ".$body);
+      	log::add('alarme_IMA_OAuth2', 'debug', "					# Header  : ".$header);
 		
 		return array($httpRespCode, $body, $header);
 	}
 	
-	private function isJson($inputJson) {
-	   json_decode($inputJson);
-	   return json_last_error() === JSON_ERROR_NONE;
-	}
-	
-	private function isJson($inputJson) {
-	   json_decode($inputJson);
-	   return json_last_error() === JSON_ERROR_NONE;
-	}
-	
+	/*
 	private function getCookiesFromGetRequest($header,$body) {
 		$regExpCsrf='/<input type="hidden" name="_csrf_token"(.*?)value="(.*?)"/ims';
 		$regExpIma='/Set-Cookie: imainternational=(.*?);/ims';
@@ -219,27 +183,23 @@ class imaProtectNewAPI {
 		     	
       	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
 	}
+	*/
 
 	private function setHeaders()   {		
 
-		$headers = array();				
-		//$headers[] ='Host: www.imaprotect.com';
-		//$headers[] ='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
-		//$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
-		//$headers[] ='Accept-Encoding: gzip, deflate, br';
-		//$cookie=sprintf('Cookie: imainternational=%s; TS013a2ec2=%s', $this->imainternational, $this->TS013a2ec2);
-		//$headers[]=$cookie;
+		$headers = array();
+
 		$headers[] ='Host: www.imaprotect.com';
-		$headers[] ='Connection: keep-alive';
-		$headers[] ='Accept: application/json, text/plain, */*';
+		$headers[] ='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
 		$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
 		$headers[] ='Accept-Encoding: gzip, deflate, br';
-		$cookie=sprintf('Cookie: imainternational=%s; TS013a2ec2=%s', $this->imainternational, $this->TS013a2ec2);
+		$cookie=sprintf('Cookie:tr=%s; imainternational=%s; TS013a2ec2=%s', 'REFERER%3Awww.imaprotect.com', $this->imainternational, $this->TS013a2ec2);
 		$headers[]=$cookie;
 		
 		return $headers;
 	}	
 	
+	/*
 	private function gunzip($zipped) {
 		$offset = 0;
 		if (substr($zipped,0,2) == "\x1f\x8b") {
@@ -253,6 +213,7 @@ class imaProtectNewAPI {
 		return "Unknown Format";
 	}	
 
+*/
 	private function setParams($request,$pwd) {			//Set params for https request to Verisure Cloud
 		
 		switch($request)  {
@@ -273,6 +234,24 @@ class imaProtectNewAPI {
 		return $params_string;
     }
 	
+	private function tokenIsValid($tokenExpires){
+		if (isset($tokenExpires)) {
+			$diff=round(strtotime($tokenExpires)-time(),1);
+			if ($diff > 10) {
+				log::add('alarme_IMA_OAuth2', 'debug', "				* sessionID is valid");
+				return true;
+			} else {
+				log::add('alarme_IMA_OAuth2', 'debug', "				* sessionID is expired");
+				return false;
+			}
+		} else {
+			log::add('alarme_IMA_OAuth2', 'debug', "			==> Expiration of sessionID is missing");
+			return false;
+		}
+	}
+	
+	
+	/*
 	private function cookieIsValid($cookieExpiredDate){
 		if (isset($cookieExpiredDate)) {
 			$diff=round(strtotime($cookieExpiredDate)-time(),1);
@@ -288,68 +267,76 @@ class imaProtectNewAPI {
 			return false;
 		}
 	}
-
+	*/
 
 	public function getDatasSession(){
-      	log::add('alarme_IMA', 'debug', "			==> " . __FUNCTION__);
-		if (config::byKey('imaToken_session_'.$this->id, 'alarme_IMA') == '') {
-            log::add('alarme_IMA', 'debug', "			==> No plugin config ... init to call");
+      	log::add('alarme_IMA_OAuth2', 'debug', "			==> " . __FUNCTION__);
+		if (config::byKey('imaOAuth_session', 'alarme_IMA') == '') {
+            log::add('alarme_IMA_OAuth2', 'debug', "			==> No plugin config ... init to call");
 			return false;
         } else {
-			log::add('alarme_IMA', 'debug', '			==> plugin config : '.json_encode(config::byKey('imaToken_session_'.$this->id, 'alarme_IMA')));
-			return self::checkDatasSession(json_encode(config::byKey('imaToken_session_'.$this->id, 'alarme_IMA')));
+			log::add('alarme_IMA_OAuth2', 'debug', '			==> plugin config : '.json_encode(config::byKey('imaOAuth_session', 'alarme_IMA')));
+			return self::checkDatasSession(json_encode(config::byKey('imaOAuth_session', 'alarme_IMA')));
 		}
 	}
 	
 	private function checkDatasSession($datasSession) {
 		if (isset($datasSession)) {
-			log::add('alarme_IMA', 'debug', "			==> Read datas session ... datas $datasSession");
+			log::add('alarme_IMA_OAuth2', 'debug', "			==> Read datas session ... datas $datasSession");
 			$arrayDecode=json_decode($datasSession,true);
 		  
-			//check if temp fil is OK
+		  
+			if (isset($arrayDecode["clientId"])) {
+				$this->clientId= $arrayDecode["clientId"];
+			}
+			
+			if (isset($arrayDecode["clientSecret"])) {
+				$this->clientSecret= $arrayDecode["clientSecret"];
+			}
+			
+			if (isset($arrayDecode["username"])) {
+				$this->username= $arrayDecode["username"];
+			}
+			
+			if (isset($arrayDecode["password"])) {
+				$this->password= $arrayDecode["password"];
+			}
+			
+			if (isset($arrayDecode["accessToken"])) {							
+				$this->accessToken= $arrayDecode["accessToken"];
+			}
+			
+			if (isset($arrayDecode["refresjToken"])) {
+				$this->refresjToken= $arrayDecode["refresjToken"];
+			}
+			
+			if (isset($arrayDecode["tokenExpires"])) {
+				$this->tokenExpires= $arrayDecode["tokenExpires"];
+			}
+			
+			if (isset($arrayDecode["code"])) {
+				$this->code= $arrayDecode["code"];
+			}
+			
+			return $this->tokenIsValid($this->tokenExpires);
+
+			/*
 			if ($this->IsNullOrEmpty($arrayDecode["expireImaCookie"]) || $this->IsNullOrEmpty($arrayDecode["imainternational"]) || $this->IsNullOrEmpty($arrayDecode["TS013a2ec2"]) || $this->IsNullOrEmpty($arrayDecode["TS0192ac0d"]) || $this->IsNullOrEmpty($arrayDecode["statusToken"]) || $this->IsNullOrEmpty($arrayDecode["captureToken"]) || $this->IsNullOrEmpty($arrayDecode["csrfToken"])) {
-			  log::add('alarme_IMA', 'debug', "			==> No all datas read in temporary file !!!");
+			  log::add('alarme_IMA_OAuth2', 'debug', "			==> No all datas read in temporary file !!!");
 			  return false;
 			}
+			*/
 			
-			if (isset($arrayDecode["expireImaCookie"])) {
-				$this->expireImaCookie=$arrayDecode["expireImaCookie"];
-			}
-			
-			if (isset($arrayDecode["imainternational"])) {
-					$this->imainternational=$arrayDecode["imainternational"];
-			}
-			
-			if (isset($arrayDecode["TS013a2ec2"])) {
-					$this->TS013a2ec2=$arrayDecode["TS013a2ec2"];
-			}
-			
-			if (isset($arrayDecode["TS0192ac0d"])) {
-					$this->TS0192ac0d=$arrayDecode["TS0192ac0d"];
-			}
-			
-			if (isset($arrayDecode["statusToken"])) {
-					$this->statusToken=$arrayDecode["statusToken"];
-			}
-			
-			if (isset($arrayDecode["captureToken"])) {
-				$this->captureToken=$arrayDecode["captureToken"];
-			}
-			
-			if (isset($arrayDecode["csrfToken"])) {
-				$this->csrfToken=$arrayDecode["csrfToken"];
-			}
 
-			return $this->cookieIsValid($this->expireImaCookie);
 		} else {
-			log::add('alarme_IMA', 'debug', "			==> No datas read in temporary file !!!");
+			log::add('alarme_IMA_OAuth2', 'debug', "			==> No datas read in temporary file !!!");
 			return false;
 		}
 	}
 	
   
   	private function manageErrorMessage($httpCode,$error) {
-      	log::add('alarme_IMA', 'debug', "			" . __FUNCTION__ . " : " . $error . "|" .$httpCode);
+      	log::add('alarme_IMA_OAuth2', 'debug', "			" . __FUNCTION__ . " : " . $error . "|" .$httpCode);
       	$errorMessage="Unknown error";
 		if (!$this->IsNullOrEmpty($error)) {
 			$errorMessage=str_replace("\"","",$error);
@@ -377,6 +364,7 @@ class imaProtectNewAPI {
     	return (!isset($input) || trim($input)==='');
 	}
   
+  /*
   	private function getHeadersLoginCheck	() {
 		
 		$headers = array();
@@ -389,7 +377,7 @@ class imaProtectNewAPI {
 
       	return $headers;
     }
-  
+
   
 	//Log to IMA Account
 	public function login()  {		
@@ -602,21 +590,21 @@ class imaProtectNewAPI {
 			return $result;
 		}
     }
-  
+    */
+	
 	private function getHeadersPost() {
-      	$headers= array();
 		$headers[] = "Origin: https://www.imaprotect.com";
 		$headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
 		$headers[] = "Accept: application/json, text/plain, */*";
-		$headers[] = "Content-Type:application/json;charset=UTF-8";
-      	$headers[] = "User-Agent:Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36(Win32)";
-		$headers[] = "imainternational: ".$this->imainternational;
-		$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;
-		$headers[] = "TS0192ac0d: ".$this->TS0192ac0d;
+		$headers[] = "Content-Type:application/json";
+		$headers[]="imainternational: ".$this->imainternational;
+		$headers[]="TS013a2ec2: ".$this->TS013a2ec2;
+		$headers[]="TS0192ac0d: ".$this->TS0192ac0d;
 		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
 		return $headers;
 	}
   
+  /*
   	//Delete selected picture
   	public function deletePictures($picture) {
       	log::add('alarme_IMA', 'debug', "			==> deletePictures : $pictureUrl");
@@ -646,11 +634,8 @@ class imaProtectNewAPI {
 	//Get camera snapshot of alarm
 	public function takeSnapshot($roomID) {
       	log::add('alarme_IMA', 'debug', "			==> takeSnapshot : $roomID");
-      
-      	$deviceId=$this->guidv4();
-        list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/token',json_encode(array('device_id' => $deviceId, 'token' => 'dn-NPrfXCqQwV4IFlwQsnZ:APA91bGnu01wxtRLvm54rMiNxsCQxiQnCKfvXInfS8me2AvCgLMjA3tJWZhQb34KEVZZcx2PwQxZasqCtgTFFp_DjxgfPvvYu9bNV_BGTZNM0AX2vHVqa7qBef1gzYTmN8jqMw3paFwy', 'model'=>'Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36(Win32)','subscriptions' => array())), "POST", $this->getHeadersPost());
 
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $deviceId)), "POST", $this->getHeadersPost());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -658,6 +643,7 @@ class imaProtectNewAPI {
 			return $result;
 		}      	
     }
+	*/
 	
 	private function guidv4() {
 		// Generate 16 bytes (128 bits) of random data or use the data passed into the function.

@@ -12,5 +12,6 @@
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
 	"language" : ["fr_FR","en_US","de_DE","sp_SP","ru_RU","id_ID","it_IT"],
+    	"whiteListFolders": ["data/img","data/records"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
 }

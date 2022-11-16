@@ -17,6 +17,48 @@
 
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
+
+$("body").on('click', ".listCmdActionMessage", function() {
+	var el = $(this).closest('.input-group').find('.CmdAction');
+	var type=$(this).attr('data-type');
+	jeedom.cmd.getSelectModal({cmd: {type: type, subType :"message"}}, function (result) {
+		el.value(result.human);
+	});
+});
+
+
+
+
+initialize();
+
+function initialize() {
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').hide();	
+}
+
+	
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgSendMsg]').on('change', function () {
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgSendMsg]').prop("checked")) {
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').show();
+	} else {
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormChangeStatus]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertIntrusion]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').hide();
+	}
+	
+});
+
+
+
 /*
  * Fonction pour l'ajout de commande, appellé automatiquement par plugin.template
  */
@@ -44,6 +86,13 @@ function addCmdToTable(_cmd) {
 		//tr += '   /   ';
 		tr += '<span class="cmdAttr" data-l1key="subType"></span>';
 		tr += '</td>';
+  
+  		tr += '<td>';
+        if (typeof jeeFrontEnd !== 'undefined' && jeeFrontEnd.jeedomVersion !== 'undefined') {
+            tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>';
+            
+    	}
+		tr += '</td>';
 	   
 		tr += '<td>';
 		tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
@@ -66,8 +115,14 @@ function addCmdToTable(_cmd) {
     	$('#table_cmdi tbody tr:last').setValues(_cmd, '.cmdAttr');
     }
   	if (init(_cmd.type) == 'action') {
-    	$('#table_cmda tbody').append(tr);
-    	$('#table_cmda tbody tr:last').setValues(_cmd, '.cmdAttr');
+		if ((_cmd.name).includes("Rafraichir")) {
+			$('#table_cmdr tbody').append(tr);
+			$('#table_cmdr tbody tr:last').setValues(_cmd, '.cmdAttr');
+		} else {
+			$('#table_cmda tbody').append(tr);
+			$('#table_cmda tbody tr:last').setValues(_cmd, '.cmdAttr');
+		}
+
     }
 	//$('#table_cmd tbody').append(tr);
     //$('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
@@ -107,6 +162,9 @@ $('#bt_RemoveDatasSession').on('click',function() {
 function setInstructions() {
   	$('#div_instruction').empty();
 	$('#div_instruction').html('<div class="alert alert-info">'+getInstruction()+'</div>');
+    $('#div_instruction_notification').empty();
+  	$('#div_instruction_notification').html('<div class="alert alert-info">'+getInstructionNotifications()+'</div>');
+
 
 }
 
@@ -135,6 +193,17 @@ function getInstruction() {
   	return instruction;
 }
 
+function getInstructionNotifications() {
+  	var instruction ="<span><u>Gestion des notifications : </u></span>";
+  	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- permet d'activer l'envoi de notification en fonction d'évènements</span>";
+  	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- l'envoi de notification est lié au cron choisi ... il peut donc y avoir un décalage entre l'évènement et l'envoi de la notification</span>";
+
+
+  	return instruction;
+}
+
 
 
 
@@ -157,6 +226,7 @@ function buildContactList(id,pkContact) {
             } else {
               var selectOption;
               var myObj = JSON.parse(JSON.stringify(data.result));
+              
 
               for (i in myObj.contactList) {
                 if (i ==0) {
@@ -172,6 +242,7 @@ function buildContactList(id,pkContact) {
                   	selectOption += ' }}</option>';
                 }
               }
+              console.log(selectOption);
               $('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgContactList]').find('option').remove().end().append(selectOption);
               $('#div_alert').showAlert({message: '{{Synchronisation terminée avec succès}}', level: 'success'});
           }
