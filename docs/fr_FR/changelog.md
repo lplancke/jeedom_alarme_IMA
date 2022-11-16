@@ -6,20 +6,17 @@
 
 # 16/11/2022
 Ajout valorisation et affichage des commandes de type info dans l'onglet des commandes
-
-# 21/10/2022
-Ne plus afficher dans la log le corps du retour de l'api IMA si celui-ci n'est pas de type JSON
-
-# 20/10/2022
-Correction bug récupération des tokens IMA
-
-# 21/11/2021
 Gestion envoi de notification en fonction du journal d'évènement
 
 * activation / désactivation
 * intrusion
 * porte ouverte et alarme activée
 
+# 21/10/2022
+Ne plus afficher dans la log le corps du retour de l'api IMA si celui-ci n'est pas de type JSON
+
+# 20/10/2022
+Correction bug récupération des tokens IMA
 # 08/11/2021
 - Modification gestion des jetons de session (stockage en BDD)
 - possibilité de supprimer les jetons de session (permet de réinitialiser les appels aux api IMA Protect)

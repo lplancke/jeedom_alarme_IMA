@@ -102,7 +102,7 @@ class imaProtectNewAPI {
 
       	log::add('alarme_IMA', 'debug', "				==> Response");
       	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
-      
+     
       	if (strpos($body, 'rejected')) {
           	/*
           	log::add('alarme_IMA', 'debug', "					# url : $url | $method");
@@ -115,10 +115,16 @@ class imaProtectNewAPI {
 				log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
 			}      	
 
+
         }
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 		
 		return array($httpRespCode, $body, $header);
+	}
+	
+	private function isJson($inputJson) {
+	   json_decode($inputJson);
+	   return json_last_error() === JSON_ERROR_NONE;
 	}
 	
 	private function isJson($inputJson) {
