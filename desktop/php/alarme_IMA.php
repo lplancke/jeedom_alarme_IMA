@@ -169,35 +169,52 @@ foreach (jeeObject::all() as $object) {
 </center>
 </legend>
 
-<legend><i class="fas fa-info-circle"></i>  {{Infos}}</legend>
+<legend><i class="fas fa-info"></i>  {{Infos}}</legend>
 	
 	<table id="table_cmdi" class="table table-bordered table-condensed ">
 		<!--<table class="table  tablesorter tablesorter-bootstrap tablesorter hasResizable table-striped hasFilters" id="table_update" style="margin-top: 5px;" role="grid"><colgroup class="tablesorter-colgroup"></colgroup>
 		</table>-->
 		<thead>
 			<tr>
-				<th style="width: 40px;">Id</th>
+				<th style="width: 80px;">Id</th>
 				<th style="width: 280px;">{{Nom}}</th>
-				<th style="width: 100px;">{{Type}}</th>
-				<th style="width: 220px;">{{Options}}</th>
-				<th style="width: 80px;">{{Action}}</th>
-				 
+				<th style="width: 120px;">{{Type}}</th>
+                <th style="">{{Etat}}</th>
+				<th style="width: 280px;">{{Options}}</th>
+				<th style="width: 140px;">{{Action}}</th>
 			</tr>
 		</thead>
 		<tbody></tbody>
 	</table>
 
-	<legend><i class="fas fa-list-alt"></i>  {{Actions}}</legend>
+	<!--<legend><i class="fas fa-list-alt"></i>  {{Actions}}</legend>-->
+	<legend><i class="fas fa-play"></i>  {{Actions}}</legend>
 	<table id="table_cmda" class="table table-bordered table-condensed">
 		
 		<thead>
 			<tr>
-				<th style="width: 40px;">Id</th>
+				<th style="width: 80px;">Id</th>
 				<th style="width: 280px;">{{Nom}}</th>
-				<th style="width: 100px;">{{Type}}</th>
-				<th style="width: 220px;">{{Options}}</th>
-				<th style="width: 80px;">{{Action}}</th>
-				 
+				<th style="width: 120px;">{{Type}}</th>
+                <th style="">{{Etat}}</th>
+				<th style="width: 280px;">{{Options}}</th>
+				<th style="width: 140px;">{{Action}}</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+	
+	<legend><i class="fas fa-sync"></i>  {{Refresh}}</legend>
+	<table id="table_cmdr" class="table table-bordered table-condensed">
+		
+		<thead>
+			<tr>
+				<th style="width: 80px;">Id</th>
+				<th style="width: 280px;">{{Nom}}</th>
+				<th style="width: 120px;">{{Type}}</th>
+                <th style="">{{Etat}}</th>
+				<th style="width: 280px;">{{Options}}</th>
+				<th style="width: 140px;">{{Action}}</th>
 			</tr>
 		</thead>
 		<tbody></tbody>
