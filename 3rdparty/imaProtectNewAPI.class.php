@@ -102,10 +102,20 @@ class imaProtectNewAPI {
 
       	log::add('alarme_IMA', 'debug', "				==> Response");
       	log::add('alarme_IMA', 'debug', "					# Code Http : $httpRespCode");
-      	//log::add('alarme_IMA', 'debug', "					# Response  : ".$resultCurl);
-      	if ($this->isJson($body)) {
-		log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
-	}  
+      
+      	if (strpos($body, 'rejected')) {
+          	/*
+          	log::add('alarme_IMA', 'debug', "					# url : $url | $method");
+          	log::add('alarme_IMA', 'debug', "					# headers : ".json_encode($headers));
+          	log::add('alarme_IMA', 'debug', "					# body : $data");
+            */
+          	throw new Exception($this->manageErrorMessage('500','Request was rejected by server -> '.$url));
+        } else {
+			if ($this->isJson($body)) {
+				log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
+			}      	
+
+        }
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 		
 		return array($httpRespCode, $body, $header);
@@ -136,25 +146,25 @@ class imaProtectNewAPI {
 		if (!$this->IsNullOrEmpty($TS013a2ec2)) {
 			$this->TS013a2ec2=$TS013a2ec2;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie TS013a2ec2 absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login function - Erreur récuperation cookie (TS013a2ec2)'));
 		}
 
 		if(!$this->IsNullOrEmpty($ima)) {
 			$this->imainternational=$ima;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie imainternational absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login function - Erreur récuperation cookie (imainternational)'));
 		}
 		
 		if(!$this->IsNullOrEmpty($expire)) {
 			$this->expireImaCookie=$expire;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie expires imainternational absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login function - Erreur récuperation cookie (expireImaCookie)'));
 		}
 		
 		if(!$this->IsNullOrEmpty($csrf)) {
 			$this->csrfToken=$csrf;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! token csrf absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login function - Erreur récuperation cookie (csrf)'));
 		}	
 		
 		log::add('alarme_IMA', 'debug', '				==> Recover cookies get : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->expireImaCookie.'|'.$this->csrfToken);
@@ -180,25 +190,25 @@ class imaProtectNewAPI {
 		if(!$this->IsNullOrEmpty($TS0192ac0d)) {
 			$this->TS0192ac0d=$TS0192ac0d;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie TS0192ac0d absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login_check function - Erreur récuperation cookie (TS0192ac0d)'));
 		}
 		
 		if(!$this->IsNullOrEmpty($TS013a2ec2)) {
 			$this->TS013a2ec2=$TS013a2ec2;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie TS013a2ec2 absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login_check function - Erreur récuperation cookie (TS013a2ec2)'));
 		}
 		
 		if(!$this->IsNullOrEmpty($ima)) {
 			$this->imainternational=$ima;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie imainternational absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login_check function - Erreur récuperation cookie (imainternational)'));
 		}
 		
 		if(!$this->IsNullOrEmpty($expire)) {
 			$this->expireImaCookie=$expire;
 		} else {
-			throw new Exception($this->manageErrorMessage('500','!!! cookie expires imainternational absent !!!'));
+			throw new Exception($this->manageErrorMessage('500','login_check function - Erreur récuperation cookie (expireImaCookie)'));
 		}
 		     	
       	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
@@ -206,8 +216,13 @@ class imaProtectNewAPI {
 
 	private function setHeaders()   {		
 
-		$headers = array();
-
+		$headers = array();				
+		//$headers[] ='Host: www.imaprotect.com';
+		//$headers[] ='text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9';
+		//$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
+		//$headers[] ='Accept-Encoding: gzip, deflate, br';
+		//$cookie=sprintf('Cookie: imainternational=%s; TS013a2ec2=%s', $this->imainternational, $this->TS013a2ec2);
+		//$headers[]=$cookie;
 		$headers[] ='Host: www.imaprotect.com';
 		$headers[] ='Connection: keep-alive';
 		$headers[] ='Accept: application/json, text/plain, */*';
@@ -338,6 +353,7 @@ class imaProtectNewAPI {
               	if (!$this->IsNullOrEmpty($errorMsg["code"]) and !$this->IsNullOrEmpty($errorMsg["message"]) ) {
 					$errorMsgCode=$errorMsg["code"];
                 	$errorMsgMessage=$errorMsg["message"];
+                  	$errorMessage=$errorMsg["message"] .' - '. $errorMsgCode;
 	              	log::add('alarme_IMA', 'debug', "				==> decode json  : " . $errorMsgCode . "|" . $errorMsgMessage);
                 }
             }
@@ -582,13 +598,15 @@ class imaProtectNewAPI {
     }
   
 	private function getHeadersPost() {
+      	$headers= array();
 		$headers[] = "Origin: https://www.imaprotect.com";
 		$headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
 		$headers[] = "Accept: application/json, text/plain, */*";
-		$headers[] = "Content-Type:application/json";
-		$headers[]="imainternational: ".$this->imainternational;
-		$headers[]="TS013a2ec2: ".$this->TS013a2ec2;
-		$headers[]="TS0192ac0d: ".$this->TS0192ac0d;
+		$headers[] = "Content-Type:application/json;charset=UTF-8";
+      	$headers[] = "User-Agent:Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36(Win32)";
+		$headers[] = "imainternational: ".$this->imainternational;
+		$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;
+		$headers[] = "TS0192ac0d: ".$this->TS0192ac0d;
 		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
 		return $headers;
 	}
@@ -622,8 +640,11 @@ class imaProtectNewAPI {
 	//Get camera snapshot of alarm
 	public function takeSnapshot($roomID) {
       	log::add('alarme_IMA', 'debug', "			==> takeSnapshot : $roomID");
+      
+      	$deviceId=$this->guidv4();
+        list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/token',json_encode(array('device_id' => $deviceId, 'token' => 'dn-NPrfXCqQwV4IFlwQsnZ:APA91bGnu01wxtRLvm54rMiNxsCQxiQnCKfvXInfS8me2AvCgLMjA3tJWZhQb34KEVZZcx2PwQxZasqCtgTFFp_DjxgfPvvYu9bNV_BGTZNM0AX2vHVqa7qBef1gzYTmN8jqMw3paFwy', 'model'=>'Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36(Win32)','subscriptions' => array())), "POST", $this->getHeadersPost());
 
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeadersPost());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/management/capture/new/'.$roomID,json_encode(array('device_id' => $deviceId)), "POST", $this->getHeadersPost());
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
