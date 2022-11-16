@@ -86,6 +86,13 @@ function addCmdToTable(_cmd) {
 		//tr += '   /   ';
 		tr += '<span class="cmdAttr" data-l1key="subType"></span>';
 		tr += '</td>';
+  
+  		tr += '<td>';
+        if (typeof jeeFrontEnd !== 'undefined' && jeeFrontEnd.jeedomVersion !== 'undefined') {
+            tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>';
+            
+    	}
+		tr += '</td>';
 	   
 		tr += '<td>';
 		tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
@@ -108,8 +115,14 @@ function addCmdToTable(_cmd) {
     	$('#table_cmdi tbody tr:last').setValues(_cmd, '.cmdAttr');
     }
   	if (init(_cmd.type) == 'action') {
-    	$('#table_cmda tbody').append(tr);
-    	$('#table_cmda tbody tr:last').setValues(_cmd, '.cmdAttr');
+		if ((_cmd.name).includes("Rafraichir")) {
+			$('#table_cmdr tbody').append(tr);
+			$('#table_cmdr tbody tr:last').setValues(_cmd, '.cmdAttr');
+		} else {
+			$('#table_cmda tbody').append(tr);
+			$('#table_cmda tbody tr:last').setValues(_cmd, '.cmdAttr');
+		}
+
     }
 	//$('#table_cmd tbody').append(tr);
     //$('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
@@ -213,6 +226,7 @@ function buildContactList(id,pkContact) {
             } else {
               var selectOption;
               var myObj = JSON.parse(JSON.stringify(data.result));
+              
 
               for (i in myObj.contactList) {
                 if (i ==0) {
@@ -228,6 +242,7 @@ function buildContactList(id,pkContact) {
                   	selectOption += ' }}</option>';
                 }
               }
+              console.log(selectOption);
               $('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgContactList]').find('option').remove().end().append(selectOption);
               $('#div_alert').showAlert({message: '{{Synchronisation terminée avec succès}}', level: 'success'});
           }
