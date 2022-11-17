@@ -127,11 +127,6 @@ class imaProtectNewAPI {
 	   return json_last_error() === JSON_ERROR_NONE;
 	}
 	
-	private function isJson($inputJson) {
-	   json_decode($inputJson);
-	   return json_last_error() === JSON_ERROR_NONE;
-	}
-	
 	private function getCookiesFromGetRequest($header,$body) {
 		$regExpCsrf='/<input type="hidden" name="_csrf_token"(.*?)value="(.*?)"/ims';
 		$regExpIma='/Set-Cookie: imainternational=(.*?);/ims';
