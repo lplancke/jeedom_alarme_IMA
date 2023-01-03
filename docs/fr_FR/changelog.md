@@ -4,6 +4,9 @@
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+# 03/012023
+- Merge de la branche beta sur la branche Master
+
 # 03/01/2023
 - Correction libellé onglet Notification dans paramétrage d'un équipement
 - Correction bug sur la MAJ des cmds lors de la création d'un nouvel équipement IMA 
