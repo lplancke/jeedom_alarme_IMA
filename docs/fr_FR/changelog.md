@@ -7,9 +7,9 @@
 # 03/01/2023
 - Correction libellé onglet Notification dans paramétrage d'un équipement
 - Correction bug sur la MAJ des cmds lors de la création d'un nouvel équipement IMA 
-* Statut alarme
-* Statut binaire alarme
-* Mode alarme
+   *  Statut alarme
+   *  Statut binaire alarme
+   *  Mode alarme
 
 # 16/11/2022
 Ajout valorisation et affichage des commandes de type info dans l'onglet des commandes
