@@ -590,7 +590,7 @@ class alarme_IMA extends eqLogic {
       
         $bEventsRefreshed=(bool)FALSE;              
 		if (isset($numericStatus) and $numericStatus!=self::IMA_IGNORED)  {
-			if (isset($oldValue) && is_numeric($oldValue)) {
+			if (isset($oldValue) && (is_numeric($oldValue) OR $oldValue =='')) {
 			  if (strcmp($oldValue,$numericStatus) > 0 OR  strcmp($oldValue,$numericStatus) < 0) {
 				log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $numericStatus");
 				$this->checkAndUpdateCmd('statusAlarme', $numericStatus);		
