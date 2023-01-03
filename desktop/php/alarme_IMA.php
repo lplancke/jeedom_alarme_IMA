@@ -60,7 +60,7 @@ foreach ($eqLogics as $eqLogic) {
 	<li role="presentation">
 		<a href="#tabNotifications" aria-controls="home" role="tab" data-toggle="tab">
 			<i class="fas fa-bell"></i> 
-			{{Notifcations}}
+			{{Notifications}}
 		</a>
 	</li>
     <li role="presentation">
