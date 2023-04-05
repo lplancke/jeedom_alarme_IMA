@@ -228,21 +228,21 @@ function buildContactList(id,pkContact) {
               var myObj = JSON.parse(JSON.stringify(data.result));
               
 
-              for (i in myObj.contactList) {
+              for (i in myObj.persons.enabled) {
                 if (i ==0) {
                   	selectOption +='<option value=\"0\">{{}}</option>';
                 }
-                if (pkContact != '' && myObj.contactList[i].pk == pkContact) {
-                  	selectOption +='<option selected value=\"'+myObj.contactList[i].pk +'\">{{' ;
-                  	selectOption += myObj.contactList[i].fullName;
+                if (pkContact != '' && myObj.persons.enabled[i].pk == pkContact) {
+                  	selectOption +='<option selected value=\"'+myObj.persons.enabled[i].pk +'\">{{' ;
+                  	selectOption += myObj.persons.enabled[i].fullName;
                   	selectOption += ' }}</option>';
                 } else {
-                  	selectOption +='<option value=\"'+myObj.contactList[i].pk +'\">{{';
-                  	selectOption += myObj.contactList[i].fullName;
+                  	selectOption +='<option value=\"'+myObj.persons.enabled[i].pk +'\">{{';
+                  	selectOption += myObj.persons.enabled[i].fullName;
                   	selectOption += ' }}</option>';
                 }
               }
-              console.log(selectOption);
+              //console.log(selectOption);
               $('.eqLogicAttr[data-l1key=configuration][data-l2key=cfgContactList]').find('option').remove().end().append(selectOption);
               $('#div_alert').showAlert({message: '{{Synchronisation terminée avec succès}}', level: 'success'});
           }

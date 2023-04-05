@@ -113,9 +113,7 @@ class imaProtectNewAPI {
         } else {
 			if ($this->isJson($body)) {
 				log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
-			}      	
-
-
+			}
         }
       	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
 		
@@ -474,7 +472,7 @@ class imaProtectNewAPI {
 	
 	public function getContactList(){   
 		log::add('alarme_IMA', 'debug', "			==> getContactList ");
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/contact/list',"", "GET",  $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/contract',"", "GET",  $this->setHeaders());
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -540,10 +538,21 @@ class imaProtectNewAPI {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         }
     }
+  
+    private function getContractList() {
+      	log::add('alarme_IMA', 'debug', "			==> getContractList ");
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'client/contract',"", "GET",  $this->setHeaders());
+      
+      	if (isset($httpcode) and $httpcode >= 400 ) {
+          	throw new Exception($this->manageErrorMessage($httpcode,$result));
+        } else {
+      		return json_decode($result,true);
+        }
+    }
       
 	private function checkAlarmPwd($pwd) {
       	$response=$this->getContactList();
-      	foreach($response['contactList'] as $contact) {
+      	foreach($response['persons']['enabled'] as $contact) {
           	if ($contact['pk'] == $this->pkContact) {
               	if ($contact['idCode'] == $pwd){
                   	return true;

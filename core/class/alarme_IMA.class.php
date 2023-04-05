@@ -92,15 +92,15 @@ class alarme_IMA extends eqLogic {
   
   	private function initCache() {
       	//cache::set('alarme_IMA::alarmStatus::'.$this->getId(),1637308809, 0);
-      	if ((cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(microtime(true)) === '') {
+      	if (((cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(microtime(true)) === '') || ((cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(microtime(true)) > time())) {
           	cache::set('alarme_IMA::alarmStatus::'.$this->getId(),time(), 0);
         }
       
-      	if ((cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(microtime(true)) === '') {
+      	if (((cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(microtime(true)) === '') || ((cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(microtime(true)) > time())) {
           	cache::set('alarme_IMA::alarmIntrusion::'.$this->getId(),time(), 0);
         }
       
-      	if ((cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(microtime(true)) === '') {
+      	if (((cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(microtime(true)) === '') || ((cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(microtime(true)) > time())) {
           	cache::set('alarme_IMA::alarmOpenedDoor::'.$this->getId(),time(), 0);
         }
     }
@@ -217,7 +217,6 @@ class alarme_IMA extends eqLogic {
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom 
       public static function cronDayly() {
-
       }
 	*/
 
