@@ -213,19 +213,7 @@ class imaProtectNewAPI {
       	log::add('alarme_IMA', 'debug', '				==> Recover cookies : '. $this->imainternational .'|'. $this->TS013a2ec2 .'|'. $this->TS0192ac0d .'|'.$this->expireImaCookie);
 	}
 
-	private function setHeaders()   {		
-		$headers = array();				
-		$headers[] ='Host: www.imaprotect.com';
-		$headers[] ='Connection: keep-alive';
-		$headers[] ='Accept: application/json, text/plain, */*';
-		$headers[] ='Referer: https://www.imaprotect.com/fr/client/';
-		$headers[] ='Accept-Encoding: gzip, deflate, br';
-		$cookie=sprintf('Cookie: imainternational=%s; TS013a2ec2=%s', $this->imainternational, $this->TS013a2ec2);
-		$headers[]=$cookie;
-		
-		return $headers;
-	}	
-	
+
 	private function gunzip($zipped) {
 		$offset = 0;
 		if (substr($zipped,0,2) == "\x1f\x8b") {
@@ -409,7 +397,7 @@ class imaProtectNewAPI {
 	
 	//Get IMA Tokens for futur actions
 	public function getTokens() {
-      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management',"", "GET", $this->setHeaders());
+      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
 			throw new Exception($result);
@@ -449,7 +437,7 @@ class imaProtectNewAPI {
 		$response='';
 		for ($i = 1; $i <= 3; $i++) {
           	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus - attemp : " . $i);
-			list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',"", "GET",  $this->setHeaders());
+			list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
 
           	if (isset($httpcode) and $httpcode >= 400 ) {
 				throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -469,7 +457,7 @@ class imaProtectNewAPI {
 	
 	public function getContactList(){   
 		log::add('alarme_IMA', 'debug', "			==> getContactList ");
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/contract',"", "GET",  $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/contract',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -483,7 +471,7 @@ class imaProtectNewAPI {
 	public function getOtherInfo() {
 		log::add('alarme_IMA', 'debug', "			==> getOtherInfo ");
 			
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/cameras',"", "GET",  $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/cameras',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -530,7 +518,7 @@ class imaProtectNewAPI {
       	//Check XO code and pwd in input
       	$this->checkAlarmPwd($pwd);
       
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'off','token' => $this->statusToken), "POST", $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'off','token' => $this->statusToken), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         }
@@ -538,7 +526,7 @@ class imaProtectNewAPI {
   
     private function getContractList() {
       	log::add('alarme_IMA', 'debug', "			==> getContractList ");
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/contract',"", "GET",  $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/contract',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -564,7 +552,7 @@ class imaProtectNewAPI {
 	//set alarm to on
 	public function setAlarmToOn() {
       	log::add('alarme_IMA', 'debug', "			==> setAlarmToOn");
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'on','token' => $this->statusToken), "POST", $this->setHeaders());	
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'on','token' => $this->statusToken), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         }
@@ -573,7 +561,7 @@ class imaProtectNewAPI {
 	//Set alarm to partial
 	public function setAlarmToPartial() {
       	log::add('alarme_IMA', 'debug', "			==> setAlarmToPartial");
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'partial','token' => $this->statusToken), "POST", $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',array('status' => 'partial','token' => $this->statusToken), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         }
@@ -582,7 +570,7 @@ class imaProtectNewAPI {
   
 	//Get camera snapshot of alarm
 	public function getCamerasSnapshot() {
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/captureList',"", "GET", $this->setHeaders());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/captureList',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -594,8 +582,8 @@ class imaProtectNewAPI {
   	//Get selected picture
   	public function getPictures($pictureUrl) {
       	log::add('alarme_IMA', 'debug', "			==> getPictures : $pictureUrl");
-		$headers = $this->setHeaders();
-      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.$pictureUrl,"", "GET", $this->setHeaders());
+		
+      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.$pictureUrl,"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -603,37 +591,33 @@ class imaProtectNewAPI {
 			return $result;
 		}
     }
-  
-	private function getHeadersPost() {
-      	$headers= array();
-		$headers[] = "Origin: https://www.imaprotect.com";
-		$headers[] = "Referer: https://www.imaprotect.com/fr/client/management";
-		$headers[] = "Accept: application/json, text/plain, */*";
-		$headers[] = "Content-Type: application/json;charset=UTF-8";
-      	$headers[] = "User-Agent:Mozilla5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36(Win32)";
-		$headers[] = "imainternational: ".$this->imainternational;
-		$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;
-		$headers[] = "TS0192ac0d: ".$this->TS0192ac0d;
-		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
-		return $headers;
-	}
 	
-	private function getHeadersV2($referer,$contentType) {
+	private function getHeaders($referer,$contentType,$origin) {
 		$headers= array();
-		$headers[] = "Origin: https://www.imaprotect.com";
+		$headers[] ='Host: www.imaprotect.com';		
 		$headers[] = "Referer: ".$referer;
 		$headers[] = "Accept: application/json, text/plain, */*";
-		$headers[] = "Content-Type: ".$contentType;
-		$headers[] = "imainternational: ".$this->imainternational;
-		$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;
-		$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
+		$headers[] ='Accept-Encoding: gzip, deflate, br';
+		$headers[] = sprintf('Cookie: TS013a2ec2=%s;imainternational=%s', $this->TS013a2ec2,$this->imainternational);
+
+		if (isset($origin)) {
+			$headers[] = "Origin: " . $origin;
+		}
+
+		if (isset($contentType)) {
+			$headers[] = "Content-Type: ".$contentType;
+		}
+
+		//$headers[] = "imainternational: ".$this->imainternational;
+		//$headers[] = "TS013a2ec2: ".$this->TS013a2ec2;
+		//$headers[] = sprintf('Cookie: TS013a2ec2=%s;TS0192ac0d=%s;imainternational=%s', $this->TS013a2ec2,$this->TS0192ac0d,$this->imainternational);
 		return $headers;
-  }
-  
+  	}
+ 
   	//Delete selected picture
   	public function deletePictures($picture) {
       	log::add('alarme_IMA', 'debug', "			==> deletePictures : $pictureUrl");
-      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/capture/delete/'.$picture,json_encode(array('token' => $this->captureToken)), "POST", $this->getHeadersV2("https://www.imaprotect.com/fr/client/management","application/json;charset=UTF-8"));
+      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/capture/delete/'.$picture,json_encode(array('token' => $this->captureToken)), "POST", $this->getHeaders("https://www.imaprotect.com/fr/client/management","application/json;charset=UTF-8",'https://www.imaprotect.com'));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -645,7 +629,7 @@ class imaProtectNewAPI {
 	//Get alarm events
 	public function getAlarmEvent(){
       	log::add('alarme_IMA', 'debug', "			==> getAlarmEvent ");
-      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/journal',"", "GET", $this->setHeaders());
+      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/journal',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -660,7 +644,7 @@ class imaProtectNewAPI {
 	public function takeSnapshot($roomID) {
       	log::add('alarme_IMA', 'debug', "			==> takeSnapshot : $roomID");
     
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeadersV2("https://www.imaprotect.com/fr/client/management","application/json;charset=UTF-8"));
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/capture/new/'.$roomID,json_encode(array('device_id' => $this->guidv4())), "POST", $this->getHeaders("https://www.imaprotect.com/fr/client/management","application/json;charset=UTF-8",'https://www.imaprotect.com'));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
