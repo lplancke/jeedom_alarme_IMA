@@ -664,7 +664,7 @@ class alarme_IMA extends eqLogic {
 				break;
 			}
         }
-		
+		log::add('alarme_IMA', 'debug',  "		* getLastPictureTaken - response : ".$response);
 		return $response;
 	}
 	
