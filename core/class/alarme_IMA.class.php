@@ -986,7 +986,7 @@ class alarme_IMA extends eqLogic {
   }
 
   private function getLastindexCmd() {		
-		return sizeof($this->getCmd());
+	return sizeof($this->getCmd());
   }
 
 
@@ -999,8 +999,27 @@ class alarme_IMA extends eqLogic {
     	$message="$function => ".$errorMessage;
     	throw new Exception($message);
   }
+  
   public function writeSeparateLine(){
-          	log::add('alarme_IMA', 'debug',  "*********************************************************************");
+		log::add('alarme_IMA', 'debug',  "*********************************************************************");
+  }
+
+  public function buildFilePathImage() {
+	log::add('alarme_IMA', 'debug',  "	* " . __FUNCTION__ );
+	$date = new DateTime();
+	$dateMef=$date->format('Y-m-d H:i:s');
+	$dateMefPicture=$date->format('Y-m-d_H_i_s');
+	$filePath='/var/www/html/plugins/alarme_IMA/data/img/snapshots/';
+	$fileName='snap_alarme_IMA_' .$dateMefPicture .'.jpg';
+	return $filePath.$fileName;
+  }
+
+  public function saveImgToFileSystem($filePath,$base64Image) {
+	log::add('alarme_IMA', 'debug',  "	* " . __FUNCTION__ .' |file path : ' . $filePath);
+	$imageData = base64_decode($base64Image);
+	$source = imagecreatefromstring($imageData);
+	$imageSave = imagejpeg($source,$filePath,100);
+	imagedestroy($source);
   }
   
 	public function toHtml($_version = 'dashboard') {
@@ -1179,10 +1198,20 @@ class alarme_IMACmd extends cmd {
 			$aLogicalId=explode('_',$logicalId);
 			$pk=$aLogicalId[2];
 			$room=$aLogicalId[1];
-			log::add('alarme_IMA', 'debug',  "  * Request snapshot on  : ". $room . ' -> ' . $pk);
+			log::add('alarme_IMA', 'debug',  "  * Request snapshot on  : ". $room . ' -> ' . $pk . '|Notification : ' . $eqlogic->getConfiguration('cfgAlertSnapshot'));
 			$urlImg = $eqlogic->takeSnapshot($pk);
 			$base64Img = $eqlogic->getPictures($urlImg);
 			$eqlogic->checkAndUpdateCmd('cameraSnapshotImage', $base64Img);
+
+			if ($eqlogic->getConfiguration('cfgAlertSnapshot') === '1') {
+				$filePath=$eqlogic->buildFilePathImage();
+				log::add('alarme_IMA', 'debug',  "  	* Save snapshot image to file system : " . $filePath);
+				$eqlogic->saveImgToFileSystem($filePath,$base64Img);								
+				log::add('alarme_IMA', 'debug',  "  	* Execute notification for sending snapshot image");
+				$notifCmd=cmd::byId(str_replace('#','',$alarme_IMA->getConfiguration('cfgCmdSendMsg')));
+				//$options = array('title' => $this->getConfiguration('cfgMsgTitle') . ' : demande de image ' . $room, 'file'=>'');
+				//$notifCmd->execCmd($options, $cache=0);
+			}
 			$eqlogic->writeSeparateLine();		
 		}
 	}
