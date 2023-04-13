@@ -385,7 +385,7 @@ class imaProtectNewAPI {
 	
 	private function loginCheck() {
 		log::add('alarme_IMA', 'debug','		* ' .  __FUNCTION__);
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeadersLoginCheck());
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/login','application/x-www-form-urlencoded','https://www.imaprotect.com'));
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
