@@ -1203,14 +1203,17 @@ class alarme_IMACmd extends cmd {
 			$base64Img = $eqlogic->getPictures($urlImg);
 			$eqlogic->checkAndUpdateCmd('cameraSnapshotImage', $base64Img);
 
-			if ($eqlogic->getConfiguration('cfgAlertSnapshot') === '1') {
+			if ($eqlogic->getConfiguration('cfgAlertSnapshot') === '1' && isset($base64Img)) {
 				$filePath=$eqlogic->buildFilePathImage();
 				log::add('alarme_IMA', 'debug',  "  	* Save snapshot image to file system : " . $filePath);
 				$eqlogic->saveImgToFileSystem($filePath,$base64Img);								
-				log::add('alarme_IMA', 'debug',  "  	* Execute notification for sending snapshot image");
-				$notifCmd=cmd::byId(str_replace('#','',$alarme_IMA->getConfiguration('cfgCmdSendMsg')));
-				//$options = array('title' => $this->getConfiguration('cfgMsgTitle') . ' : demande de image ' . $room, 'file'=>'');
-				//$notifCmd->execCmd($options, $cache=0);
+				
+				$notifCmd=cmd::byId(str_replace('#','',$eqlogic->getConfiguration('cfgCmdSendMsg')));
+				if (is_object($notifCmd)) {
+					log::add('alarme_IMA', 'debug',  "  	* Execute notification for sending snapshot image");
+					$options = array('title' => $eqlogic->getConfiguration('cfgMsgTitle') . ' : demande d\'image pour ' . $room, 'files'=> array($filePath));
+					$notifCmd->execCmd($options, $cache=0);
+				}	
 			}
 			$eqlogic->writeSeparateLine();		
 		}
