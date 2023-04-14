@@ -3,13 +3,13 @@ Description
 Ce plugin permet  : 
 * afficher le statut de votre alarme IMA téléassistance
 * modifier le mode de l'alarme
-+ activer le mode total
-+ activer le mode partiel
-+ desactiver de l'alarme
+	+ activer le mode total
+	+ activer le mode partiel
+	+ desactiver de l'alarme
 * visionner les prises de photos
 * supprimer les prises de photos
 * prendre des snapshots via les cameras IMA
-+ envoyer la photo prise par notification
+	+ envoyer la photo prise par notification
 * consulter la liste des évènements de l'alarme
 * envoyer des notifications en fonction des évènements de l'alarme (envoi lié à la fréquence du cron)
 
