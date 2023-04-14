@@ -1241,7 +1241,7 @@ class alarme_IMACmd extends cmd {
 				$notifCmd=cmd::byId(str_replace('#','',$eqlogic->getConfiguration('cfgCmdSendMsg')));
 				if (is_object($notifCmd)) {
 					log::add('alarme_IMA', 'debug',  "  	* Execute notification for sending snapshot image");
-					$options = array('title' => $eqlogic->getConfiguration('cfgMsgTitle') . ' : demande d\'image pour ' . $room, 'files'=> array($filePath));
+					$options = array('title' => $eqlogic->getConfiguration('cfgMsgTitle') . ' : demande d\'image pour ' . $room,'message' => '', 'files'=> array($filePath));
 					$notifCmd->execCmd($options, $cache=0);
 				}	
 			}
