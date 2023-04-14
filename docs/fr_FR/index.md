@@ -69,10 +69,10 @@ Gestion des notifications en fonction des évènements de l'alarme
 
 - activer les notifications
 - chosissez sur quels évènements vous souhaitez être notifié 
--- Activation / désactivation
--- intrusion
--- ouvrant ouvert et alarme activée
--- demande de snapshot
+	+ Activation / désactivation
+	+ intrusion
+	+ ouvrant ouvert et alarme activée
+	+ demande de snapshot
 - sélectionnez la commande notification utilisée par le plugin pour envoyer la notification
 - choisissez le titre de la notification
 
