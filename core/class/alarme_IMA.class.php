@@ -222,8 +222,7 @@ class alarme_IMA extends eqLogic {
 		log::add('alarme_IMA', 'debug', '	* Suppression snapshot de plus de 10J');
 		
 		//10 days
-		//$threshold = 864000;
-		$threshold = 60;
+		$threshold = 864000;
 		$nbDelete=0;
 		
 		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
