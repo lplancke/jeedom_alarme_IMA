@@ -33,6 +33,8 @@ class alarme_IMA extends eqLogic {
 	const IMA_UNKNOWN=-1;
 	const IMA_IGNORED=-2;
 
+	const SNAPSHOT_PATH='/var/www/html/plugins/alarme_IMA/data/img/snapshots/';
+
   	private function fmt_date($timeStamp) {
 		setlocale(LC_TIME, 'fr_FR.utf8','fra');
 		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
@@ -214,11 +216,37 @@ class alarme_IMA extends eqLogic {
       log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - End');
     }
 
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom 
+    /* Fonction exécutée automatiquement tous les jours par Jeedom */
       public static function cronDayly() {
+		log::add('alarme_IMA', 'debug', 'Exécution du cron daily Alarme IMA - Start');
+		log::add('alarme_IMA', 'debug', '	* Suppression snapshot de plus de 10J');
+		
+		//10 days
+		//$threshold = 864000;
+		$threshold = 60;
+		$nbDelete=0;
+		
+		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
+			$folder=new DirectoryIterator(self::SNAPSHOT_PATH. $alarme_IMA->getId());
+			log::add('alarme_IMA', 'debug',' 	  - équipement Ima Protec traité : ' . $alarme_IMA->getId());
+			log::add('alarme_IMA', 'debug',' 		-> esapce utilisé avant purge : ' . shell_exec('du -sh '. self::SNAPSHOT_PATH. $alarme_IMA->getId()));
+			foreach($folder as $file) {
+			  try {			
+				if($file->isFile() && !$file->isDot() && (time() - $file->getMTime() > $delta)) {
+					log::add('alarme_IMA', 'debug',"			- File : " . self::SNAPSHOT_PATH. $alarme_IMA->getId().'/'.$file->getFilename()  . '| creation date : ' .  $file->getMTime() . '	==> deleted');
+					unlink(self::SNAPSHOT_PATH. $alarme_IMA->getId().'/'.$file->getFilename());
+					$nbDelete++;
+				}
+			  } catch (Exception $e) {
+				$alarme_IMA->manageErrorAPI("cronDayly",'Error on deleteFile function on a file : ' .  $e->getMessage());			  
+			  }
+			}
+			log::add('alarme_IMA', 'debug', ' 		-> Nb fichiers purgés : ' . $nbDelete);
+		}
+
+		log::add('alarme_IMA', 'debug', 'Exécution du cron daily Alarme IMA - End');
       }
-	*/
+	
 
 
     /*     * *********************Méthodes d'instance************************* */
@@ -1004,14 +1032,17 @@ class alarme_IMA extends eqLogic {
 		log::add('alarme_IMA', 'debug',  "*********************************************************************");
   }
 
-  public function buildFilePathImage() {
+  public function buildFilePathImage($id) {
 	log::add('alarme_IMA', 'debug',  "	* " . __FUNCTION__ );
 	$date = new DateTime();
 	$dateMef=$date->format('Y-m-d H:i:s');
 	$dateMefPicture=$date->format('Y-m-d_H_i_s');
-	$filePath='/var/www/html/plugins/alarme_IMA/data/img/snapshots/';
-	$fileName='snap_alarme_IMA_' .$dateMefPicture .'.jpg';
-	return $filePath.$fileName;
+
+	if (!file_exists(self::SNAPSHOT_PATH.$id)) {
+		mkdir(self::SNAPSHOT_PATH.$id, 0777, true);
+	}
+
+	return self::SNAPSHOT_PATH.$id.'/snap_alarme_IMA_' .$dateMefPicture .'.jpg';
   }
 
   public function saveImgToFileSystem($filePath,$base64Image) {
@@ -1204,7 +1235,7 @@ class alarme_IMACmd extends cmd {
 			$eqlogic->checkAndUpdateCmd('cameraSnapshotImage', $base64Img);
 
 			if ($eqlogic->getConfiguration('cfgAlertSnapshot') === '1' && isset($base64Img)) {
-				$filePath=$eqlogic->buildFilePathImage();
+				$filePath=$eqlogic->buildFilePathImage($eqlogic->getId());
 				log::add('alarme_IMA', 'debug',  "  	* Save snapshot image to file system : " . $filePath);
 				$eqlogic->saveImgToFileSystem($filePath,$base64Img);								
 				
