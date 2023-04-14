@@ -33,6 +33,8 @@ class alarme_IMA extends eqLogic {
 	const IMA_UNKNOWN=-1;
 	const IMA_IGNORED=-2;
 
+	const SNAPSHOT_PATH='/var/www/html/plugins/alarme_IMA/data/img/snapshots/';
+
   	private function fmt_date($timeStamp) {
 		setlocale(LC_TIME, 'fr_FR.utf8','fra');
 		return(ucwords(strftime("%a %d %b %T",$timeStamp)));
@@ -214,11 +216,36 @@ class alarme_IMA extends eqLogic {
       log::add('alarme_IMA', 'debug', 'Exécution du cron hourly Alarme IMA - End');
     }
 
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom 
+    /* Fonction exécutée automatiquement tous les jours par Jeedom */
       public static function cronDayly() {
+		log::add('alarme_IMA', 'debug', 'Exécution du cron daily Alarme IMA - Start');
+		log::add('alarme_IMA', 'debug', '	* Suppression snapshot de plus de 10J');
+		
+		//10 days
+		$threshold = 864000;
+		$nbDelete=0;
+		
+		foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
+			$folder=new DirectoryIterator(self::SNAPSHOT_PATH. $alarme_IMA->getId());
+			log::add('alarme_IMA', 'debug',' 	  - équipement Ima Protec traité : ' . $alarme_IMA->getId());
+			log::add('alarme_IMA', 'debug',' 		-> esapce utilisé avant purge : ' . shell_exec('du -sh '. self::SNAPSHOT_PATH. $alarme_IMA->getId()));
+			foreach($folder as $file) {
+			  try {			
+				if($file->isFile() && !$file->isDot() && (time() - $file->getMTime() > $delta)) {
+					log::add('alarme_IMA', 'debug',"			- File : " . self::SNAPSHOT_PATH. $alarme_IMA->getId().'/'.$file->getFilename()  . '| creation date : ' .  $file->getMTime() . '	==> deleted');
+					unlink(self::SNAPSHOT_PATH. $alarme_IMA->getId().'/'.$file->getFilename());
+					$nbDelete++;
+				}
+			  } catch (Exception $e) {
+				$alarme_IMA->manageErrorAPI("cronDayly",'Error on deleteFile function on a file : ' .  $e->getMessage());			  
+			  }
+			}
+			log::add('alarme_IMA', 'debug', ' 		-> Nb fichiers purgés : ' . $nbDelete);
+		}
+
+		log::add('alarme_IMA', 'debug', 'Exécution du cron daily Alarme IMA - End');
       }
-	*/
+	
 
 
     /*     * *********************Méthodes d'instance************************* */
@@ -257,9 +284,9 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setConfiguration("MaxValue", self::IMA_ON);
 			$alarme_IMACmd->setConfiguration("MinValue", self::IMA_UNKNOWN);
 			//$alarme_IMACmd->save();
+			$alarme_IMACmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
-		$alarme_IMACmd->setOrder(1);
 		$alarme_IMACmd->save();
       
       
@@ -278,10 +305,9 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setTemplate('mobile', 'line');
 			$alarme_IMACmd->setIsHistorized(1);
 			$alarme_IMACmd->setDisplay('graphStep', '1');
-			//$alarme_IMACmd->save();
+			$alarme_IMACmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
-		$alarme_IMACmd->setOrder(4);
 		$alarme_IMACmd->save();
       
       	$alarme_IMACmd = $this->getCmd(null, 'alarmState');
@@ -301,11 +327,10 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setDisplay('graphStep', '1');
           	$alarme_IMACmd->setConfiguration("MaxValue", 1);
 			$alarme_IMACmd->setConfiguration("MinValue", 0);
-			//$alarme_IMACmd->save();
+			$alarme_IMACmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
 		$alarme_IMACmd->setOrder(3);
-		$alarme_IMACmd->save();
       
         $alarme_IMACmd = $this->getCmd(null, 'binaryAlarmStatus');
 		if (! is_object($alarme_IMACmd))		{
@@ -324,13 +349,10 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setDisplay('graphStep', '1');
 			$alarme_IMACmd->setConfiguration("MaxValue", 1);
 			$alarme_IMACmd->setConfiguration("MinValue", 0);
-			//$alarme_IMACmd->save();
+			$alarme_IMACmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
-		$alarme_IMACmd->setOrder(2);
-		$alarme_IMACmd->save();
-		
-      
+		$alarme_IMACmd->save();      
       
       	$cmd = $this->getCmd(null, 'alarmeEvents');
 		if (! is_object($cmd))		{
@@ -347,10 +369,9 @@ class alarme_IMA extends eqLogic {
           	$cmd->setConfiguration('cmdsMaked', true);
           	$cmd->setTemplate('dashboard', 'default');
 			$cmd->setTemplate('mobile','default');
-          	//$cmd->save();
+			$cmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmd->getName().' (LogicalId : '.$cmd->getLogicalId().')');
         }
-		$cmd->setOrder(5);
 		$cmd->save();
 
       	$cmd = $this->getCmd(null, 'alarmeEventsBrute');
@@ -368,10 +389,9 @@ class alarme_IMA extends eqLogic {
           	$cmd->setConfiguration('cmdsMaked', true);
           	$cmd->setTemplate('dashboard', 'default');
 			$cmd->setTemplate('mobile','default');
-          	//$cmd->save();
+			$cmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmd->getName().' (LogicalId : '.$cmd->getLogicalId().')');
         }
-		$cmd->setOrder(6);
 		$cmd->save();
 		
       	$cmdCameraSnapshot = $this->getCmd(null, 'cameraSnapshot');
@@ -388,10 +408,9 @@ class alarme_IMA extends eqLogic {
             $cmdCameraSnapshot->setIsHistorized(0);
           	$cmdCameraSnapshot->setTemplate('dashboard', 'default');
 			$cmdCameraSnapshot->setTemplate('mobile','default');
-          	//$cmdCameraSnapshot->save();
+			$cmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdCameraSnapshot->getName().' (LogicalId : '.$cmdCameraSnapshot->getLogicalId().')');
         }
-		$cmdCameraSnapshot->setOrder(7);
 		$cmdCameraSnapshot->save();
       
       	$cmdCameraSnapshotBrute = $this->getCmd(null, 'cameraSnapshotBrute');
@@ -408,10 +427,9 @@ class alarme_IMA extends eqLogic {
             $cmdCameraSnapshotBrute->setIsHistorized(0);
           	$cmdCameraSnapshotBrute->setTemplate('dashboard', 'default');
 			$cmdCameraSnapshotBrute->setTemplate('mobile','default');
-          	//$cmdCameraSnapshotBrute->save();
+			$cmdCameraSnapshotBrute->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdCameraSnapshotBrute->getName().' (LogicalId : '.$cmdCameraSnapshotBrute->getLogicalId().')');
         }
-		$cmdCameraSnapshotBrute->setOrder(8);
 		$cmdCameraSnapshotBrute->save();
       
       	$cmdRefreshAlarmStatus = $this->getCmd(null, 'refreshAlarmeStatus');
@@ -426,10 +444,9 @@ class alarme_IMA extends eqLogic {
           	$cmdRefreshAlarmStatus->setTemplate('dashboard', 'default');
 			$cmdRefreshAlarmStatus->setTemplate('mobile','default');
           	$cmdRefreshAlarmStatus->dontRemoveCmd();
-			//$cmdRefreshAlarmStatus->save();
+			$cmdRefreshAlarmStatus->setOrder($this->getLastindexCmd());
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdRefreshAlarmStatus->getName().' (LogicalId : '.$cmdRefreshAlarmStatus->getLogicalId().')');
 		}
-		$cmdRefreshAlarmStatus->setOrder(9);
 		$cmdRefreshAlarmStatus->save();
       
       	$cmdRefreshCameraSnapshot = $this->getCmd(null, 'refreshCameraSnapshot');
@@ -443,10 +460,9 @@ class alarme_IMA extends eqLogic {
 			$cmdRefreshCameraSnapshot->setSubType('other');
           	$cmdRefreshCameraSnapshot->setTemplate('dashboard', 'default');
 			$cmdRefreshCameraSnapshot->setTemplate('mobile','default');
-			//$cmdRefreshCameraSnapshot->save();
+			$cmdRefreshCameraSnapshot->setOrder($this->getLastindexCmd());
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdRefreshCameraSnapshot->getName().' (LogicalId : '.$cmdRefreshCameraSnapshot->getLogicalId().')');
 		}
-		$cmdRefreshCameraSnapshot->setOrder(10);
 		$cmdRefreshCameraSnapshot->save();
       
 
@@ -461,10 +477,9 @@ class alarme_IMA extends eqLogic {
 			$cmdRefreshEventsAlarm->setSubType('other');
           	$cmdRefreshEventsAlarm->setTemplate('dashboard', 'default');
 			$cmdRefreshEventsAlarm->setTemplate('mobile','default');
-			//$cmdRefreshEventsAlarm->save();
+			$cmdRefreshEventsAlarm->setOrder($this->getLastindexCmd());
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdRefreshEventsAlarm->getName().' (LogicalId : '.$cmdRefreshEventsAlarm->getLogicalId().')');
 		}
-		$cmdRefreshEventsAlarm->setOrder(11);
 		$cmdRefreshEventsAlarm->save();
 	  
       	$cmdActionModeAlarme = $this->getCmd(null, 'setModeAlarme');
@@ -476,15 +491,14 @@ class alarme_IMA extends eqLogic {
           $cmdActionModeAlarme->setLogicalId('setModeAlarme');
           $cmdActionModeAlarme->setType('action');
           $cmdActionModeAlarme->setSubType('message');
+		  $cmdActionModeAlarme->setOrder($this->getLastindexCmd());
           log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdActionModeAlarme->getName().' (LogicalId : '.$cmdActionModeAlarme->getLogicalId().')');
         }
-
-		$cmdActionModeAlarme->setOrder(12);    
+  
 		$cmdActionModeAlarme->setConfiguration('title', '');
 		$cmdActionModeAlarme->setConfiguration('listValue', '');
 		$cmdActionModeAlarme->setDisplay('title_placeholder','Mode alarme');
 		$cmdActionModeAlarme->setDisplay('title_disable', 0);
-		//$cmdActionModeAlarme->setDisplay('title_color', 0);
 		$cmdActionModeAlarme->setDisplay('title_possibility_list', 'on,off,partial');
 		$cmdActionModeAlarme->save();
       
@@ -499,12 +513,30 @@ class alarme_IMA extends eqLogic {
 			$cmdActionScreenshot->setSubType('message');
           	$cmdActionScreenshot->setTemplate('dashboard', 'default');
 			$cmdActionScreenshot->setTemplate('mobile','default');
-			//$cmdActionScreenshot->save();
+			$cmdActionScreenshot->setOrder($this->getLastindexCmd());
 			log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdActionScreenshot->getName().' (LogicalId : '.$cmdActionScreenshot->getLogicalId().')');
 		}
       	$cmdActionScreenshot->setDisplay('title_placeholder','Action sur caméra');
-		$cmdActionScreenshot->setOrder(13);
 		$cmdActionScreenshot->save();
+
+		$cmd = $this->getCmd(null, 'cameraSnapshotImage');
+		if (! is_object($cmd))		{
+          	$cmd = new alarme_IMACmd();
+            $cmd->setName('Dernière image snapshot');
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->setLogicalId('cameraSnapshotImage');
+            $cmd->setUnite('');
+            $cmd->setType('info');
+            $cmd->setSubType('string');
+            $cmd->setIsVisible(1);
+            $cmd->setIsHistorized(0);
+          	$cmd->setTemplate('dashboard', 'default');
+			$cmd->setTemplate('mobile','default');
+			$cmd->setOrder($this->getLastindexCmd());
+          	log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmd->getName().' (LogicalId : '.$cmd->getLogicalId().')');
+        }
+		$cmd->save();
+
 		log::add('alarme_IMA', 'debug',  "Création des commandes - End");
     }
 
@@ -664,7 +696,7 @@ class alarme_IMA extends eqLogic {
 				break;
 			}
         }
-		
+		log::add('alarme_IMA', 'debug',  "		* getLastPictureTaken - response : ".$response);
 		return $response;
 	}
 	
@@ -944,7 +976,12 @@ class alarme_IMA extends eqLogic {
                   }
                   $listValue.= $roomsList[$i]["pk"] . "|" . $roomsList[$i]["room"];
                   $placeholderMessage.=$roomsList[$i]["room"];
+
+				  //create cmd for camera snapshot
+					$this->createCmdActionOther('Snapshot camera '.$roomsList[$i]["room"],$roomsList[$i]["room"],$roomsList[$i]["pk"]);
                 }
+
+				
 			}
 			
 			if ($listValue != '') {
@@ -957,6 +994,28 @@ class alarme_IMA extends eqLogic {
 	  log::add('alarme_IMA', 'debug',  "	* setRoomsList End");
   }
 
+  private function createCmdActionOther($cmdName,$room,$pk) {
+	$cmdActionOther = $this->getCmd(null, 'snapshot_'.$room.'_'.$pk);
+	if (!is_object($cmdActionOther)) {
+		$cmdActionOther = new alarme_IMACmd();
+		$cmdActionOther->setName('Snapshot camera '.$room);
+		$cmdActionOther->setEqLogic_id($this->getId());
+		$cmdActionOther->setLogicalId('snapshot_'.$room.'_'.$pk);
+		$cmdActionOther->setType('action');
+		$cmdActionOther->setSubType('other');
+		$cmdActionOther->setTemplate('dashboard', 'default');
+		$cmdActionOther->setTemplate('mobile','default');
+		$cmdActionOther->setOrder($this->getLastindexCmd());
+		log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdActionOther->getName().' (LogicalId : '.$cmdActionOther->getLogicalId().')');
+	}
+	
+	$cmdActionOther->save();
+  }
+
+  private function getLastindexCmd() {		
+	return sizeof($this->getCmd());
+  }
+
 
   
   private function IsNullOrEmpty($input){
@@ -967,8 +1026,30 @@ class alarme_IMA extends eqLogic {
     	$message="$function => ".$errorMessage;
     	throw new Exception($message);
   }
+  
   public function writeSeparateLine(){
-          	log::add('alarme_IMA', 'debug',  "*********************************************************************");
+		log::add('alarme_IMA', 'debug',  "*********************************************************************");
+  }
+
+  public function buildFilePathImage($id) {
+	log::add('alarme_IMA', 'debug',  "	* " . __FUNCTION__ );
+	$date = new DateTime();
+	$dateMef=$date->format('Y-m-d H:i:s');
+	$dateMefPicture=$date->format('Y-m-d_H_i_s');
+
+	if (!file_exists(self::SNAPSHOT_PATH.$id)) {
+		mkdir(self::SNAPSHOT_PATH.$id, 0777, true);
+	}
+
+	return self::SNAPSHOT_PATH.$id.'/snap_alarme_IMA_' .$dateMefPicture .'.jpg';
+  }
+
+  public function saveImgToFileSystem($filePath,$base64Image) {
+	log::add('alarme_IMA', 'debug',  "	* " . __FUNCTION__ .' |file path : ' . $filePath);
+	$imageData = base64_decode($base64Image);
+	$source = imagecreatefromstring($imageData);
+	$imageSave = imagejpeg($source,$filePath,100);
+	imagedestroy($source);
   }
   
 	public function toHtml($_version = 'dashboard') {
@@ -1086,21 +1167,6 @@ class alarme_IMACmd extends cmd {
             		$eqlogic->writeSeparateLine();
             		log::add('alarme_IMA', 'debug',  "Click on refresh alarm status");
 					$eqlogic->GetAlarmState();
-					/*
-            		$oldValue=$eqlogic->getCmd(null, 'statusAlarme')->execCmd();
-					$newValue = $eqlogic->GetAlarmState();
-            		
-            		if (isset($newValue))  {
-                      	$eqlogic->checkAndUpdateCmd('statusAlarme', $newValue);
-                      	if	(isset($oldValue) && is_numeric($oldValue)) {
-                          if (strcmp($oldValue,$newValue) > 0 OR  strcmp($oldValue,$newValue) < 0) {
-                            log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $newValue");
-                            sleep(3);
-                            $eqlogic->getCmd(null, 'refreshAlarmEvents')->execCmd();
-                          }
-                        }
-                    }
-					*/
             		$eqlogic->writeSeparateLine();
             		break;
           		case 'refreshAlarmEvents':
@@ -1137,7 +1203,7 @@ class alarme_IMACmd extends cmd {
                     break;
           		case 'actionScreenshot':
             		$eqlogic->writeSeparateLine();
-            		log::add('alarme_IMA', 'debug',  "  * Requête title : ".$_options['title'] . " | message : " .$_options['message']);
+            		log::add('alarme_IMA', 'debug',  "  * Request title : ".$_options['title'] . " | message : " .$_options['message']);
             		if (isset($_options['message']) and isset($_options['title'])){
                       	if ($_options['title']=="get") {
 	                      	return $eqlogic->getPictures($_options['message']);
@@ -1146,14 +1212,41 @@ class alarme_IMACmd extends cmd {
                         }  else if ($_options['title']=="take"){
 							return $eqlogic->takeSnapshot($_options['message']);
 						}else {
-                          	log::add('alarme_IMA', 'debug',  "  * Requête non prise en charge : ".$_options['title']);
+                          	log::add('alarme_IMA', 'debug',  "  * Request non prise en charge : ".$_options['title']);
                         }
                     } else {
-                      	log::add('alarme_IMA', 'debug',  "  * Requête non complète => manque title ou message");
+                      	log::add('alarme_IMA', 'debug',  "  * Request non complète => manque title ou message");
                     }
             		$eqlogic->writeSeparateLine();
             		break;
+
+					//manage camera snapshot
+		
         }
+
+		if (strpos($logicalId, 'snapshot') !== false) {
+			$aLogicalId=explode('_',$logicalId);
+			$pk=$aLogicalId[2];
+			$room=$aLogicalId[1];
+			log::add('alarme_IMA', 'debug',  "  * Request snapshot on  : ". $room . ' -> ' . $pk . '|Notification : ' . $eqlogic->getConfiguration('cfgAlertSnapshot'));
+			$urlImg = $eqlogic->takeSnapshot($pk);
+			$base64Img = $eqlogic->getPictures($urlImg);
+			$eqlogic->checkAndUpdateCmd('cameraSnapshotImage', $base64Img);
+
+			if ($eqlogic->getConfiguration('cfgAlertSnapshot') === '1' && isset($base64Img)) {
+				$filePath=$eqlogic->buildFilePathImage($eqlogic->getId());
+				log::add('alarme_IMA', 'debug',  "  	* Save snapshot image to file system : " . $filePath);
+				$eqlogic->saveImgToFileSystem($filePath,$base64Img);								
+				
+				$notifCmd=cmd::byId(str_replace('#','',$eqlogic->getConfiguration('cfgCmdSendMsg')));
+				if (is_object($notifCmd)) {
+					log::add('alarme_IMA', 'debug',  "  	* Execute notification for sending snapshot image");
+					$options = array('title' => $eqlogic->getConfiguration('cfgMsgTitle') . ' : demande d\'image pour ' . $room, 'files'=> array($filePath));
+					$notifCmd->execCmd($options, $cache=0);
+				}	
+			}
+			$eqlogic->writeSeparateLine();		
+		}
 	}
 
 }

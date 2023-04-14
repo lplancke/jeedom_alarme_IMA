@@ -277,6 +277,18 @@ foreach (jeeObject::all() as $object) {
 							</div>
 						</div>
 					</div>
+					<div class="form-group" data-l1key="configuration" data-l2key="cfgFormAlertSnapshot">
+						<label class="col-md-6 control-label">{{Demande de snapshot}}
+							<sup>
+								<i class="fa fa-question-circle tooltips" title="{{Notification avec image lors d'une demande de snapshot}}"></i>
+							</sup>
+						</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgAlertSnapshot"/>
+							</div>
+						</div>
+					</div>
 						</br>
 						</br>
 
