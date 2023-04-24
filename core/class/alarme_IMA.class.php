@@ -183,9 +183,8 @@ class alarme_IMA extends eqLogic {
               
 
               if (self::stringContains($eventType,$event)) {
-                $date=new DateTime($eventDetailV['fields']['creationDatetime']);
-          		$mefDate=$date->format('Y-m-d H:i:s');
-                return array("date" => $mefDate, "timestamp"=> strtotime($mefDate),"event" => $event, "detailEvent" => str_replace("'"," ",$eventDetailV['fields']['subtitle']));
+				$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
+				return array("date" => $mefDate, "timestamp"=> strtotime($mefDate),"event" => $event, "detailEvent" => str_replace("'"," ",$eventDetailV['fields']['subtitle']));
               }
             }
           }	
@@ -794,8 +793,7 @@ class alarme_IMA extends eqLogic {
 					$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
 					$icon=$eventDetailV['fields']['icon'];
 					//$date=str_replace(['T','+01:00'],' ',$eventDetailV['fields']['creationDatetime']);
-                	$date=new DateTime($eventDetailV['fields']['creationDatetime']);
-          			$mefDate=$date->format('Y-m-d H:i:s');
+					$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
 					
 					$alarmeEventTab .=  "<tr>";
 					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
@@ -812,6 +810,18 @@ class alarme_IMA extends eqLogic {
     	//log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End => $alarmeEventTab");
 		log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End");
     	return $alarmeEventTab;
+  }
+
+  private function mefDateTime($dateTime) {
+	try{
+		$date=new DateTime($dateTime);
+		return $date->format('Y-m-d H:i:s');
+	} catch (Exception $e) {
+		log::add('alarme_IMA', 'error',  "  Error on DateTime conversion -> " . $e->getMessage());
+		//force actual date
+		$date = new DateTime();
+		return $date->format('Y-m-d H:i:s');
+	}
   }
 
 	public function removeDatasSession($input) {
