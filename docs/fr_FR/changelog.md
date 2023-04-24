@@ -3,6 +3,9 @@
 >**IMPORTANT**
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+# 24/04/2023
+- correction erreur récurrente sur la covnersion des dates des évènements (DateTime::__construct() error)
+
 # 13/04/2023
 - correction gestion validation token ima protect
 - correction fonction de prise de snapshot
