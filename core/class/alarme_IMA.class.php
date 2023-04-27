@@ -817,7 +817,7 @@ class alarme_IMA extends eqLogic {
 		$date=new DateTime($dateTime);
 		return $date->format('Y-m-d H:i:s');
 	} catch (Exception $e) {
-		log::add('alarme_IMA', 'error',  "  Error on DateTime conversion -> " . $e->getMessage());
+		log::add('alarme_IMA', 'error',  "  Error on DateTime conversion -> " . $e->getMessage() . '('.$dateTime.')');
 		//force actual date
 		$date = new DateTime();
 		return $date->format('Y-m-d H:i:s');
