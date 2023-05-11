@@ -785,29 +785,46 @@ class alarme_IMA extends eqLogic {
 		$alarmeEventTab .= "</thead>";
 		$alarmeEventTab .= "<tbody>";
 
-        foreach($resultArr as $journalK=>$journalV) {
-          foreach($journalV as $eventDateK=>$eventDateV){
-			  
-			  foreach($eventDateV as $eventDetailK=>$eventDetailV){
-					$event=str_replace("'"," ",$eventDetailV['fields']['title']);
-					$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
-					$icon=$eventDetailV['fields']['icon'];
-					//$date=str_replace(['T','+01:00'],' ',$eventDetailV['fields']['creationDatetime']);
-					$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
-					
+		$journal=$resultArr['journal'];
+		foreach($journal as $eventDateK=>$eventDateV){
+			if ($eventDateK != 'error') {				
+				foreach($eventDateV as $eventDetailK=>$eventDetailV){
+					if (array_key_exists('title', $eventDetailV)) {
+						$event='';
+						$icon='';
+						$mefDate='';
+						$detail='';
+						if (array_key_exists('fields', $eventDetailV['title'])) {
+							$event=str_replace("'"," ",$eventDetailV['fields']['title']);
+						}
+
+						if (array_key_exists('fields', $eventDetailV['subtitle'])) {
+							$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
+						}
+
+						if (array_key_exists('fields', $eventDetailV['icon'])) {
+							$icon=$eventDetailV['fields']['icon'];
+						}
+
+						if (array_key_exists('fields', $eventDetailV['creationDatetime'])) {
+							$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
+						}
+					}				
 					$alarmeEventTab .=  "<tr>";
 					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
 					$alarmeEventTab .=  "<td>$mefDate</td>";
 					$alarmeEventTab .=  "<td>$event</td>";
 					$alarmeEventTab .=  "<td>$detail</td>";
 					$alarmeEventTab .=  "</tr>"; 
-			  }
-          }	
-        }
+				}
+			} else {
+				log::add('alarme_IMA', 'debug',  "			* error in response of events journal : " . $eventDateK . ' -> ' . json_encode($eventDateV));
+			}
+		}	
         $alarmeEventTab .=  "</tbody>";
 		$alarmeEventTab .=  "</table>";
     	$alarmeEventTab .=  "</div>";
-    	//log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End => $alarmeEventTab");
+
 		log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End");
     	return $alarmeEventTab;
   }
