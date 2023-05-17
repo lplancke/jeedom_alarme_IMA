@@ -789,24 +789,25 @@ class alarme_IMA extends eqLogic {
 		foreach($journal as $eventDateK=>$eventDateV){
 			if ($eventDateK != 'error') {				
 				foreach($eventDateV as $eventDetailK=>$eventDetailV){
-					if (array_key_exists('title', $eventDetailV)) {
+				foreach($eventDateV as $eventDetailK=>$eventDetailV){
+					if (array_key_exists('title', $eventDetailV['fields'])) {
 						$event='';
 						$icon='';
 						$mefDate='';
 						$detail='';
-						if (array_key_exists('fields', $eventDetailV['title'])) {
+						if (array_key_exists('title', $eventDetailV['fields'])) {
 							$event=str_replace("'"," ",$eventDetailV['fields']['title']);
 						}
 
-						if (array_key_exists('fields', $eventDetailV['subtitle'])) {
+						if (array_key_exists('subtitle', $eventDetailV['fields'])) {
 							$detail=str_replace("'"," ",$eventDetailV['fields']['subtitle']);
 						}
 
-						if (array_key_exists('fields', $eventDetailV['icon'])) {
+						if (array_key_exists('icon', $eventDetailV['fields'])) {
 							$icon=$eventDetailV['fields']['icon'];
 						}
 
-						if (array_key_exists('fields', $eventDetailV['creationDatetime'])) {
+						if (array_key_exists('creationDatetime', $eventDetailV['fields'])) {
 							$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
 						}
 					}				
