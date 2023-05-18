@@ -789,7 +789,6 @@ class alarme_IMA extends eqLogic {
 		foreach($journal as $eventDateK=>$eventDateV){
 			if ($eventDateK != 'error') {				
 				foreach($eventDateV as $eventDetailK=>$eventDetailV){
-				foreach($eventDateV as $eventDetailK=>$eventDetailV){
 					if (array_key_exists('title', $eventDetailV['fields'])) {
 						$event='';
 						$icon='';
@@ -812,7 +811,7 @@ class alarme_IMA extends eqLogic {
 						}
 					}				
 					$alarmeEventTab .=  "<tr>";
-					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"\" style=\"width: 30px\"/</td>";
+					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
 					$alarmeEventTab .=  "<td>$mefDate</td>";
 					$alarmeEventTab .=  "<td>$event</td>";
 					$alarmeEventTab .=  "<td>$detail</td>";
