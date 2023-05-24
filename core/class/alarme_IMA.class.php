@@ -34,6 +34,8 @@ class alarme_IMA extends eqLogic {
 	const IMA_IGNORED=-2;
 
 	const SNAPSHOT_PATH='/var/www/html/plugins/alarme_IMA/data/img/snapshots/';
+	const ICON_PATH='/var/www/html/plugins/alarme_IMA/data/img/icons/';
+	const ACCESS_ICON_PATH='/plugins/alarme_IMA/data/img/icons/';
 
   	private function fmt_date($timeStamp) {
 		setlocale(LC_TIME, 'fr_FR.utf8','fra');
@@ -53,35 +55,7 @@ class alarme_IMA extends eqLogic {
 		            foreach (eqLogic::byType('alarme_IMA', true) as $alarme_IMA) {
                       	
                       	$bEventsRefreshed=(bool)FALSE;
-					
-                      	//$oldValue=$alarme_IMA->getCmd(null, 'statusAlarme')->execCmd();
-						$newValue=$alarme_IMA->GetAlarmState();
-                      /*
-                        if (isset($newValue) and $newValue!=self::IMA_IGNORED)  {
-                            $alarme_IMA->checkAndUpdateCmd('statusAlarme', $newValue);
-                          	if (isset($oldValue) && is_numeric($oldValue)) {
-                              if (strcmp($oldValue,$newValue) > 0 OR  strcmp($oldValue,$newValue) < 0) {
-                                log::add('alarme_IMA', 'debug',  " Le statut de l alarme a change (old|new): $oldValue | $newValue");
-                                $alarme_IMA->getCmd(null, 'refreshAlarmEvents')->execCmd();
-                                $bEventsRefreshed=(bool)TRUE;
-                              } else {
-                                log::add('alarme_IMA', 'debug',  " Le statut de l'alarme n'a pas changé (old|new): $oldValue | $newValue");
-                              }
-                            }
-                        } else {
-                            log::add('alarme_IMA', 'debug', "Retour ignoré");
-                        }
-                      
-                      	
-                      	if ($alarme_IMA->getConfiguration('cfgSendMsg') === '1' and $alarme_IMA->getConfiguration('cfgCmdSendMsg') != '' ) {
-                          	$notifCmd=cmd::byId(str_replace('#','',$alarme_IMA->getConfiguration('cfgCmdSendMsg')));
-                          	if (is_object($notifCmd)) {
-                          		$alarme_IMA->manageNotifications($bEventsRefreshed,$notifCmd);
-                            } else {
-                            }
-                        }
-						*/
-                      	
+						$newValue=$alarme_IMA->GetAlarmState();                    	
                         $alarme_IMA->writeSeparateLine();
                    }
                    
@@ -116,10 +90,7 @@ class alarme_IMA extends eqLogic {
           	$this->getCmd(null, 'refreshAlarmEvents')->execCmd();
         } else {
 			log::add('alarme_IMA', 'debug',  "  ". __FUNCTION__ ." Start");
-			//log::add('alarme_IMA', 'debug', '	- cache alarmStatus : ' . (cache::byKey('alarme_IMA::alarmStatus::'.$this->getId()))->getValue(false));
-			//log::add('alarme_IMA', 'debug',  '	- cache alarmIntrusion : ' . (cache::byKey('alarme_IMA::alarmIntrusion::'.$this->getId()))->getValue(false));
-			//log::add('alarme_IMA', 'debug',  '	- cache alarmOpenedDoor : ' . (cache::byKey('alarme_IMA::alarmOpenedDoor::'.$this->getId()))->getValue(false));
-			
+
 			$eventResponse=$this->getCmd(null, 'alarmeEventsBrute')->execCmd();
 			if ($this->getConfiguration('cfgAlertChangeStatus') === '1') {
               		$this->checkActivity('activ','alarmStatus',$eventResponse,$notifCmd);
@@ -147,7 +118,7 @@ class alarme_IMA extends eqLogic {
       	log::add('alarme_IMA', 'debug', "				=> cache value for " . $cacheName  ." ". $cache);
       	log::add('alarme_IMA', 'debug', "				=> timestamp response  " . $response["timestamp"]);
 
-        if ($response["timestamp"] != '' and ($response["timestamp"] > $cache)) {
+        if (!(is_null($response)) && $response["timestamp"] != '' and ($response["timestamp"] > $cache)) {
           log::add('alarme_IMA', 'debug', '					-> send notif for ' . $activity);
           cache::set('alarme_IMA::'.$cacheName.'::'.$this->getId(),$response["timestamp"], 0);
           
@@ -178,17 +149,25 @@ class alarme_IMA extends eqLogic {
 
         foreach($resultArr as $journalK=>$journalV) {
           foreach($journalV as $eventDateK=>$eventDateV){
-            foreach($eventDateV as $eventDetailK=>$eventDetailV){
-              $event=str_replace("'"," ",$eventDetailV['fields']['title']);
-              
+			if ($eventDateK != 'error') {
+				foreach($eventDateV as $eventDetailK=>$eventDetailV){
+					if (array_key_exists('title', $eventDetailV['fields'])) {
+						$event=str_replace("'"," ",$eventDetailV['fields']['title']);
 
-              if (self::stringContains($eventType,$event)) {
-				$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
-				return array("date" => $mefDate, "timestamp"=> strtotime($mefDate),"event" => $event, "detailEvent" => str_replace("'"," ",$eventDetailV['fields']['subtitle']));
-              }
-            }
+						if (self::stringContains($eventType,$event)) {
+							$mefDate=self::mefDateTime($eventDetailV['fields']['creationDatetime']);
+							return array("date" => $mefDate, "timestamp"=> strtotime($mefDate),"event" => $event, "detailEvent" => str_replace("'"," ",$eventDetailV['fields']['subtitle']));
+						}
+					}
+				            
+
+
+				}
+			}
           }	
-        }	
+        }
+		
+		return NULL;
     }
   
   	private static function stringContains($string_1, $string_2) {
@@ -803,7 +782,7 @@ class alarme_IMA extends eqLogic {
 						}
 
 						if (array_key_exists('icon', $eventDetailV['fields'])) {
-							$icon=$eventDetailV['fields']['icon'];
+							$icon=self::storeAndBuildIcon($eventDetailV['fields']['icon']);
 						}
 
 						if (array_key_exists('creationDatetime', $eventDetailV['fields'])) {
@@ -811,7 +790,7 @@ class alarme_IMA extends eqLogic {
 						}
 					}				
 					$alarmeEventTab .=  "<tr>";
-					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"me\" style=\"width: 30px\"/</td>";
+					$alarmeEventTab .=  "<td><img src=\"$icon\" alt=\"\" style=\"width: 30px\"/</td>";
 					$alarmeEventTab .=  "<td>$mefDate</td>";
 					$alarmeEventTab .=  "<td>$event</td>";
 					$alarmeEventTab .=  "<td>$detail</td>";
@@ -827,6 +806,18 @@ class alarme_IMA extends eqLogic {
 
 		log::add('alarme_IMA', 'debug',  "		* build alarm events tab - End");
     	return $alarmeEventTab;
+  }
+
+  private function storeAndBuildIcon($urlImg) {
+	if (!file_exists(self::ICON_PATH)) {
+		mkdir(self::ICON_PATH, 0777, true);
+	}
+
+	$mefImdName=str_replace(array('https://pilotageadistance.imateleassistance.com/proxy/static/hss/events_v3/'),array(''),$urlImg);
+	file_put_contents(self::ICON_PATH.$mefImdName, file_get_contents($urlImg));
+
+	return network::getNetworkAccess().self::ACCESS_ICON_PATH.$mefImdName;
+	
   }
 
   private function mefDateTime($dateTime) {
