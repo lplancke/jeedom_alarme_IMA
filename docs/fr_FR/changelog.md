@@ -3,6 +3,10 @@
 >**IMPORTANT**
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+# 24/05/2023
+- correction anomalie affichage images / icons évènements dans l'historique des évènements
+- correction anomalie notification et récupération des évènements en erreur (appel IMA)
+
 # 15/05/2023
 - correction erreur récupération du journal des évènements
  
