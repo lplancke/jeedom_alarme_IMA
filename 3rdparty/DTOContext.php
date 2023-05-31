@@ -9,8 +9,6 @@ class DTOContext implements JsonSerializable {
 	protected  $_refreshToken;
   	protected  $_tokenExpires;
 	protected  $_code;
-	
-	
 
 	public function __construct(array $data) {
 		

@@ -1,16 +1,18 @@
 Description
 ===
 Ce plugin permet  : 
-- afficher le statut de votre alarme IMA téléassistance
-- modifier le mode de l'alarme
--- activer le mode total
--- activer le mode partiel
--- desactiver de l'alarme
-- visionner les prises de photos
-- supprimer les prises de photos
-- prendre des snapshots via les cameras IMA
-- consulter la liste des évènements de l'alarme
-- envoyer des notifications en fonction des évènements de l'alarme (envoi lié à la fréquence du cron)
+* afficher le statut de votre alarme IMA téléassistance
+* modifier le mode de l'alarme
+	+ activer le mode total
+	+ activer le mode partiel
+	+ desactiver de l'alarme
+* visionner les prises de photos
+* supprimer les prises de photos
+* prendre des snapshots via les cameras IMA
+	+ envoyer la photo prise par notification
+* consulter la liste des évènements de l'alarme
+* envoyer des notifications en fonction des évènements de l'alarme (envoi lié à la fréquence du cron)
+
 
 
 
@@ -25,6 +27,8 @@ Cron
 Le plugin vous offre la possibilité de choisir le cron de MAJ du statut de l'alarme au travers de la page d'activation du plugin.
 
 Un cron toutes les heures est executé automatiquement pour récupérer l'historique des prises de vue
+
+Un cron tous les jours est executé pour supprimer les snapshots de plus de 10 jours
 
 
 Création de l'alarme
@@ -65,9 +69,10 @@ Gestion des notifications en fonction des évènements de l'alarme
 
 - activer les notifications
 - chosissez sur quels évènements vous souhaitez être notifié 
--- Activation / désactivation
--- intrusion
--- ouvrant ouvert et alarme activée
+	+ Activation / désactivation
+	+ intrusion
+	+ ouvrant ouvert et alarme activée
+	+ demande de snapshot
 - sélectionnez la commande notification utilisée par le plugin pour envoyer la notification
 - choisissez le titre de la notification
 
@@ -147,6 +152,7 @@ Liste des commandes d'un équipement "Alarme_IMA"
 	* Images caméras données brutes : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
 	* Evenements : historique des évènements de l'alarme (format html)
 	* Evenements données brutes  : flux JSON de l'api IMA => permet de traiter l'information comme on le souhaite
+	* Dernière image snapshot : contient l'image en base64 issu de le dernière demande de snapshot d'une commande action caméra spécifique
 
  * commande de type action
 	* Rafraîchir statut caméra : permet de forcer le rafraichissement de l'état d'activatio de l'alarme
@@ -176,6 +182,8 @@ Liste des commandes d'un équipement "Alarme_IMA"
 				* exemple de valeur de configuration : {"listValue":"1870|garage;1871|s\u00e9jour"}
 					* la pk pour la pièce garage est 1870
 					* la pk pour la pièce séjour est 1871
+		* une commande action est générée automatiquement par pièce disposant d'une caméra
+			* nom de la commande : Snapshot camera %nomDeLaPiece%
 
 ![alt text](../images/Alarme_IMA_List_Rooms.JPG "Liste des caméras disponibles")
 
