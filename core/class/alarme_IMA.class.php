@@ -1013,7 +1013,7 @@ class alarme_IMA extends eqLogic {
   }
 
   private function createCmdActionOther($cmdName,$room,$pk) {
-	log::add('alarme_IMA', 'debug',  "	* createCmdActionOther : " . $cmdName . '|' .  $room . '|' . $pk);
+	log::add('alarme_IMA', 'debug',  '	* createCmdActionOther : ' . $cmdName . '|' .  $room . '|' . $pk . ' for id :' . $this->getId());
 	$cmdActionOther = $this->getCmd(null, 'snapshot_'.$room.'_'.$pk);
 	if (!is_object($cmdActionOther)) {
 		$cmdActionOther = new alarme_IMACmd();
@@ -1026,9 +1026,8 @@ class alarme_IMA extends eqLogic {
 		$cmdActionOther->setTemplate('mobile','default');
 		$cmdActionOther->setOrder($this->getLastindexCmd());
 		log::add('alarme_IMA', 'debug', 'Création de la commande '.$cmdActionOther->getName().' (LogicalId : '.$cmdActionOther->getLogicalId().')');
+		$cmdActionOther->save();
 	}
-	
-	$cmdActionOther->save();
   }
 
   private function getLastindexCmd() {		
