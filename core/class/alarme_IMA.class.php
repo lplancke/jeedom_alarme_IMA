@@ -308,7 +308,7 @@ class alarme_IMA extends eqLogic {
 			$alarme_IMACmd->setOrder($this->getLastindexCmd());
           	log::add('alarme_IMA', 'debug', 'Création de la commande '.$alarme_IMACmd->getName().' (LogicalId : '.$alarme_IMACmd->getLogicalId().')');
         }
-		$alarme_IMACmd->setOrder(3);
+		$alarme_IMACmd->save();
       
         $alarme_IMACmd = $this->getCmd(null, 'binaryAlarmStatus');
 		if (! is_object($alarme_IMACmd))		{
