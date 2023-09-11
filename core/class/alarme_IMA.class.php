@@ -1013,6 +1013,7 @@ class alarme_IMA extends eqLogic {
   }
 
   private function createCmdActionOther($cmdName,$room,$pk) {
+	log::add('alarme_IMA', 'debug',  "	* createCmdActionOther : " . $cmdName . '|' .  $room . '|' . $pk);
 	$cmdActionOther = $this->getCmd(null, 'snapshot_'.$room.'_'.$pk);
 	if (!is_object($cmdActionOther)) {
 		$cmdActionOther = new alarme_IMACmd();
