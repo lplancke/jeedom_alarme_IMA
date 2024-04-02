@@ -422,12 +422,11 @@ class imaProtectNewAPI {
 
 	private function retrieveIMATokens($result) {
 		$array = array();
-		preg_match( '/Alarm-status ref="myAlarm" data-token="([^"]*)"/i', $result, $array ) ;
-		$alarmToken=$array[1];
+		preg_match( '/alarm-status token="([^"]*)"/i', $result, $array ) ;
 		$this->statusToken=$array[1];
 						
 		$array = array();
-		preg_match( '/Capture-list ref="myCapture" data-token="([^"]*)"/i', $result, $array ) ;
+		preg_match( '/capture-list token="([^"]*)"/i', $result, $array ) ;
 		$this->captureToken=$array[1];
 	}
 
