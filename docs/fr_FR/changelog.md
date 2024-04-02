@@ -27,6 +27,9 @@
 # 03/012023
 - Merge de la branche beta sur la branche Master
 
+# 03/012023
+- Merge de la branche beta sur la branche Master
+
 # 03/01/2023
 - Correction libellé onglet Notification dans paramétrage d'un équipement
 - Correction bug sur la MAJ des cmds lors de la création d'un nouvel équipement IMA 
