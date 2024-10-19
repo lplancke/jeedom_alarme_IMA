@@ -84,6 +84,13 @@
 				  </div>
 				</div>	
 			</div>
+
+      <div class="pwdAlphanumeric">
+				<input id="tbInputAlpha" type="password" />
+        <div class="line">
+					<button id="btnValidate" class="favorite styled" type="button" onclick="validate('#id#');" style="height:60px;width:188px">VALIDER</button>
+				  </div>
+			</div>
   		</div>
 	</div>
 	
@@ -201,7 +208,13 @@
     });
 	
     $('.off').on('click', function() {
-		showpwd("off");
+      if ('#checkPwdXO#' == '1') {
+        if ('#cfgXOAlpha#' == '1') {
+          showpwdAlphanumeric("off");
+        } else {
+          showpwdNumeric("off");
+        }        
+      }		  
     });
 	
 	jeedom.cmd.update['#cameraSnapshot_id#']({display_value:'#cameraSnapshot#',valueDate:'#valueDate#'});
@@ -227,6 +240,7 @@
       	$('.eqLogic[data-eqLogic_id=' + id +']' + ' .modal').css('display','none');
       	$('.eqLogic[data-eqLogic_id=' + id  +']' +' .itemPreview').attr('src','');
         $('.eqLogic[data-eqLogic_id=' + id +']' +' #tbInput').val('');
+        $('.eqLogic[data-eqLogic_id=' + id +']' +' #tbInputAlpha').val('');
         deleteErrorSpan('#id#');
         var i;
         listeIdTimeOut#uid#.forEach((timeOut, i) => {
@@ -240,7 +254,8 @@
 							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('710px');
 							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('520px');
 							$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
-                            $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+              $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+              $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwdAlphanumeric').hide();
 							
 							$('.eqLogic[data-eqLogic_id=' +id +']' +' .itemPreview').attr('src','data:image/png;base64,' + $Result);
                           }
@@ -328,6 +343,7 @@
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('520px');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+        $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwdAlphanumeric').hide();
 		$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .loader').show();
 		 jeedom.cmd.execute({ id: '#actionScreenshot_id#', value: {'title': 'take', 'message': document.getElementById("room#uid#").value},
                           success:  function($result) {
@@ -342,12 +358,25 @@
   
 
 	
-	function showpwd(action) {
+	function showpwdNumeric(action) {
+      console.log("showpwdNumeric");
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('250px');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('380px');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .itmPreview').hide();
+        $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwdAlphanumeric').hide();
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').show();
+      	load('#id#');
+	}
+
+  function showpwdAlphanumeric(action) {
+    console.log("showpwdAlphanumeric");
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('250px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('150px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .itmPreview').hide();
+        $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwdAlphanumeric').show();
       	load('#id#');
 	}
       
@@ -357,8 +386,15 @@
     }
 
     function del(id) {
-      	var value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
-      	$('.eqLogic[data-eqLogic_id=' +id +']' +' #tbInput').val(value.substr(0, value.length - 1));
+        var value = '';
+        if ('#cfgXOAlpha#' == '1') {
+      	  value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInputAlpha').val();
+          $('.eqLogic[data-eqLogic_id=' +id +']' +' #tbInputAlpha').val(value.substr(0, value.length - 1));
+        } else {
+          value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+          $('.eqLogic[data-eqLogic_id=' +id +']' +' #tbInput').val(value.substr(0, value.length - 1));
+        }
+      	
     }
       
     function load(id) {
@@ -369,15 +405,28 @@
       
     function validate(id) {
       	deleteErrorSpan(id);
-      	console.log("on execute la demande d arret de l alarme : " + '#setModeAlarme_id#');
+        var value = '';
+        if ('#cfgXOAlpha#' == '1') {
+      	  value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInputAlpha').val();
+        } else {
+          value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+        }
+
+      	console.log("on execute la demande d arret de l alarme : " + '#setModeAlarme_id#' + " -> " + value);
       	jeedom.cmd.execute({id: '#setModeAlarme_id#', 
-                            value: {'title': 'off', 'message': $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val()}, 
+                            value: {'title': 'off', 'message': value}, 
                             success: function ($succes) {
                               $('.eqLogic[data-eqLogic_id=' +id +']' +' #closemodalEvent').trigger( "click" );
                             } ,
                             error: function ($error) {
                               console.log("error : " + $error.message);
-                              $('.eqLogic[data-eqLogic_id=' +id +']' +' .pwd').after($error.message);
+
+                              if ('#cfgXOAlpha#' == '1') {
+                                $('.eqLogic[data-eqLogic_id=' +id +']' +' .pwdAlphanumeric').after($error.message);
+                              } else {
+                                $('.eqLogic[data-eqLogic_id=' +id +']' +' .pwd').after($error.message);
+                              }
+                              
                               $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').css('color','red');
                               var width=$('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width() + $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').text().length;
                               $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width(width + 'px');
@@ -601,6 +650,14 @@
 }
 
 .pwd {
+  //background-color: #fefefe;
+  background-color: transparent;
+  margin: auto;
+  padding: 20px;
+  //border: 1px solid #888;
+}
+
+.pwdAlphanumeric {
   //background-color: #fefefe;
   background-color: transparent;
   margin: auto;
