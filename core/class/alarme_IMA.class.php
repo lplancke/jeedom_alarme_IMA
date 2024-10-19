@@ -1142,7 +1142,13 @@ class alarme_IMA extends eqLogic {
 				$replace['#' . $cmd->getLogicalId() . '_listValue#'] = $listOption;
 			}
 		}
-		  
+		 
+		//pass ima option for xo code
+		$replace['#checkPwdXO#'] = $this->getConfiguration('checkPwdXO');
+
+		//pass ima option if xo code is alphanumeric
+		$replace['#cfgXOAlpha#'] = $this->getConfiguration('cfgXOAlpha');
+
       log::add('alarme_IMA', 'debug',  "Function toHtml - Value replace : ".json_encode($replace));	
       $html = template_replace($replace, getTemplate('core', $_version, 'default_alarme_IMA', 'alarme_IMA'));
       cache::set('widgetHtml' . $_version . $this->getId(), $html, 1);

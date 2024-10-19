@@ -91,6 +91,7 @@
 <script>
   	console.log("Entree dans plugin im protect - Statut alarme : " + #statusAlarme# + " | id cmd statut alarme : " + #statusAlarme_id#);
    	console.log("Rooms list : " + '#actionScreenshot_listValue#');
+    console.log("Check XO code : " + '#checkPwdXO#' + " |XO code is alphanumeric ? " + '#cfgXOAlpha#');
                 
   	jeedom.cmd.update['#statusAlarme_id#'] = function(_options) {
       	
