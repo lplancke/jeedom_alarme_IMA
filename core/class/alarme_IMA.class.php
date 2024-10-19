@@ -868,6 +868,12 @@ class alarme_IMA extends eqLogic {
 	try {
 		$myImaProtectAlarm = $this->getInstanceIMAApi();
 	    log::add('alarme_IMA', 'debug',  "	* Extinction alarme");
+
+		$checkPwdXO=$this->getConfiguration('checkPwdXO');
+		if ($checkPwdXO == '1' && empty($pwd)) {
+			$this->manageErrorAPI('setAlarmToOff','Le code XO est nécessaire pour désarmer l\'alarme');		
+		}
+	
 		$myImaProtectAlarm->setAlarmToOff($pwd);
 	} catch (Exception $e) {
 	  $this->manageErrorAPI("setAlarmToOff",$e->getMessage());
@@ -960,9 +966,8 @@ class alarme_IMA extends eqLogic {
   
   private function getInstanceIMAApi(){
     try {
-      	$imaProtectAPI = new imaProtectNewAPI($this->getConfiguration('login_ima'),$this->getConfiguration('password_ima'),$this->getConfiguration('cfgContactList'),$this->getId());
+      	$imaProtectAPI = new imaProtectNewAPI($this->getConfiguration('login_ima'),$this->getConfiguration('password_ima'),$this->getConfiguration('cfgContactList'),$this->getId(),$this->getConfiguration('checkPwdXO'));
 				
-      	//if (!($imaProtectAPI->getContextFromTmpFile())) {
 		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
 			$imaProtectAPI->login();

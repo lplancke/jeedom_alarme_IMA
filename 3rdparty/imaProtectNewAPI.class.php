@@ -13,7 +13,10 @@ class imaProtectNewAPI {
   
   	//private key of contact
   	private $pkContact;
-	
+
+	//check XO code for desarming alarm
+	private $checkPwdXO;
+		
 	//Expiration date for sessionID
   	private $expireImaCookie;
   
@@ -34,12 +37,13 @@ class imaProtectNewAPI {
 	private $csrfToken;
 	
 		
-	public function __construct($username,$password,$pkContact,$id) {
+	public function __construct($username,$password,$pkContact,$id,$checkPwdXO) {
         log::add('alarme_IMA', 'debug', "			==> constructor of class imaProtectNewAPI - Start");
 		$this->id=$id;
 		$this->username = $username;
 		$this->password = $password;
       	$this->pkContact= $pkContact;
+		$this->checkPwdXO = $checkPwdXO;
 		$this->expireImaCookie=null;
 		$this->imainternational=null;
 		$this->TS013a2ec2=null;
@@ -535,17 +539,21 @@ class imaProtectNewAPI {
     }
       
 	private function checkAlarmPwd($pwd) {
-      	$response=$this->getContactList();
-      	foreach($response['persons']['enabled'] as $contact) {
-          	if ($contact['pk'] == $this->pkContact) {
-              	if ($contact['idCode'] == $pwd){
-                  	return true;
-                } else {
-                  	throw new Exception('Le mot de passe est incorrect');
-                }
-            }
-        }
-      	throw new Exception('Le contact n\'est pas présent dans le référentiel des contacts');
+		if ($this->checkPwdXO == '1') {
+			$response=$this->getContactList();
+			foreach($response['persons']['enabled'] as $contact) {
+				if ($contact['pk'] == $this->pkContact) {
+					if ($contact['idCode'] == $pwd){
+						return true;
+				  } else {
+						throw new Exception('Le mot de passe est incorrect');
+				  }
+			  }
+		  }
+			throw new Exception('Le contact n\'est pas présent dans le référentiel des contacts');  
+		} else {
+			log::add('alarme_IMA', 'debug', "				==> XO code not checked for alarm desarming ");
+		}
 	}
 	
 	//set alarm to on
