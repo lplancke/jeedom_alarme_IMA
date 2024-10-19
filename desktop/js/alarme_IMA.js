@@ -37,6 +37,15 @@ function initialize() {
 	$('.form-group[data-l1key=configuration][data-l2key=cfgFormAlertOpenedDoor]').hide();
 	$('.form-group[data-l1key=configuration][data-l2key=cfgFormCmdSendMsg]').hide();
 	$('.form-group[data-l1key=configuration][data-l2key=cfgFormMsgTitle]').hide();	
+	$('.form-group[data-l1key=contactForm]').hide();
+	$('.form-group[data-l1key=configuration][data-l2key=cfgFormCodeXOAlpha]').hide();
+	
+	
+	
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').value() == 1) {
+		$('.form-group[data-l1key=contactForm]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCodeXOAlpha]').show();
+	}
 }
 
 	
@@ -134,13 +143,14 @@ function addCmdToTable(_cmd) {
 
 setInstructions();
 
+
 function printEqLogic(_eqLogic) {
   	//console.log('PrintEqLogic : ' + _eqLogic.id);
   //console.log('conf eqlogic : ' + _eqLogic.configuration['login_ima']);
   //console.log('conf eqlogic : ' + _eqLogic.configuration['cfgContactList']);
   //console.log("json : " + JSON.stringify(_eqLogic));
   
-  if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=login_ima]').value() != '' && $('.eqLogicAttr[data-l1key=configuration][data-l2key=password_ima]').value() !='') {
+  if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=login_ima]').value() != '' && $('.eqLogicAttr[data-l1key=configuration][data-l2key=password_ima]').value() !='' && $('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').value() == 1) {
   	buildContactList($('.eqLogicAttr[data-l1key=id]').value(), _eqLogic.configuration['cfgContactList']);
   }
 };
@@ -156,6 +166,23 @@ $('#bt_RemoveDatasSession').on('click',function() {
 	$('#div_alert').showAlert({message: '{{Suppression données de session en cours}}', level: 'warning'});
   	removeDatasSession(eqid);
 });
+
+
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').on('change', function () {
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').value() == 0) {
+		$('.form-group[data-l1key=contactForm]').hide();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCodeXOAlpha]').hide();
+	}
+	
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').value() == 1) {
+		$('.form-group[data-l1key=contactForm]').show();
+		$('.form-group[data-l1key=configuration][data-l2key=cfgFormCodeXOAlpha]').show();
+		var eqid= $('.eqLogicAttr[data-l1key=id]').value();
+		buildContactList(eqid,'');
+	}
+});
+
+
 
 
 
