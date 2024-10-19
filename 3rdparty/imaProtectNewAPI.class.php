@@ -539,6 +539,7 @@ class imaProtectNewAPI {
     }
       
 	private function checkAlarmPwd($pwd) {
+		log::add('alarme_IMA', 'debug', "checkAlarmPwd -> " . $this->checkPwdXO);
 		if ($this->checkPwdXO == '1') {
 			$response=$this->getContactList();
 			foreach($response['persons']['enabled'] as $contact) {

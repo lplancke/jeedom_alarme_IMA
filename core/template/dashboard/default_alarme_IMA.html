@@ -214,7 +214,9 @@
         } else {
           showpwdNumeric("off");
         }        
-      }		  
+      } else {
+        validate('#id#')
+      }	  
     });
 	
 	jeedom.cmd.update['#cameraSnapshot_id#']({display_value:'#cameraSnapshot#',valueDate:'#valueDate#'});
@@ -402,14 +404,18 @@
 			$('.eqLogic[data-eqLogic_id=' +id +']' +' #btn'+i).val(i);
         }
     }
-      
+    
+    
+
     function validate(id) {
       	deleteErrorSpan(id);
         var value = '';
-        if ('#cfgXOAlpha#' == '1') {
-      	  value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInputAlpha').val();
-        } else {
-          value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+        if ('#checkPwdXO#' == '1') {
+          if ('#cfgXOAlpha#' == '1') {
+            value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInputAlpha').val();
+          } else {
+            value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+          }
         }
 
       	console.log("on execute la demande d arret de l alarme : " + '#setModeAlarme_id#' + " -> " + value);

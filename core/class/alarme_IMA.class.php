@@ -843,7 +843,7 @@ class alarme_IMA extends eqLogic {
     $response='';
 	try {
       	$eqlogic = eqLogic::byId($input);
-      	$imaProtectAPI = new imaProtectNewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input);
+      	$imaProtectAPI = new imaProtectNewAPI($eqlogic->getConfiguration('login_ima'),$eqlogic->getConfiguration('password_ima'),$eqlogic->getConfiguration('cfgContactList'),$input,$eqlogic->getConfiguration('checkPwdXO'));
 		
 		if (!($imaProtectAPI->getDatasSession())) {
 			log::add('alarme_IMA', 'debug',  "	* Validation couple user / mdp");
