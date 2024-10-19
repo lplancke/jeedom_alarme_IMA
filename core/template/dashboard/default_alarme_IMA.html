@@ -58,7 +58,7 @@
 			
 			
 			<div class="pwd">
-				<input id="tbInput" type="password" />
+				<input id="tbInput" type="password" style="width:188px"/>
 				<div id="VirtualKey">
 				  <div class="line">              	
 					<button id="btn1" class="favorite styled" type="button" onclick="input(this);" style="height:60px;width:60px">1</button>
@@ -88,7 +88,7 @@
       <div class="pwdAlphanumeric">
 				<input id="tbInputAlpha" type="password" />
         <div class="line">
-					<button id="btnValidate" class="favorite styled" type="button" onclick="validate('#id#');" style="height:60px;width:188px">VALIDER</button>
+					<button id="btnValidate" class="favorite styled" type="button" onclick="validate('#id#');" style="height:30px;width:170px">VALIDER</button>
 				  </div>
 			</div>
   		</div>
@@ -259,7 +259,7 @@
               $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
               $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwdAlphanumeric').hide();
 							
-							$('.eqLogic[data-eqLogic_id=' +id +']' +' .itemPreview').attr('src','data:image/png;base64,' + $Result);
+							$('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' .itemPreview').attr('src','data:image/png;base64,' + $Result);
                           }
                          });
     }
@@ -374,7 +374,7 @@
   function showpwdAlphanumeric(action) {
     console.log("showpwdAlphanumeric");
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').width('250px');
-      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('150px');
+      	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal-content').height('100px');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .modal').css('display','block');
       	$('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .itmPreview').hide();
         $('.eqLogic[data-eqLogic_id=' +'#id#'+']' + ' .pwd').hide();
@@ -412,9 +412,9 @@
         var value = '';
         if ('#checkPwdXO#' == '1') {
           if ('#cfgXOAlpha#' == '1') {
-            value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInputAlpha').val();
+            value = $('.eqLogic[data-eqLogic_id=' + id +']' +' #tbInputAlpha').val();
           } else {
-            value = $('.eqLogic[data-eqLogic_id=' +'#id#' +']' +' #tbInput').val();
+            value = $('.eqLogic[data-eqLogic_id=' + id +']' +' #tbInput').val();
           }
         }
 

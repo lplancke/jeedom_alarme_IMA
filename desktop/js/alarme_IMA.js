@@ -149,9 +149,11 @@ function printEqLogic(_eqLogic) {
   //console.log('conf eqlogic : ' + _eqLogic.configuration['login_ima']);
   //console.log('conf eqlogic : ' + _eqLogic.configuration['cfgContactList']);
   //console.log("json : " + JSON.stringify(_eqLogic));
+
+  var pkContactList = _eqLogic.configuration['cfgContactList'];
   
   if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=login_ima]').value() != '' && $('.eqLogicAttr[data-l1key=configuration][data-l2key=password_ima]').value() !='' && $('.eqLogicAttr[data-l1key=configuration][data-l2key=checkPwdXO]').value() == 1) {
-  	buildContactList($('.eqLogicAttr[data-l1key=id]').value(), _eqLogic.configuration['cfgContactList']);
+	buildContactList($('.eqLogicAttr[data-l1key=id]').value(), _eqLogic.configuration['cfgContactList']);  	
   }
 };
 
@@ -202,13 +204,16 @@ function getInstruction() {
   	instruction += "</br>";
   	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Saisissez vos login et mot de passe</span>";
   	instruction += "</br>";
-  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Sauvegardez l'équipement</span>";
-  	instruction += "</br>";
-  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Synchronisez les contacts</span>";
+	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Option Validation code XO  : permet de déleguer au plugin, lors du désarmement, le contrôle du code XO du contact séléctionné</span>";
 	instruction += "</br>";
-  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Choisissez le contact</span>";
+	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Option Code XO alphanumérique : permet de préciser le caractère alphanumériquedu code XO (affichage widget IMA)</span>";
+	instruction += "</br>";
+	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Sauvegardez l'équipement</span>";
+	instruction += "</br>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Choisissez le contact (option validation code XO) </span>";
   	instruction += "</br>";
-  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Le choix du contact permet au plugin de contrôler lors de l'arrêt de l'alarme que le code de desactivation passé par l'utilisateur correspond bien à celui du contact (code XO)</span>";
+  	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Le choix du contact permet au plugin de contrôler lors du désarmement que le code de desactivation passé par l'utilisateur correspond bien à celui du contact (code XO)</span>";
   	instruction += "</br>";
   	instruction += "<span>&nbsp;&nbsp;&nbsp;&nbsp;- Sauvegardez l'équipement ... le plugin doit être opérationnel</span>";
 	instruction += "</br>";

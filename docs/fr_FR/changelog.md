@@ -3,6 +3,10 @@
 >**IMPORTANT**
 >
 >Pour rappel s'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+# 19/10/2024
+- ajout d'une option pour déléguer au plugin le controle du code XO du contact séléctionné pour désarmer l'alarme (cocher option Validation code XO)
+- prise en charge d'un code XO alpanumérique (cocher l'option Code XO alphanumerique)
+
 # 02/04/2024
 - correction récupération token ima protect (suite changement IMA)
   
