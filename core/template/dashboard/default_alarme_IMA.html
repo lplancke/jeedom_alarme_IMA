@@ -436,7 +436,12 @@
                               $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').css('color','red');
                               var width=$('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width() + $('.eqLogic[data-eqLogic_id=' +id +']' +' #span_errorMessage').text().length;
                               $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').width(width + 'px');
-                              $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').height('410px');
+
+                              if ('#cfgXOAlpha#' == '1') {
+                                $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').height('180px');
+                              } else {
+                                $('.eqLogic[data-eqLogic_id=' +id +']' +' .modal-content').height('410px');
+                              }
                             } 
                            } 
         );
