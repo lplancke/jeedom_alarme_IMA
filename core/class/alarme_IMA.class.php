@@ -26,7 +26,7 @@ if (!class_exists('imaProtectNewAPI')) {
 }
 
 class alarme_IMA extends eqLogic {
-    /*     * *************************Attributs*****************************cc* */
+    /*     * *************************Attributs****************************** */
 	const IMA_ON=2;
 	const IMA_PARTIAL=1;
 	const IMA_OFF=0;
