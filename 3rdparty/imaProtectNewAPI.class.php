@@ -13,7 +13,10 @@ class imaProtectNewAPI {
   
   	//private key of contact
   	private $pkContact;
-	
+
+	//check XO code for desarming alarm
+	private $checkPwdXO;
+		
 	//Expiration date for sessionID
   	private $expireImaCookie;
   
@@ -34,12 +37,13 @@ class imaProtectNewAPI {
 	private $csrfToken;
 	
 		
-	public function __construct($username,$password,$pkContact,$id) {
+	public function __construct($username,$password,$pkContact,$id,$checkPwdXO) {
         log::add('alarme_IMA', 'debug', "			==> constructor of class imaProtectNewAPI - Start");
 		$this->id=$id;
 		$this->username = $username;
 		$this->password = $password;
       	$this->pkContact= $pkContact;
+		$this->checkPwdXO = $checkPwdXO;
 		$this->expireImaCookie=null;
 		$this->imainternational=null;
 		$this->TS013a2ec2=null;
@@ -377,7 +381,7 @@ class imaProtectNewAPI {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
           	//store cookie from response
-          	$this->getCookiesFromGetRequest($header,$result);
+          	//$this->getCookiesFromGetRequest($header,$result);
 			//get cookie for accessing to ima api
 			$this->loginCheck();
 		}
@@ -436,7 +440,8 @@ class imaProtectNewAPI {
 		$response='';
 		for ($i = 1; $i <= 3; $i++) {
           	log::add('alarme_IMA', 'debug', "			==> getAlarmStatus - attemp : " . $i);
-			list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+			//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/management/',null,null));
+			list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/status.json',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/management/',null,null));
 
           	if (isset($httpcode) and $httpcode >= 400 ) {
 				throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -470,7 +475,8 @@ class imaProtectNewAPI {
 	public function getOtherInfo() {
 		log::add('alarme_IMA', 'debug', "			==> getOtherInfo ");
 			
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/cameras',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+		//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/cameras',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/cameras.json',"", "GET",  $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -535,17 +541,22 @@ class imaProtectNewAPI {
     }
       
 	private function checkAlarmPwd($pwd) {
-      	$response=$this->getContactList();
-      	foreach($response['persons']['enabled'] as $contact) {
-          	if ($contact['pk'] == $this->pkContact) {
-              	if ($contact['idCode'] == $pwd){
-                  	return true;
-                } else {
-                  	throw new Exception('Le mot de passe est incorrect');
-                }
-            }
-        }
-      	throw new Exception('Le contact n\'est pas présent dans le référentiel des contacts');
+		log::add('alarme_IMA', 'debug', "checkAlarmPwd -> " . $this->checkPwdXO);
+		if ($this->checkPwdXO == '1') {
+			$response=$this->getContactList();
+			foreach($response['persons']['enabled'] as $contact) {
+				if ($contact['pk'] == $this->pkContact) {
+					if ($contact['idCode'] == $pwd){
+						return true;
+				  } else {
+						throw new Exception('Le mot de passe est incorrect');
+				  }
+			  }
+		  }
+			throw new Exception('Le contact n\'est pas présent dans le référentiel des contacts');  
+		} else {
+			log::add('alarme_IMA', 'debug', "				==> XO code not checked for alarm desarming ");
+		}
 	}
 	
 	//set alarm to on
@@ -569,7 +580,8 @@ class imaProtectNewAPI {
   
 	//Get camera snapshot of alarm
 	public function getCamerasSnapshot() {
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/captureList',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+		//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/captureList',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/captureList.json',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
@@ -628,7 +640,8 @@ class imaProtectNewAPI {
 	//Get alarm events
 	public function getAlarmEvent(){
       	log::add('alarme_IMA', 'debug', "			==> getAlarmEvent ");
-      	list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/journal',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+      	//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/journal',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/management/journal.json',"", "GET", $this->getHeaders('https://www.imaprotect.com/fr/client/',null,null));
       	
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
