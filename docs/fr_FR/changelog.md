@@ -6,6 +6,10 @@
 
 # 04/03/2025
 - maj suite modification api ImaProtect
+- 
+# 19/10/2024
+- ajout d'une option pour déléguer au plugin le controle du code XO du contact séléctionné pour désarmer l'alarme (cocher option Validation code XO)
+- prise en charge d'un code XO alpanumérique (cocher l'option Code XO alphanumerique)
 
 # 02/04/2024
 - correction récupération token ima protect (suite changement IMA)

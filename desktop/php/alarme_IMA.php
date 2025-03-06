@@ -129,6 +129,27 @@ foreach (jeeObject::all() as $object) {
     </div>
     </br>
 	<div class="form-group">
+        <label class="col-sm-3 control-label">{{Validation code XO}}
+			<sup>
+				<i class="fa fa-question-circle tooltips" title="{{Permet d'activer, lors de la désarmement de l'alarme, un contrôle entre le code saisi et le code XO IMA}}"></i>
+			</sup>
+		</label>
+		<div class="col-sm-5">
+			<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="checkPwdXO"/>
+		</div>
+    </div>
+		<div class="form-group" data-l1key="configuration" data-l2key="cfgFormCodeXOAlpha">
+        <label class="col-sm-3 control-label">{{Code XO alphanumérique}}
+			<sup>
+				<i class="fa fa-question-circle tooltips" title="{{Le code XO est alphanumérique, ex : 830AZ}}"></i>
+			</sup>
+		</label>
+		<div class="col-sm-5">
+			<input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="cfgXOAlpha"/>
+		</div>
+    </div>
+    </br>
+	<div class="form-group" data-l1key="contactForm">
 		<label class="col-sm-3 control-label">{{Contact}}
 			<sup>
 				<i class="fa fa-question-circle tooltips" title="{{Contact utilisé pour le code de validation XO}}"></i>
