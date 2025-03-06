@@ -119,7 +119,7 @@ class imaProtectNewAPI {
 				log::add('alarme_IMA', 'debug', "					# Body  : ".$body);
 			}
         }
-      	log::add('alarme_IMA', 'debug', "					# Header  : ".$header);
+      	log::add('alarme_IMA', 'debug', "					# ChD Header  : ".$header);
 		
 		return array($httpRespCode, $body, $header);
 	}
@@ -140,7 +140,7 @@ class imaProtectNewAPI {
 		
 		$csrf=str_replace(array('\\"','[',']','"',' ',"\n"),'',json_encode($matchCsrf[2]));  
 		$ima=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchIma[1]));
-		$TS013a2ec2=str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchTS[1]));
+		$TS013a2ec2=explode(',',str_replace(array('"','[',']','\\'),array('','','',''),json_encode($matchTS[1])))[0];
 	  
 		$regExexpires='/Set-Cookie: imainternational='.$ima.'; expires=(.*?);/ims';
 		preg_match_all($regExexpires, $header, $matchExpires);
@@ -236,6 +236,9 @@ class imaProtectNewAPI {
 		switch($request)  {
 			case "LOGIN":
 				$params = array( '_username' => $this->username, '_password' => $this->password, '_csrf_token' => $this->csrfToken );
+				break;
+			case "LOGIN_CHECK":
+				$params = array( '_username' => $this->username, '_password' => $this->password, '_csrf_token' => 'csrf-token' );
 				break;
           	case "ALARM_OFF":
             	$params = array('status' => 'off','token' => $this->$statusToken);
@@ -376,20 +379,25 @@ class imaProtectNewAPI {
 	//Log to IMA Account
 	public function login()  {		
 		log::add('alarme_IMA', 'debug','		* ' .  __FUNCTION__);
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login',null, "GET", null);
+		/*
+		//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login',null, "GET", null);
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN_CHECK",null), "POST", null);
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
           	//store cookie from response
-          	//$this->getCookiesFromGetRequest($header,$result);
+          	$this->getCookiesFromGetRequest($header,$result);
 			//get cookie for accessing to ima api
-			$this->loginCheck();
+			//$this->loginCheck();
 		}
+		*/
+		$this->loginCheck();
 	}
 	
 	private function loginCheck() {
 		log::add('alarme_IMA', 'debug','		* ' .  __FUNCTION__);
-		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN",null), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/login','application/x-www-form-urlencoded','https://www.imaprotect.com'));
+		//list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN_CHECK",null), "POST", $this->getHeaders('https://www.imaprotect.com/fr/client/login','application/x-www-form-urlencoded','https://www.imaprotect.com'));
+		list($httpcode, $result, $header) = $this->doRequest(self::BASE_URL.'/fr/client/login_check',$this->setParams("LOGIN_CHECK",null), "POST", null);
       	if (isset($httpcode) and $httpcode >= 400 ) {
           	throw new Exception($this->manageErrorMessage($httpcode,$result));
         } else {
